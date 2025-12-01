@@ -16,8 +16,8 @@
                     @endif
 
                     <!-- Overlay -->
-                    <div class="absolute inset-0 bg-black/40"></div>
-
+                    <div class="absolute inset-0 bg-black/40 {{ $slide['has_content'] ? '' : 'hidden' }}"></div>
+                    
                     <!-- Content -->
                     @if ($slide['has_content'])
                         <div class="absolute inset-0 flex items-center">
@@ -27,20 +27,20 @@
 
                                     @if (!empty($slide['badge']))
                                         <div
-                                            class="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-6">
+                                            class="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-6 font-cambay">
                                             <span class="text-sm font-semibold text-white">{{ $slide['badge'] }}</span>
                                         </div>
                                     @endif
 
                                     @if (!empty($slide['title']))
                                         <h1
-                                            class="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4">
+                                            class="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4 font-quantico">
                                             {!! $slide['title'] !!}
                                         </h1>
                                     @endif
 
                                     @if (!empty($slide['subtitle']))
-                                        <p class="text-xl md:text-2xl text-white/90 leading-relaxed mb-8">
+                                        <p class="text-xl md:text-2xl text-white/90 leading-relaxed mb-8 font-cambay">
                                             {{ $slide['subtitle'] }}
                                         </p>
                                     @endif
@@ -50,7 +50,7 @@
                                             class="flex flex-col sm:flex-row gap-4 {{ $slide['content_position'] === 'center' ? 'justify-center' : ($slide['content_position'] === 'right' ? 'justify-end' : 'justify-start') }}">
                                             @foreach ($slide['cta_buttons'] as $button)
                                                 <a href="{{ $button['url'] }}"
-                                                    class="{{ $button['type'] === 'primary' ? 'bg-accent hover:bg-accent/90 text-white' : 'border-2 border-white hover:bg-white hover:text-primary text-white' }} px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                                                    class="{{ $button['type'] === 'primary' ? 'bg-accent hover:bg-accent/90 text-white' : 'border-2 border-white hover:bg-white hover:text-primary text-white' }} px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-quantico">
                                                     {{ $button['text'] }}
                                                 </a>
                                             @endforeach
@@ -64,32 +64,10 @@
             @endforeach
         </div>
 
-        <!-- Navigation Buttons -->
-        <div
-            class="swiper-button-next text-white after:content-[''] w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mr-4">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-        </div>
-        <div
-            class="swiper-button-prev text-white after:content-[''] w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center ml-4">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-            </svg>
-        </div>
-
         <!-- Pagination -->
         <div class="swiper-pagination !bottom-8"></div>
 
-        <!-- Scroll Down Indicator -->
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10">
-            <div class="animate-bounce cursor-pointer" onclick="scrollToContent()">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-                </svg>
-            </div>
-        </div>
+
     </div>
 </section>
 <script>
@@ -105,10 +83,7 @@
             fadeEffect: {
                 crossFade: true
             },
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
+            navigation: false,
             pagination: {
                 el: '.swiper-pagination',
                 clickable: true,
@@ -129,24 +104,4 @@
             }
         });
     });
-
-    function scrollToContent() {
-        document.querySelector('#content-section')?.scrollIntoView({
-            behavior: 'smooth'
-        });
-    }
 </script>
-
-<style>
-    .swiper-pagination-bullet-active {
-        background: #ffffff !important;
-        transform: scale(1.2);
-    }
-    .swiper-slide {
-        text-align: center;
-        font-size: 18px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-</style>

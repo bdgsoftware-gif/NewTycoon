@@ -11,34 +11,59 @@
             - @yield('title')
         @endif
     </title>
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Cambay:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Quantico:ital,wght@0,400;0,700;1,400;1,700&display=swap"
         rel="stylesheet">
-
-    <!-- Styles / Scripts -->
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Core Styles -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
-    <!-- Push Styles & Scripts -->
+
+    <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css" />
 
-    <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
+    <!-- Additional Head Scripts & Styles -->
     @stack('head-scripts')
     @stack('styles')
+    <style>
+        .swiper {
+            width: 100%;
+            height: 100%;
+        }
+
+        .swiper-slide {
+            height: auto;
+        }
+
+        .swiper-button-disabled {
+            opacity: 0.3 !important;
+            cursor: not-allowed !important;
+        }
+    </style>
 </head>
 
 <body class="font-sans antialiased bg-white">
     <div class="min-h-screen mx-auto max-w-full">
         @include('frontend.partials.navbar')
-        @yield('content')
-        @include('frontend.partials.footer')
+
+        <main>
+            @yield('content')
+        </main>
+
+        {{-- @include('frontend.partials.footer') --}}
     </div>
 
-    @stack('scripts')
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
 
+    <!-- Additional Scripts -->
+    @stack('scripts')
 </body>
 
 </html>

@@ -13,26 +13,26 @@ class FooterController extends Controller
         $columns = [
             [
                 'title' => 'Information',
-                'links' => ['History', 'Careers', 'Press And Media', 'Brand Partners', 'Affiliates'],
+                'links' => ['About Us', 'Careers', 'Press & Media', 'Brand Partners', 'Affiliates'],
             ],
             [
-                'title' => 'Useful Links',
-                'links' => ['Partner Program', 'Affiliate Program', 'App Developers', 'Investors', 'Recent Blogs', 'Contact Us'],
+                'title' => 'Customer Service',
+                'links' => ['Contact Us', 'Shipping Info', 'Returns', 'Size Guide', 'FAQ'],
             ],
             [
-                'title' => 'Resources',
-                'links' => ['Privacy Policy', 'Shipping Policy', 'Refund Polices', 'Delivery Terms', 'Terms & Condition'],
+                'title' => 'Legal',
+                'links' => ['Privacy Policy', 'Terms of Service', 'Shipping Policy', 'Refund Policy', 'Cookie Policy'],
             ],
             [
-                'title' => 'Support',
-                'links' => ['Shop E-Scooters', 'Sustainability', 'Warranty Information', 'Product Registration', 'User Manuals'],
+                'title' => 'Shop',
+                'links' => ['New Arrivals', 'Best Sellers', 'Sale', 'Gift Cards', 'Store Locator'],
             ],
         ];
 
         $brand = [
             'name' => 'TYCOON',
-            'description' => 'Donec lobortis varius est. Nulla ullamcorper sapien bibendum erat ornare congue. Sed tempus elementum ex convallis bibendum.',
-            'productImage' => 'https://cdn.pixabay.com/photo/2022/09/21/17/36/vr-7470787_1280.png',
+            'description' => 'Your premier destination for cutting-edge technology and electronics. We bring you the latest innovations with exceptional quality and service.',
+            'productImage' => 'images/footer-product.png', // Use your local image path
         ];
 
         $payments = [
