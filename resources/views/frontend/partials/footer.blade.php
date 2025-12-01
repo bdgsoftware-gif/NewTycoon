@@ -96,7 +96,8 @@
                     offers, and tech news.</p>
                 <div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto font-quantico">
                     <input type="email" placeholder="Enter your email"
-                        class="flex-1 px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-primary transition-colors font-quantico">
+                        class="flex-1 px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-400
+         focus:outline-none focus:ring-0 focus:border-primary transition-colors font-quantico" />
                     <button
                         class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-red-600 transition-colors font-semibold whitespace-nowrap">
                         Subscribe

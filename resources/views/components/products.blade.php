@@ -14,9 +14,9 @@
                     class="group bg-white rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl relative">
                     <!-- Product Image with Overlay -->
                     <a href="{{ route('product.details', $product['slug']) }}" class="block relative">
-                        <div class="relative w-full h-80 overflow-hidden bg-gray-100">
-                            <img src="{{ asset($product['images'][0]) }}" alt="{{ $product['name'] }}"
-                                class="w-full h-full object-cover transition-all duration-500 group-hover:scale-105" />
+                        <div class="relative w-full aspect-square bg-gray-100 overflow-hidden">
+                            <img src="{{ asset($product['images'][0]) }}"
+                                class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105">
 
                             <!-- Product Badges -->
                             @if ($product['is_new'])

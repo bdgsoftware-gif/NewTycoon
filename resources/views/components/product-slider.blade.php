@@ -1,7 +1,7 @@
 <!-- resources/views/components/product-slider.blade.php -->
 <section class="max-w-8xl mx-auto px-4 py-12" data-slider-section="{{ $sliderId }}">
     <!-- Debug: Check all products are being passed -->
-    <div class="">
+    <div class="hidden">
         <p>Total Products: {{ count($slidingProducts) }}</p>
         <p>Slides Per View: {{ $slidesPerView }}</p>
         @foreach ($slidingProducts as $index => $product)
@@ -39,7 +39,7 @@
         <div class="swiper swiper-{{ $sliderId }} relative">
             <div class="swiper-wrapper">
                 @foreach ($slidingProducts as $product)
-                    <div class="swiper-slide h-auto">
+                    <div class="swiper-slide !h-auto">
                         @if ($cardStyle === 'minimal')
                             @include('components.product-cards.minimal', ['product' => $product])
                         @elseif($cardStyle === 'elegant')

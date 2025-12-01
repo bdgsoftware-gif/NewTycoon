@@ -315,7 +315,75 @@ class HomeController extends Controller
                 'rating' => 4.6,
                 'review_count' => 167,
                 'description' => 'High-performance gaming laptop with RTX graphics.'
-            ]
+            ],
+            [
+                'id' => 5,
+                'name' => '4K Action Camera',
+                'slug' => '4k-action-camera',
+                'images' => [
+                    'images/products/default1.png',
+                    'images/products/default2.png'
+                ],
+                'original_price' => 399.99,
+                'discounted_price' => 319.99,
+                'discount_percentage' => 20,
+                'in_stock' => true,
+                'is_new' => true,
+                'rating' => 4.4,
+                'review_count' => 54,
+                'description' => 'Compact 4K action camera for durable, high-quality footage.'
+            ],
+            [
+                'id' => 6,
+                'name' => 'Noise-Cancelling Wireless Earbuds',
+                'slug' => 'noise-cancelling-wireless-earbuds',
+                'images' => [
+                    'images/products/default1.png',
+                    'images/products/default2.png'
+                ],
+                'original_price' => 149.99,
+                'discounted_price' => 99.99,
+                'discount_percentage' => 33,
+                'in_stock' => true,
+                'is_new' => false,
+                'rating' => 4.1,
+                'review_count' => 76,
+                'description' => 'Pocket-sized earbuds with active noise cancellation.'
+            ],
+            [
+                'id' => 7,
+                'name' => 'Smart Home Speaker',
+                'slug' => 'smart-home-speaker',
+                'images' => [
+                    'images/products/default1.png',
+                    'images/products/default2.png'
+                ],
+                'original_price' => 99.99,
+                'discounted_price' => 69.99,
+                'discount_percentage' => 30,
+                'in_stock' => true,
+                'is_new' => true,
+                'rating' => 4.3,
+                'review_count' => 142,
+                'description' => 'Voice-controlled smart speaker with crisp audio.'
+            ],
+            [
+                'id' => 8,
+                'name' => '4K Ultra HD Monitor 27"',
+                'slug' => '4k-ultra-hd-monitor-27',
+                'images' => [
+                    'images/products/default1.png',
+                    'images/products/default2.png'
+                ],
+                'original_price' => 349.99,
+                'discounted_price' => 299.99,
+                'discount_percentage' => 14,
+                'in_stock' => true,
+                'is_new' => false,
+                'rating' => 4.5,
+                'review_count' => 66,
+                'description' => 'Crisp 4K display with vibrant colors and wide viewing angles.'
+            ],
         ];
     }
 
@@ -355,8 +423,8 @@ class HomeController extends Controller
         return [
             [
                 'id' => 1,
-                'name' => 'Wireless Bluetooth Headphones 5',
-                'slug' => 'wireless-bluetooth-headphones-5', // Fixed: removed space, added hyphen
+                'name' => 'Wireless Bluetooth Headphones',
+                'slug' => 'wireless-bluetooth-headphones-5',
                 'images' => [
                     'images/products/default1.png',
                     'images/products/default2.png'
@@ -369,7 +437,7 @@ class HomeController extends Controller
             ],
             [
                 'id' => 2,
-                'name' => 'Smart Fitness Watch Series 5',
+                'name' => 'Smart Fitness Watch Series',
                 'slug' => 'smart-fitness-watch-series-5',
                 'images' => [
                     'images/products/default1.png',
@@ -412,7 +480,7 @@ class HomeController extends Controller
             [
                 'id' => 5,
                 'name' => 'Wireless Bluetooth Headphones',
-                'slug' => 'wireless-bluetooth-headphones', // Different from first
+                'slug' => 'wireless-bluetooth-headphones',
                 'images' => [
                     'images/products/default1.png',
                     'images/products/default2.png'
@@ -425,8 +493,8 @@ class HomeController extends Controller
             ],
             [
                 'id' => 6,
-                'name' => 'Smart Fitness Watch Series 6', // Changed name
-                'slug' => 'smart-fitness-watch-series-6', // Different slug
+                'name' => 'Smart Fitness Watch Series 6',
+                'slug' => 'smart-fitness-watch-series-6',
                 'images' => [
                     'images/products/default1.png',
                     'images/products/default2.png'
@@ -439,8 +507,8 @@ class HomeController extends Controller
             ],
             [
                 'id' => 7,
-                'name' => 'Professional DSLR Camera Kit', // Changed name
-                'slug' => 'professional-dslr-camera-kit', // Different slug
+                'name' => 'Professional DSLR Camera Kit',
+                'slug' => 'professional-dslr-camera-kit',
                 'images' => [
                     'images/products/default1.png',
                     'images/products/default2.png'
@@ -453,8 +521,8 @@ class HomeController extends Controller
             ],
             [
                 'id' => 8,
-                'name' => 'Gaming Laptop Pro Max', // Changed name
-                'slug' => 'gaming-laptop-pro-max', // Different slug
+                'name' => 'Gaming Laptop Pro Max',
+                'slug' => 'gaming-laptop-pro-max',
                 'images' => [
                     'images/products/default1.png',
                     'images/products/default2.png'
@@ -464,7 +532,35 @@ class HomeController extends Controller
                 'discount_percentage' => 10,
                 'in_stock' => true,
                 'is_new' => false,
-            ]
+            ],
+            [
+                'id' => 9,
+                'name' => '4K Action Camera',
+                'slug' => '4k-action-camera',
+                'images' => [
+                    'images/products/default1.png',
+                    'images/products/default2.png'
+                ],
+                'original_price' => 399.99,
+                'discounted_price' => 319.99,
+                'discount_percentage' => 20,
+                'in_stock' => true,
+                'is_new' => true,
+            ],
+            [
+                'id' => 10,
+                'name' => 'Noise-Cancelling Earbuds',
+                'slug' => 'noise-cancelling-wireless-earbuds',
+                'images' => [
+                    'images/products/default1.png',
+                    'images/products/default2.png'
+                ],
+                'original_price' => 149.99,
+                'discounted_price' => 99.99,
+                'discount_percentage' => 33,
+                'in_stock' => true,
+                'is_new' => false,
+            ],
         ];
     }
     protected function getFeaturedProducts()

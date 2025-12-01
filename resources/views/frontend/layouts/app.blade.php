@@ -31,21 +31,7 @@
     <!-- Additional Head Scripts & Styles -->
     @stack('head-scripts')
     @stack('styles')
-    <style>
-        .swiper {
-            width: 100%;
-            height: 100%;
-        }
-
-        .swiper-slide {
-            height: auto;
-        }
-
-        .swiper-button-disabled {
-            opacity: 0.3 !important;
-            cursor: not-allowed !important;
-        }
-    </style>
+    
 </head>
 
 <body class="font-sans antialiased bg-white">
@@ -56,7 +42,7 @@
             @yield('content')
         </main>
 
-        {{-- @include('frontend.partials.footer') --}}
+        @include('frontend.partials.footer')
     </div>
 
     <!-- Swiper JS -->
