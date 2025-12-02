@@ -20,5 +20,16 @@ Route::prefix('orders')->group(function () {
 });
 
 Route::get('/search', [HomeController::class, 'index'])->name('search');
+Route::get('/terms', function () {
+    return view('terms');
+})->name('terms');
 
+Route::get('/privacy', function () {
+    return view('privacy');
+})->name('privacy');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile');
+    Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+});
 require __DIR__ . '/auth.php';

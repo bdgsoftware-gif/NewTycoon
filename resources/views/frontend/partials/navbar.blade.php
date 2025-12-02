@@ -53,7 +53,8 @@
             <div class="flex items-center space-x-4">
                 <!-- Search icon -->
                 <button id="search-toggle"
-                    class="text-gray-600 hover:text-primary p-2 transition-all duration-300 hover:rotate-90" title="Click to Search">
+                    class="text-gray-600 hover:text-primary p-2 transition-all duration-300 hover:rotate-90"
+                    title="Click to Search">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -79,10 +80,10 @@
                                     class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
                                     Profile
                                 </a>
-                                <a href="{{ route('dashboard') }}"
+                                {{-- <a href="{{ route('dashboard') }}"
                                     class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
                                     Dashboard
-                                </a>
+                                </a> --}}
                                 <a href="{{ route('trackOrder') }}"
                                     class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
                                     Track Order
