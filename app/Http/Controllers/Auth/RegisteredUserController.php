@@ -41,6 +41,12 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Assign default role (customer)
+        $user->assignRole('customer');
+
+        // Create empty profile
+        $user->profile()->create([]);
+
         event(new Registered($user));
 
         Auth::login($user);

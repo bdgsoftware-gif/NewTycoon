@@ -88,6 +88,28 @@
                                     class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
                                     Track Order
                                 </a>
+                                {{--  --}}
+                                <!-- Show only for customers -->
+                                @if (auth()->user()->hasRole('customer'))
+                                    <a href="/orders"
+                                        class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
+                                        My Orders</a>
+                                @endif
+
+                                <!-- Show only for admins/moderators -->
+                                @if (auth()->user()->hasAnyRole(['admin', 'moderator']))
+                                    <a href="/admin"
+                                        class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
+                                        Admin Panel</a>
+                                @endif
+
+                                <!-- Show only with specific permission -->
+                                @if (auth()->user()->hasPermission('manage_products'))
+                                    <a href="/admin/products"
+                                        class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
+                                        Products</a>
+                                @endif
+                                {{--  --}}
                                 <hr class="my-1">
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf

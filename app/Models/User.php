@@ -2,47 +2,241 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, SoftDeletes, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
+        'status',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    // Relationships
+    public function roles()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->belongsToMany(Role::class)->withTimestamps();
+    }
+
+    /**
+     * Get the user's profile.
+     */
+    public function profile()
+    {
+        return $this->hasOne(UserProfile::class);
+    }
+
+    // ADD SCOPES FOR ROLE-BASED QUERIES
+    public function scopeDoctors($query)
+    {
+        return $query->whereHas('roles', function ($q) {
+            $q->where('name', 'doctor');
+        });
+    }
+
+    public function scopePatients($query)
+    {
+        return $query->whereHas('roles', function ($q) {
+            $q->where('name', 'patient');
+        });
+    }
+
+    public function scopeStaff($query)
+    {
+        return $query->whereHas('roles', function ($q) {
+            $q->where('name', 'staff');
+        });
+    }
+
+    // Role & Permission Methods
+    public function assignRole($role)
+    {
+        if (is_string($role)) {
+            $role = Role::where('name', $role)->firstOrFail();
+        }
+
+        return $this->roles()->syncWithoutDetaching([$role->id]);
+    }
+
+    public function assignRoles(array $roles)
+    {
+        $roleIds = [];
+        foreach ($roles as $role) {
+            if (is_string($role)) {
+                $role = Role::where('name', $role)->firstOrFail();
+            }
+            $roleIds[] = $role->id;
+        }
+
+        return $this->roles()->syncWithoutDetaching($roleIds);
+    }
+
+    public function removeRole($role)
+    {
+        if (is_string($role)) {
+            $role = Role::where('name', $role)->firstOrFail();
+        }
+
+        return $this->roles()->detach($role->id);
+    }
+
+    public function syncRoles(array $roles)
+    {
+        $roleIds = [];
+        foreach ($roles as $role) {
+            if (is_string($role)) {
+                $role = Role::where('name', $role)->firstOrFail();
+            }
+            $roleIds[] = $role->id;
+        }
+
+        return $this->roles()->sync($roleIds);
+    }
+
+    public function hasRole($role)
+    {
+        // Eager load roles to avoid N+1 queries
+        $this->loadMissing('roles');
+
+        if (is_string($role)) {
+            return $this->roles->contains('name', $role);
+        }
+
+        if (is_array($role)) {
+            return $this->roles->whereIn('name', $role)->isNotEmpty();
+        }
+
+        return $this->roles->contains('id', $role->id);
+    }
+
+    public function hasAnyRole($roles)
+    {
+        if (!auth()->check()) return false;
+
+        // Eager load roles to avoid N+1 queries
+        $this->loadMissing('roles');
+
+        if (is_string($roles)) {
+            // Handle pipe-separated string: 'admin|staff'
+            $roles = explode('|', $roles);
+        }
+
+        // Handle both array and multiple arguments
+        if (!is_array($roles)) {
+            $roles = func_get_args();
+        }
+
+        return $this->roles->whereIn('name', $roles)->isNotEmpty();
+    }
+
+    public function hasAllRoles($roles)
+    {
+        if (is_string($roles)) {
+            $roles = func_get_args();
+        }
+
+        $this->loadMissing('roles');
+        $userRoles = $this->roles->pluck('name')->toArray();
+
+        return count(array_diff($roles, $userRoles)) === 0;
+    }
+
+    public function hasPermission($permission)
+    {
+        $this->loadMissing('roles.permissions');
+        return $this->roles->flatMap(function ($role) {
+            return $role->permissions;
+        })->contains('name', $permission);
+    }
+
+    public function hasPermissionThroughRole($permission)
+    {
+        $this->loadMissing('roles.permissions');
+        foreach ($this->roles as $role) {
+            if ($role->hasPermission($permission)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Attribute accessors
+    public function getRoleNamesAttribute()
+    {
+        $this->loadMissing('roles');
+        return $this->roles->pluck('name');
+    }
+
+    public function getPermissionsAttribute()
+    {
+        $this->loadMissing('roles.permissions');
+        return $this->roles->flatMap(function ($role) {
+            return $role->permissions;
+        })->unique('name');
+    }
+
+    // Scopes - FIXED: Use proper column names
+    public function scopeRole($query, $role)
+    {
+        if (is_string($role)) {
+            return $query->whereHas('roles', function ($q) use ($role) {
+                $q->where('name', $role); // FIXED: Use 'name' not role_id
+            });
+        }
+
+        if ($role instanceof Role) {
+            return $query->whereHas('roles', function ($q) use ($role) {
+                $q->where('id', $role->id); // FIXED: Use 'id' not role_id
+            });
+        }
+
+        return $query;
+    }
+
+    public function scopeWhereRole($query, $roles)
+    {
+        $roles = is_array($roles) ? $roles : [$roles];
+
+        return $query->whereHas('roles', function ($q) use ($roles) {
+            $q->whereIn('name', $roles);
+        });
+    }
+
+    public function isAdmin()
+    {
+        return $this->hasRole('admin');
+    }
+
+    public function isModerator()
+    {
+        return $this->hasRole('moderator');
+    }
+
+    public function isCustomer()
+    {
+        return $this->hasRole('customer');
+    }
+
+    public function can($permission)
+    {
+        return $this->hasPermission($permission);
     }
 }
