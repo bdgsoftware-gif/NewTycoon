@@ -1,5 +1,5 @@
 <!-- Elegant Card Style -->
-<a href="{{ route('product.details', $product['slug']) }}" class="block group">
+<a href="{{ route('product.show', $product['slug']) }}" class="block group">
     <div
         class="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-all duration-300 overflow-hidden h-full">
         <!-- Image -->

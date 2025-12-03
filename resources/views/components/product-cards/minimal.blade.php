@@ -17,7 +17,7 @@
     class="group relative h-full bg-white border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col overflow-hidden">
 
     <!-- Image Section -->
-    <a href="{{ route('product.details', $productSlug) }}">
+    <a href="{{ route('product.show', $productSlug) }}">
         <div class="w-full aspect-square bg-white overflow-hidden relative">
             <img src="{{ asset($primaryImage) }}"
                 class="absolute inset-0 w-full h-full object-contain transition-opacity duration-300 group-hover:opacity-0">
@@ -59,7 +59,7 @@
     <!-- Product Info -->
     <div class="p-4 border-t border-gray-100 flex-grow flex flex-col">
 
-        <a href="{{ route('product.details', $productSlug) }}"
+        <a href="{{ route('product.show', $productSlug) }}"
             class="font-medium font-quantico text-gray-900 text-sm mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-200 flex-grow">
             {{ $productName }}
         </a>

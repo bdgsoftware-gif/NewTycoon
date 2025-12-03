@@ -13,7 +13,7 @@
                 <div
                     class="group bg-white rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl relative">
                     <!-- Product Image with Overlay -->
-                    <a href="{{ route('product.details', $product['slug']) }}" class="block relative">
+                    <a href="{{ route('product.show', $product['slug']) }}" class="block relative">
                         <div class="relative w-full aspect-square bg-gray-100 overflow-hidden">
                             <img src="{{ asset($product['images'][0]) }}"
                                 class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105">
@@ -100,7 +100,7 @@
 
                     <!-- Product Info -->
                     <div class="p-5">
-                        <a href="{{ route('product.details', $product['slug']) }}" class="block">
+                        <a href="{{ route('product.show', $product['slug']) }}" class="block">
                             <h3
                                 class="text-lg font-semibold text-gray-900 mb-2 hover:text-primary transition-colors duration-200 line-clamp-2 font-cambay">
                                 {{ $product['name'] }}

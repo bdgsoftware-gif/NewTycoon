@@ -30,6 +30,25 @@ export default {
             colors: {
                 primary: "#ea2f30",
                 accent: "#b16130",
+                "primary-light": "#fee2e2",
+                "primary-dark": "#b91c1c",
+                "accent-light": "#fed7aa",
+                "accent-dark": "#c2410c",
+            },
+            animation: {
+                "fade-in": "fadeIn 0.5s ease-in-out",
+                "slide-up": "slideUp 0.3s ease-out",
+                "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+            },
+            keyframes: {
+                fadeIn: {
+                    "0%": { opacity: "0" },
+                    "100%": { opacity: "1" },
+                },
+                slideUp: {
+                    "0%": { transform: "translateY(10px)", opacity: "0" },
+                    "100%": { transform: "translateY(0)", opacity: "1" },
+                },
             },
         },
     },
@@ -47,5 +66,8 @@ export default {
                 },
             });
         },
+        require("@tailwindcss/forms"),
+        require("@tailwindcss/typography"),
+        require("@tailwindcss/aspect-ratio"),
     ],
 };

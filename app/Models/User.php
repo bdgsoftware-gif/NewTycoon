@@ -234,9 +234,4 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasRole('customer');
     }
-
-    public function can($permission)
-    {
-        return $this->hasPermission($permission);
-    }
 }

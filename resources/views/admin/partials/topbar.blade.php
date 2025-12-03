@@ -60,7 +60,7 @@
                         Profile
                     </a>
                     @if (auth()->user()->hasPermission('manage_settings'))
-                        <a href="{{ route('admin.settings') }}"
+                        <a href="{{ route('admin.settings.index') }}"
                             class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                             <i class="fas fa-cog mr-3 text-gray-400"></i>
                             Settings

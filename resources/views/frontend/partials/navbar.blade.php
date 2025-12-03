@@ -98,7 +98,7 @@
 
                                 <!-- Show only for admins/moderators -->
                                 @if (auth()->user()->hasAnyRole(['admin', 'moderator']))
-                                    <a href="/admin"
+                                    <a href="{{ route('admin.dashboard') }}"
                                         class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
                                         Admin Panel</a>
                                 @endif

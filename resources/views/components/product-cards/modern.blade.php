@@ -1,5 +1,5 @@
 <!-- Modern Card Style -->
-<a href="{{ route('product.details', $product['slug']) }}" class="block group">
+<a href="{{ route('product.show', $product['slug']) }}" class="block group">
     <div
         class="bg-white rounded-lg border border-gray-200 hover:border-primary transition-all duration-300 product-card-hover overflow-hidden shadow-sm hover:shadow-lg">
         <!-- Image Container -->
