@@ -1,5 +1,5 @@
 <!-- User Stories in Motion Section -->
-<section class="w-full bg-white py-12">
+<section class="w-full bg-white py-8">
     <div class="max-w-8xl mx-auto">
         <!-- Section Header -->
         <div class="text-center max-w-3xl mx-auto mb-12 md:mb-16">
@@ -15,7 +15,7 @@
         <div class="relative">
             <!-- Desktop: Swiper with 4 videos per slide -->
             <div class="hidden lg:block">
-                <div class="swiper userStoriesSwiper">
+                <div class="swiper userStoriesSwiper py-4">
                     <div class="swiper-wrapper">
                         <!-- Group videos in chunks of 4 for desktop -->
                         @php
@@ -31,8 +31,8 @@
                                             <!-- Video Container -->
                                             <div class="relative aspect-[9/16] bg-black">
                                                 <video class="w-full h-full object-cover" controls
-                                                    controlsList="nodownload" poster="{{ $story->thumbnail ?? '' }}"
-                                                    preload="metadata">
+                                                    controlsList="nodownload"
+                                                    poster="{{ asset($story->thumbnail) ?? '' }}" preload="metadata">
                                                     <source src="{{ asset('storage/' . $story->video_path) }}"
                                                         type="video/mp4">
                                                     Your browser does not support the video tag.
@@ -54,7 +54,7 @@
                                             <div class="p-4">
                                                 <div class="flex items-center mb-2">
                                                     @if ($story->user_avatar)
-                                                        <img src="{{ asset('storage/' . $story->user_avatar) }}"
+                                                        <img src="{{ asset($story->user_avatar) }}"
                                                             alt="{{ $story->user_name }}"
                                                             class="w-8 h-8 rounded-full mr-3">
                                                     @else
@@ -128,7 +128,7 @@
                                         <!-- Video Container -->
                                         <div class="relative aspect-[9/16] bg-black">
                                             <video class="w-full h-full object-cover" controls controlsList="nodownload"
-                                                poster="{{ $story->thumbnail ?? '' }}" preload="metadata">
+                                                poster="{{ asset($story->thumbnail) ?? '' }}" preload="metadata">
                                                 <source src="{{ asset('storage/' . $story->video_path) }}"
                                                     type="video/mp4">
                                                 Your browser does not support the video tag.
@@ -150,7 +150,7 @@
                                         <div class="p-4">
                                             <div class="flex items-center mb-3">
                                                 @if ($story->user_avatar)
-                                                    <img src="{{ asset('storage/' . $story->user_avatar) }}"
+                                                    <img src="{{ asset($story->user_avatar) }}"
                                                         alt="{{ $story->user_name }}"
                                                         class="w-10 h-10 rounded-full mr-3">
                                                 @else

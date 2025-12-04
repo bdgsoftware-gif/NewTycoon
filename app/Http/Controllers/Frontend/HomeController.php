@@ -844,9 +844,9 @@ class HomeController extends Controller
                 (object)[
                     'id' => 1,
                     'user_name' => 'Sarah Johnson',
-                    'user_avatar' => 'https://ui-avatars.com/api/?name=Sarah+Johnson&background=random',
-                    'video_path' => 'videos/demo/story1.mp4', // You can use placeholder videos
-                    'thumbnail' => 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                    'user_avatar' => 'images/stories/user.jpg',
+                    'video_path' => 'videos/stories/story1.mp4', // You can use placeholder videos
+                    'thumbnail' => 'images/car.jpg',
                     'caption' => 'Just got my new gaming headset! The sound quality is absolutely incredible and the comfort is next level.',
                     'likes_count' => 245,
                     'comments_count' => 32,
@@ -861,9 +861,9 @@ class HomeController extends Controller
                 (object)[
                     'id' => 2,
                     'user_name' => 'Mike Chen',
-                    'user_avatar' => 'https://ui-avatars.com/api/?name=Mike+Chen&background=random',
-                    'video_path' => 'videos/demo/story2.mp4',
-                    'thumbnail' => 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                    'user_avatar' => 'images/stories/user.jpg',
+                    'video_path' => 'videos/stories/story1.mp4',
+                    'thumbnail' => 'images/car.jpg',
                     'caption' => 'Unboxing the new wireless keyboard. The typing experience is so smooth!',
                     'likes_count' => 189,
                     'comments_count' => 21,
@@ -878,9 +878,9 @@ class HomeController extends Controller
                 (object)[
                     'id' => 3,
                     'user_name' => 'Emma Wilson',
-                    'user_avatar' => 'https://ui-avatars.com/api/?name=Emma+Wilson&background=random',
-                    'video_path' => 'videos/demo/story3.mp4',
-                    'thumbnail' => 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                    'user_avatar' => 'images/stories/user.jpg',
+                    'video_path' => 'videos/stories/story1.mp4',
+                    'thumbnail' => 'images/car.jpg',
                     'caption' => 'My new smartwatch arrived! The battery life is amazing and fitness tracking is super accurate.',
                     'likes_count' => 312,
                     'comments_count' => 45,
@@ -895,9 +895,9 @@ class HomeController extends Controller
                 (object)[
                     'id' => 4,
                     'user_name' => 'Alex Rodriguez',
-                    'user_avatar' => 'https://ui-avatars.com/api/?name=Alex+Rodriguez&background=random',
-                    'video_path' => 'videos/demo/story4.mp4',
-                    'thumbnail' => 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                    'user_avatar' => 'images/stories/user.jpg',
+                    'video_path' => 'videos/stories/story1.mp4',
+                    'thumbnail' => 'images/car.jpg',
                     'caption' => 'Testing out the new wireless earbuds. Noise cancellation is phenomenal!',
                     'likes_count' => 278,
                     'comments_count' => 38,
@@ -912,9 +912,9 @@ class HomeController extends Controller
                 (object)[
                     'id' => 5,
                     'user_name' => 'Lisa Park',
-                    'user_avatar' => 'https://ui-avatars.com/api/?name=Lisa+Park&background=random',
-                    'video_path' => 'videos/demo/story5.mp4',
-                    'thumbnail' => 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                    'user_avatar' => 'images/stories/user.jpg',
+                    'video_path' => 'videos/stories/story1.mp4',
+                    'thumbnail' => 'images/car.jpg',
                     'caption' => 'Just set up my new monitor. The colors are so vibrant and the refresh rate is buttery smooth.',
                     'likes_count' => 198,
                     'comments_count' => 27,
@@ -929,9 +929,9 @@ class HomeController extends Controller
                 (object)[
                     'id' => 6,
                     'user_name' => 'David Miller',
-                    'user_avatar' => 'https://ui-avatars.com/api/?name=David+Miller&background=random',
-                    'video_path' => 'videos/demo/story6.mp4',
-                    'thumbnail' => 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                    'user_avatar' => 'images/stories/user.jpg',
+                    'video_path' => 'videos/stories/story1.mp4',
+                    'thumbnail' => 'images/car.jpg',
                     'caption' => 'First impressions of the new gaming mouse. The precision is unbelievable for competitive gaming.',
                     'likes_count' => 265,
                     'comments_count' => 41,
@@ -941,109 +941,6 @@ class HomeController extends Controller
                         'id' => 6,
                         'name' => 'Gaming Mouse',
                         'slug' => 'gaming-mouse'
-                    ]
-                ],
-                (object)[
-                    'id' => 7,
-                    'user_name' => 'Sophia Williams',
-                    'user_avatar' => 'https://ui-avatars.com/api/?name=Sophia+Williams&background=random',
-                    'video_path' => 'videos/demo/story7.mp4',
-                    'thumbnail' => 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-                    'caption' => 'My new laptop arrived! The performance is incredible for both work and gaming.',
-                    'likes_count' => 325,
-                    'comments_count' => 52,
-                    'views_count' => 1650,
-                    'created_at' => now()->subDays(7),
-                    'product' => (object)[
-                        'id' => 7,
-                        'name' => 'Gaming Laptop',
-                        'slug' => 'gaming-laptop'
-                    ]
-                ],
-                (object)[
-                    'id' => 8,
-                    'user_name' => 'James Wilson',
-                    'user_avatar' => 'https://ui-avatars.com/api/?name=James+Wilson&background=random',
-                    'video_path' => 'videos/demo/story8.mp4',
-                    'thumbnail' => 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-                    'caption' => 'Testing the new gaming chair. The ergonomics are perfect for long gaming sessions.',
-                    'likes_count' => 187,
-                    'comments_count' => 29,
-                    'views_count' => 920,
-                    'created_at' => now()->subDays(8),
-                    'product' => (object)[
-                        'id' => 8,
-                        'name' => 'Gaming Chair',
-                        'slug' => 'gaming-chair'
-                    ]
-                ],
-                // Add more dummy data to make 12 items total
-                (object)[
-                    'id' => 9,
-                    'user_name' => 'Olivia Brown',
-                    'user_avatar' => 'https://ui-avatars.com/api/?name=Olivia+Brown&background=random',
-                    'video_path' => 'videos/demo/story9.mp4',
-                    'thumbnail' => 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-                    'caption' => 'Unboxing my new tablet. The display quality is stunning for media consumption.',
-                    'likes_count' => 212,
-                    'comments_count' => 33,
-                    'views_count' => 1050,
-                    'created_at' => now()->subDays(9),
-                    'product' => (object)[
-                        'id' => 9,
-                        'name' => 'Tablet Pro',
-                        'slug' => 'tablet-pro'
-                    ]
-                ],
-                (object)[
-                    'id' => 10,
-                    'user_name' => 'Daniel Lee',
-                    'user_avatar' => 'https://ui-avatars.com/api/?name=Daniel+Lee&background=random',
-                    'video_path' => 'videos/demo/story10.mp4',
-                    'thumbnail' => 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-                    'caption' => 'Just installed the new SSD in my PC. The boot time is lightning fast!',
-                    'likes_count' => 178,
-                    'comments_count' => 24,
-                    'views_count' => 850,
-                    'created_at' => now()->subDays(10),
-                    'product' => (object)[
-                        'id' => 10,
-                        'name' => 'SSD 1TB',
-                        'slug' => 'ssd-1tb'
-                    ]
-                ],
-                (object)[
-                    'id' => 11,
-                    'user_name' => 'Maya Patel',
-                    'user_avatar' => 'https://ui-avatars.com/api/?name=Maya+Patel&background=random',
-                    'video_path' => 'videos/demo/story11.mp4',
-                    'thumbnail' => 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-                    'caption' => 'First look at the new webcam. The video quality is perfect for streaming and video calls.',
-                    'likes_count' => 231,
-                    'comments_count' => 35,
-                    'views_count' => 1120,
-                    'created_at' => now()->subDays(11),
-                    'product' => (object)[
-                        'id' => 11,
-                        'name' => '4K Webcam',
-                        'slug' => '4k-webcam'
-                    ]
-                ],
-                (object)[
-                    'id' => 12,
-                    'user_name' => 'Ryan Taylor',
-                    'user_avatar' => 'https://ui-avatars.com/api/?name=Ryan+Taylor&background=random',
-                    'video_path' => 'videos/demo/story12.mp4',
-                    'thumbnail' => 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-                    'caption' => 'Testing the new microphone. Crystal clear audio for podcasts and gaming.',
-                    'likes_count' => 195,
-                    'comments_count' => 28,
-                    'views_count' => 940,
-                    'created_at' => now()->subDays(12),
-                    'product' => (object)[
-                        'id' => 12,
-                        'name' => 'USB Microphone',
-                        'slug' => 'usb-microphone'
                     ]
                 ],
             ]);
