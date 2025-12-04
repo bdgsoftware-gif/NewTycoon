@@ -12,7 +12,7 @@
                 <img src="{{ asset($smartSection['image']) }}" alt="{{ $smartSection['title'] }}"
                     class="absolute inset-0 w-full h-full object-cover rounded-2xl" loading="lazy">
                 <div
-                    class="relative z-10 flex flex-col items-center justify-start h-full text-center text-black px-6 py-12">
+                    class="relative z-10 flex flex-col items-center justify-start h-full text-center text-black py-12">
                     <h3 class="text-2xl md:text-5xl font-bold mb-4 font-cambay">{{ $smartSection['title'] }}</h3>
                     <p class="text-lg md:text-xl mb-6 font-cambay">{{ $smartSection['description'] }}</p>
                     <a href="{{ $smartSection['button_url'] ?? '#' }}"

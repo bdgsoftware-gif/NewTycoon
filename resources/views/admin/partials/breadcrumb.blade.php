@@ -6,7 +6,7 @@
                 <a href="{{ route('admin.dashboard') }}"
                     class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-indigo-600">
                     <i class="fas fa-home mr-2"></i>
-                    Dashboard
+                    Dashboard /
                 </a>
             </li>
             @yield('breadcrumb')

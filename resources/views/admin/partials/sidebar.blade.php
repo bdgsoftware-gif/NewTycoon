@@ -1,10 +1,8 @@
 <!-- Sidebar -->
-<div class="w-64 bg-gradient-to-b from-gray-900 to-gray-800 border-r border-gray-700 flex flex-col flex-shrink-0 transition-all duration-300 ease-in-out shadow-xl"
-    :class="{ 'w-20': sidebarCollapsed }" x-data="{
-        sidebarCollapsed: false,
+<div class="w-64 bg-gradient-to-b from-gray-900 to-gray-800 border-r border-gray-700 flex flex-col flex-shrink-0 shadow-xl no-scrollbar"
+    x-data="{
         activeGroup: null,
         init() {
-            this.sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
             // Set active group based on current route
             @if (request()->routeIs('admin.users.*')) this.activeGroup = 'users';
             @elseif(request()->routeIs('admin.products.*'))
@@ -13,13 +11,6 @@
                 this.activeGroup = 'orders';
             @elseif(request()->routeIs('admin.settings.*'))
                 this.activeGroup = 'settings'; @endif
-    
-            $watch('sidebarCollapsed', value => {
-                localStorage.setItem('sidebarCollapsed', value);
-                if (value) {
-                    this.activeGroup = null;
-                }
-            });
         }
     }" id="sidebar">
 
@@ -27,7 +18,7 @@
     <div class="h-20 flex items-center justify-center border-b border-gray-700">
         <a href="{{ route('admin.dashboard') }}" class="group flex flex-col items-center">
             <img src="{{ asset('images/wh-logo.png') }}" alt="Azmion Admin Logo" loading="lazy"
-                class="h-8 md:h-10 w-auto transition-transform duration-300 group-hover:scale-110">
+                class="h-8 md:h-10 w-auto">
 
             <span
                 class="mt-1 text-xs tracking-wide text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
@@ -36,50 +27,38 @@
         </a>
     </div>
 
-
     <!-- Navigation -->
-    <nav class="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
+    <nav class="flex-1 px-3 py-6 space-y-1 overflow-y-auto no-scrollbar">
         <!-- Dashboard -->
         <a href="{{ route('admin.dashboard') }}"
-            class="group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.dashboard') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}"
-            x-data="{ tooltip: false }" @mouseenter="if (sidebarCollapsed) tooltip = true" @mouseleave="tooltip = false">
+            class="group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.dashboard') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
             <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('admin.dashboard') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}"
                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                     d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
-            <span class="ml-3 font-inter" x-show="!sidebarCollapsed">Dashboard</span>
-            <div x-show="sidebarCollapsed && tooltip" x-transition
-                class="absolute left-full ml-3 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-xl z-50 whitespace-nowrap border border-gray-700">
-                Dashboard
-            </div>
+            <span class="ml-3 font-inter">Dashboard</span>
         </a>
 
         <!-- Users -->
         @if (auth()->user()->hasPermission('manage_users'))
             <div x-data="{ open: activeGroup === 'users' }">
                 <button @click="open = !open; activeGroup = open ? 'users' : null"
-                    class="w-full group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.users.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}"
-                    x-data="{ tooltip: false }" @mouseenter="if (sidebarCollapsed) tooltip = true"
-                    @mouseleave="tooltip = false">
+                    class="w-full group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.users.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
                     <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('admin.users.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
-                    <span class="ml-3 font-inter flex-1 text-left" x-show="!sidebarCollapsed">Users</span>
+                    <span class="ml-3 font-inter flex-1 text-left">Users</span>
                     <svg :class="{ 'transform rotate-90': open }"
                         class="ml-2 h-4 w-4 text-gray-400 transition-transform duration-200 flex-shrink-0"
-                        x-show="!sidebarCollapsed" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
-                    <div x-show="sidebarCollapsed && tooltip" x-transition
-                        class="absolute left-full ml-3 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-xl z-50 whitespace-nowrap border border-gray-700">
-                        Users
-                    </div>
                 </button>
 
-                <div x-show="open && !sidebarCollapsed" x-collapse class="ml-8 mt-1 space-y-1">
+                <div x-show="open" x-collapse class="ml-8 mt-1 space-y-1">
                     <a href="{{ route('admin.users.index') }}"
                         class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.users.index') ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:text-white hover:bg-gray-700/30' }}">
                         <svg class="mr-3 h-4 w-4 {{ request()->routeIs('admin.users.index') ? 'text-primary' : 'text-gray-500 group-hover:text-primary' }}"
@@ -106,27 +85,21 @@
         @if (auth()->user()->hasPermission('manage_products'))
             <div x-data="{ open: activeGroup === 'products' }">
                 <button @click="open = !open; activeGroup = open ? 'products' : null"
-                    class="w-full group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.products.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}"
-                    x-data="{ tooltip: false }" @mouseenter="if (sidebarCollapsed) tooltip = true"
-                    @mouseleave="tooltip = false">
+                    class="w-full group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.products.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
                     <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('admin.products.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                     </svg>
-                    <span class="ml-3 font-inter flex-1 text-left" x-show="!sidebarCollapsed">Products</span>
+                    <span class="ml-3 font-inter flex-1 text-left">Products</span>
                     <svg :class="{ 'transform rotate-90': open }"
                         class="ml-2 h-4 w-4 text-gray-400 transition-transform duration-200 flex-shrink-0"
-                        x-show="!sidebarCollapsed" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
-                    <div x-show="sidebarCollapsed && tooltip" x-transition
-                        class="absolute left-full ml-3 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-xl z-50 whitespace-nowrap border border-gray-700">
-                        Products
-                    </div>
                 </button>
 
-                <div x-show="open && !sidebarCollapsed" x-collapse class="ml-8 mt-1 space-y-1">
+                <div x-show="open" x-collapse class="ml-8 mt-1 space-y-1">
                     <a href="{{ route('admin.products.index') }}"
                         class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.products.index') ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:text-white hover:bg-gray-700/30' }}">
                         <svg class="mr-3 h-4 w-4 {{ request()->routeIs('admin.products.index') ? 'text-primary' : 'text-gray-500 group-hover:text-primary' }}"
@@ -152,38 +125,26 @@
         <!-- Categories -->
         @if (auth()->user()->hasPermission('manage_products'))
             <a href="{{ route('admin.categories.index') }}"
-                class="group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.categories.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}"
-                x-data="{ tooltip: false }" @mouseenter="if (sidebarCollapsed) tooltip = true"
-                @mouseleave="tooltip = false">
+                class="group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.categories.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
                 <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('admin.categories.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}"
                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                         d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
-                <span class="ml-3 font-inter" x-show="!sidebarCollapsed">Categories</span>
-                <div x-show="sidebarCollapsed && tooltip" x-transition
-                    class="absolute left-full ml-3 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-xl z-50 whitespace-nowrap border border-gray-700">
-                    Categories
-                </div>
+                <span class="ml-3 font-inter">Categories</span>
             </a>
         @endif
 
         <!-- Brands -->
         @if (auth()->user()->hasPermission('manage_products'))
             <a href="{{ route('admin.brands.index') }}"
-                class="group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.brands.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}"
-                x-data="{ tooltip: false }" @mouseenter="if (sidebarCollapsed) tooltip = true"
-                @mouseleave="tooltip = false">
+                class="group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.brands.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
                 <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('admin.brands.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}"
                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                         d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" />
                 </svg>
-                <span class="ml-3 font-inter" x-show="!sidebarCollapsed">Brands</span>
-                <div x-show="sidebarCollapsed && tooltip" x-transition
-                    class="absolute left-full ml-3 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-xl z-50 whitespace-nowrap border border-gray-700">
-                    Brands
-                </div>
+                <span class="ml-3 font-inter">Brands</span>
             </a>
         @endif
 
@@ -191,27 +152,21 @@
         @if (auth()->user()->hasPermission('view_orders'))
             <div x-data="{ open: activeGroup === 'orders' }">
                 <button @click="open = !open; activeGroup = open ? 'orders' : null"
-                    class="w-full group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.orders.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}"
-                    x-data="{ tooltip: false }" @mouseenter="if (sidebarCollapsed) tooltip = true"
-                    @mouseleave="tooltip = false">
+                    class="w-full group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.orders.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
                     <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('admin.orders.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
-                    <span class="ml-3 font-inter flex-1 text-left" x-show="!sidebarCollapsed">Orders</span>
+                    <span class="ml-3 font-inter flex-1 text-left">Orders</span>
                     <svg :class="{ 'transform rotate-90': open }"
                         class="ml-2 h-4 w-4 text-gray-400 transition-transform duration-200 flex-shrink-0"
-                        x-show="!sidebarCollapsed" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
-                    <div x-show="sidebarCollapsed && tooltip" x-transition
-                        class="absolute left-full ml-3 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-xl z-50 whitespace-nowrap border border-gray-700">
-                        Orders
-                    </div>
                 </button>
 
-                <div x-show="open && !sidebarCollapsed" x-collapse class="ml-8 mt-1 space-y-1">
+                <div x-show="open" x-collapse class="ml-8 mt-1 space-y-1">
                     <a href="{{ route('admin.orders.index') }}"
                         class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.orders.index') ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:text-white hover:bg-gray-700/30' }}">
                         <svg class="mr-3 h-4 w-4 {{ request()->routeIs('admin.orders.index') ? 'text-primary' : 'text-gray-500 group-hover:text-primary' }}"
@@ -237,38 +192,26 @@
         <!-- Content -->
         @if (auth()->user()->hasPermission('manage_content'))
             <a href="{{ route('admin.content.index') }}"
-                class="group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.content.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}"
-                x-data="{ tooltip: false }" @mouseenter="if (sidebarCollapsed) tooltip = true"
-                @mouseleave="tooltip = false">
+                class="group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.content.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
                 <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('admin.content.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}"
                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                         d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                 </svg>
-                <span class="ml-3 font-inter" x-show="!sidebarCollapsed">Content</span>
-                <div x-show="sidebarCollapsed && tooltip" x-transition
-                    class="absolute left-full ml-3 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-xl z-50 whitespace-nowrap border border-gray-700">
-                    Content
-                </div>
+                <span class="ml-3 font-inter">Content</span>
             </a>
         @endif
 
         <!-- Analytics -->
         @if (auth()->user()->hasPermission('view_reports'))
             <a href="{{ route('admin.analytics.index') }}"
-                class="group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.analytics.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}"
-                x-data="{ tooltip: false }" @mouseenter="if (sidebarCollapsed) tooltip = true"
-                @mouseleave="tooltip = false">
+                class="group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.analytics.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
                 <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('admin.analytics.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}"
                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                         d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <span class="ml-3 font-inter" x-show="!sidebarCollapsed">Analytics</span>
-                <div x-show="sidebarCollapsed && tooltip" x-transition
-                    class="absolute left-full ml-3 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-xl z-50 whitespace-nowrap border border-gray-700">
-                    Analytics
-                </div>
+                <span class="ml-3 font-inter">Analytics</span>
             </a>
         @endif
 
@@ -276,9 +219,7 @@
         @if (auth()->user()->hasPermission('manage_settings'))
             <div x-data="{ open: activeGroup === 'settings' }">
                 <button @click="open = !open; activeGroup = open ? 'settings' : null"
-                    class="w-full group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.settings.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}"
-                    x-data="{ tooltip: false }" @mouseenter="if (sidebarCollapsed) tooltip = true"
-                    @mouseleave="tooltip = false">
+                    class="w-full group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.settings.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
                     <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('admin.settings.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -286,19 +227,15 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <span class="ml-3 font-inter flex-1 text-left" x-show="!sidebarCollapsed">Settings</span>
+                    <span class="ml-3 font-inter flex-1 text-left">Settings</span>
                     <svg :class="{ 'transform rotate-90': open }"
                         class="ml-2 h-4 w-4 text-gray-400 transition-transform duration-200 flex-shrink-0"
-                        x-show="!sidebarCollapsed" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
-                    <div x-show="sidebarCollapsed && tooltip" x-transition
-                        class="absolute left-full ml-3 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-xl z-50 whitespace-nowrap border border-gray-700">
-                        Settings
-                    </div>
                 </button>
 
-                <div x-show="open && !sidebarCollapsed" x-collapse class="ml-8 mt-1 space-y-1">
+                <div x-show="open" x-collapse class="ml-8 mt-1 space-y-1">
                     <a href="{{ route('admin.settings.index') }}"
                         class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.settings.index') ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:text-white hover:bg-gray-700/30' }}">
                         <svg class="mr-3 h-4 w-4 {{ request()->routeIs('admin.settings.index') ? 'text-primary' : 'text-gray-500 group-hover:text-primary' }}"
@@ -322,7 +259,7 @@
         @endif
 
         <!-- Quick Actions Section -->
-        <div class="pt-6 mt-6 border-t border-gray-700" x-show="!sidebarCollapsed">
+        <div class="pt-6 mt-6 border-t border-gray-700">
             <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Quick Actions</p>
             <div class="space-y-2">
                 @if (auth()->user()->hasPermission('manage_users'))
@@ -358,7 +295,7 @@
                 <span
                     class="text-white font-semibold text-sm">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
             </div>
-            <div class="ml-3" x-show="!sidebarCollapsed">
+            <div class="ml-3">
                 <p class="text-sm font-medium text-white truncate">{{ Auth::user()->name }}</p>
                 <p class="text-xs text-gray-300 truncate">
                     @if (Auth::user()->isAdmin())
@@ -381,21 +318,6 @@
             </div>
         </div>
     </div>
-</div>
 
-@push('scripts')
-    <script>
-        // Add keyboard shortcut for sidebar toggle (Ctrl+B or Cmd+B)
-        document.addEventListener('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
-                e.preventDefault();
-                Alpine.nextTick(() => {
-                    const sidebar = Alpine.$data(document.getElementById('sidebar'));
-                    if (sidebar) {
-                        sidebar.sidebarCollapsed = !sidebar.sidebarCollapsed;
-                    }
-                });
-            }
-        });
-    </script>
-@endpush
+</div>
+~

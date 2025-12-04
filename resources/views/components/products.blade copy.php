@@ -8,10 +8,10 @@
         </h2>
 
         <!-- Products Grid -->
-        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6">
+        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach ($products as $product)
                 <div
-                    class="group bg-white rounded-3xl overflow-hidden relative">
+                    class="group bg-white rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl relative">
                     <!-- Product Image with Overlay -->
                     <a href="{{ route('product.show', $product['slug']) }}" class="block relative">
                         <div class="relative w-full aspect-square bg-gray-100 overflow-hidden">

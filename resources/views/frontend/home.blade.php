@@ -4,8 +4,8 @@
     @include('frontend.partials.hero')
     <x-category-slider :categories="$categories" />
     <x-products :products="$products" />
-    @include('frontend.partials.smart-section')
-
+    {{-- @include('frontend.partials.smart-section') --}}
+    @include('frontend.partials.ads-banner')
     <!-- Product Sliders with Consistent Design -->
     {{-- <x-product-slider :products="$recommendedProducts" title="Recommended for you" :autoPlay="true" :showNavigation="true" /> --}}
 
@@ -13,10 +13,15 @@
         cardStyle="modern" /> --}}
 
     {{-- Correct usage: --}}
-    <x-product-slider :slidingProducts="$recommendedProducts ?? []" title="Recommended for you" sliderId="recommendedSlider" :slidesPerView="5"
-        :autoPlay="true" :showNavigation="true" :showPagination="false" cardStyle="minimal" />
+    <x-product-slider :slidingProducts="$recommendedProducts ?? []" title="New Arrival" sliderId="newArrival" :slidesPerView="5" :autoPlay="false"
+        :showNavigation="true" :showPagination="false" cardStyle="minimal" />
 
     {{-- <x-product-slider :products="$newArrivals" title="New Arrivals" sliderId="newArrivalsSlider" cardStyle="elegant"
         :slidesPerView="3" /> --}}
 
+    <!-- Ads Banner Component -->
+    <x-ads-banner :adsBanners="$adsBanners ?? []" />
+    <x-product-slider :slidingProducts="$recommendedProducts ?? []" title="Recommended for you" sliderId="recommendedSlider" :slidesPerView="5"
+        :autoPlay="true" :showNavigation="true" :showPagination="false" cardStyle="minimal" />
+    @include('frontend.partials.user-stories')
 @endsection

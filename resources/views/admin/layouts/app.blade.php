@@ -37,7 +37,7 @@
             @include('admin.partials.topbar')
 
             <!-- Main Content -->
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto p-4 no-scrollbar">
                 <div class="max-w-8xl mx-auto">
                     <!-- Breadcrumb -->
                     @include('admin.partials.breadcrumb')

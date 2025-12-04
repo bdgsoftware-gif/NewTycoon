@@ -75,32 +75,27 @@
                         class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 border">
                         <div class="py-1">
                             @auth
-                                <!-- Authenticated user menu -->
-                                <a href="{{ route('profile') }}"
-                                    class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
-                                    Profile
-                                </a>
-                                {{-- <a href="{{ route('dashboard') }}"
-                                    class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
-                                    Dashboard
-                                </a> --}}
-                                <a href="{{ route('trackOrder') }}"
-                                    class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
-                                    Track Order
-                                </a>
-                                {{--  --}}
-                                <!-- Show only for customers -->
-                                @if (auth()->user()->hasRole('customer'))
-                                    <a href="/orders"
-                                        class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
-                                        My Orders</a>
-                                @endif
-
                                 <!-- Show only for admins/moderators -->
                                 @if (auth()->user()->hasAnyRole(['admin', 'moderator']))
                                     <a href="{{ route('admin.dashboard') }}"
                                         class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
                                         Admin Panel</a>
+                                @endif
+                                <!-- Authenticated user menu -->
+                                <a href="{{ route('profile') }}"
+                                    class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
+                                    Profile
+                                </a>
+
+                                <a href="{{ route('trackOrder') }}"
+                                    class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
+                                    Track Order
+                                </a>
+                                <!-- Show only for customers -->
+                                @if (auth()->user()->hasRole('customer'))
+                                    <a href="/orders"
+                                        class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
+                                        My Orders</a>
                                 @endif
 
                                 <!-- Show only with specific permission -->

@@ -5,7 +5,7 @@
 
 @section('breadcrumb')
     <li class="inline-flex items-center">
-        <span class="text-gray-500">Dashboard</span>
+        <span class="text-gray-500">Home</span>
     </li>
 @endsection
 

@@ -1,5 +1,5 @@
 <!-- resources/views/components/product-slider.blade.php -->
-<section class="max-w-8xl mx-auto px-4 py-12" data-slider-section="{{ $sliderId }}">
+<section class="max-w-8xl mx-auto py-12" data-slider-section="{{ $sliderId }}">
     <!-- Debug: Check all products are being passed -->
     <div class="hidden">
         <p>Total Products: {{ count($slidingProducts) }}</p>
