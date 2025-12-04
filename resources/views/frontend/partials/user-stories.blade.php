@@ -1,6 +1,6 @@
 <!-- User Stories in Motion Section -->
 <section class="w-full bg-white py-8">
-    <div class="max-w-8xl mx-auto">
+    <div class="max-w-8xl mx-auto px-4">
         <!-- Section Header -->
         <div class="text-center max-w-3xl mx-auto mb-12 md:mb-16">
             <h2 class="text-3xl md:text-5xl font-bold text-gray-900 mb-4 font-quantico">
@@ -11,207 +11,34 @@
             </p>
         </div>
 
-        <!-- Video Reels Section -->
-        <div class="relative">
-            <!-- Desktop: Swiper with 4 videos per slide -->
-            <div class="hidden lg:block">
-                <div class="swiper userStoriesSwiper py-4">
-                    <div class="swiper-wrapper">
-                        <!-- Group videos in chunks of 4 for desktop -->
-                        @php
-                            $videoChunks = $userStories->chunk(4);
-                        @endphp
+        <!-- Single Swiper for all screen sizes -->
+        <div class="swiper userStoriesSwiper">
+            <div class="swiper-wrapper">
+                @foreach ($userStories as $index => $story)
+                    <div class="swiper-slide">
+                        <div class="w-full">
+                            <div class="bg-gray-50 rounded-2xl overflow-hidden shadow-lg">
+                                <!-- Video Container -->
+                                <div class="relative aspect-[9/16] bg-black">
+                                    <video id="video-{{ $index }}" class="w-full h-full object-cover" controls
+                                        playsinline preload="metadata" poster="{{ asset($story->thumbnail) ?? '' }}"
+                                        data-video-index="{{ $index }}">
+                                        <source src="{{ asset($story->video_path) }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
 
-                        @foreach ($videoChunks as $chunk)
-                            <div class="swiper-slide">
-                                <div class="grid grid-cols-4 gap-4 md:gap-6 px-4">
-                                    @foreach ($chunk as $story)
+                                    <!-- Loading indicator -->
+                                    <div
+                                        class="absolute inset-0 flex items-center justify-center bg-black/50 video-loading hidden">
                                         <div
-                                            class="bg-gray-50 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-                                            <!-- Video Container -->
-                                            <div class="relative aspect-[9/16] bg-black">
-                                                <video class="w-full h-full object-cover" controls
-                                                    controlsList="nodownload"
-                                                    poster="{{ asset($story->thumbnail) ?? '' }}" preload="metadata">
-                                                    <source src="{{ asset('storage/' . $story->video_path) }}"
-                                                        type="video/mp4">
-                                                    Your browser does not support the video tag.
-                                                </video>
-
-                                                <!-- Play/Pause Overlay -->
-                                                <div
-                                                    class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
-                                                    <div class="bg-black/50 rounded-full p-3">
-                                                        <svg class="w-8 h-8 text-white" fill="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path d="M8 5v14l11-7z" />
-                                                        </svg>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Story Info -->
-                                            <div class="p-4">
-                                                <div class="flex items-center mb-2">
-                                                    @if ($story->user_avatar)
-                                                        <img src="{{ asset($story->user_avatar) }}"
-                                                            alt="{{ $story->user_name }}"
-                                                            class="w-8 h-8 rounded-full mr-3">
-                                                    @else
-                                                        <div
-                                                            class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center mr-3">
-                                                            <span class="text-primary font-semibold text-sm">
-                                                                {{ strtoupper(substr($story->user_name, 0, 1)) }}
-                                                            </span>
-                                                        </div>
-                                                    @endif
-                                                    <div>
-                                                        <h4 class="font-semibold text-gray-900 text-sm">
-                                                            {{ $story->user_name }}</h4>
-                                                        <p class="text-xs text-gray-500">
-                                                            {{ $story->created_at->diffForHumans() }}</p>
-                                                    </div>
-                                                </div>
-
-                                                <p class="text-sm text-gray-700 mb-2 line-clamp-2">{{ $story->caption }}
-                                                </p>
-
-                                                <!-- Engagement Stats -->
-                                                <div class="flex items-center justify-between text-xs text-gray-500">
-                                                    <div class="flex items-center space-x-4">
-                                                        <span class="flex items-center">
-                                                            <svg class="w-4 h-4 mr-1" fill="none"
-                                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                                                            </svg>
-                                                            {{ $story->likes_count }}
-                                                        </span>
-                                                        <span class="flex items-center">
-                                                            <svg class="w-4 h-4 mr-1" fill="none"
-                                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                                            </svg>
-                                                            {{ $story->comments_count }}
-                                                        </span>
-                                                    </div>
-
-                                                    <!-- Product Tag -->
-                                                    @if ($story->product)
-                                                        <span
-                                                            class="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full">
-                                                            {{ $story->product->name }}
-                                                        </span>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-
-            <!-- Mobile & Tablet: Single video per slide -->
-            <div class="block lg:hidden">
-                <div class="swiper userStoriesMobileSwiper">
-                    <div class="swiper-wrapper">
-                        @foreach ($userStories as $story)
-                            <div class="swiper-slide">
-                                <div class="max-w-sm mx-auto">
-                                    <div class="bg-gray-50 rounded-2xl overflow-hidden shadow-lg">
-                                        <!-- Video Container -->
-                                        <div class="relative aspect-[9/16] bg-black">
-                                            <video class="w-full h-full object-cover" controls controlsList="nodownload"
-                                                poster="{{ asset($story->thumbnail) ?? '' }}" preload="metadata">
-                                                <source src="{{ asset('storage/' . $story->video_path) }}"
-                                                    type="video/mp4">
-                                                Your browser does not support the video tag.
-                                            </video>
-
-                                            <!-- Play/Pause Overlay -->
-                                            <div
-                                                class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
-                                                <div class="bg-black/50 rounded-full p-3">
-                                                    <svg class="w-8 h-8 text-white" fill="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path d="M8 5v14l11-7z" />
-                                                    </svg>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Story Info -->
-                                        <div class="p-4">
-                                            <div class="flex items-center mb-3">
-                                                @if ($story->user_avatar)
-                                                    <img src="{{ asset($story->user_avatar) }}"
-                                                        alt="{{ $story->user_name }}"
-                                                        class="w-10 h-10 rounded-full mr-3">
-                                                @else
-                                                    <div
-                                                        class="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center mr-3">
-                                                        <span class="text-primary font-semibold">
-                                                            {{ strtoupper(substr($story->user_name, 0, 1)) }}
-                                                        </span>
-                                                    </div>
-                                                @endif
-                                                <div>
-                                                    <h4 class="font-semibold text-gray-900">{{ $story->user_name }}
-                                                    </h4>
-                                                    <p class="text-sm text-gray-500">
-                                                        {{ $story->created_at->diffForHumans() }}</p>
-                                                </div>
-                                            </div>
-
-                                            <p class="text-gray-700 mb-3">{{ $story->caption }}</p>
-
-                                            <!-- Engagement Stats -->
-                                            <div class="flex items-center justify-between">
-                                                <div class="flex items-center space-x-6">
-                                                    <span class="flex items-center text-gray-600">
-                                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                                                        </svg>
-                                                        {{ $story->likes_count }}
-                                                    </span>
-                                                    <span class="flex items-center text-gray-600">
-                                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                                        </svg>
-                                                        {{ $story->comments_count }}
-                                                    </span>
-                                                </div>
-
-                                                <!-- Product Tag -->
-                                                @if ($story->product)
-                                                    <span
-                                                        class="bg-primary/10 text-primary text-sm px-3 py-1 rounded-full">
-                                                        {{ $story->product->name }}
-                                                    </span>
-                                                @endif
-                                            </div>
+                                            class="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin">
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
+                        </div>
                     </div>
-
-                    <!-- Pagination for Mobile -->
-                    <div class="swiper-pagination !bottom-0 mt-6"></div>
-                </div>
+                @endforeach
             </div>
         </div>
 
@@ -234,60 +61,211 @@
 
 @push('scripts')
     <script>
-        // Initialize Desktop Swiper (4 videos per slide)
         document.addEventListener('DOMContentLoaded', function() {
-            // Desktop Swiper (4 per slide)
-            if (document.querySelector('.userStoriesSwiper')) {
-                const desktopSwiper = new Swiper('.userStoriesSwiper', {
-                    slidesPerView: 1,
-                    spaceBetween: 20,
-                    navigation: {
-                        nextEl: '.swiper-button-next',
-                        prevEl: '.swiper-button-prev',
+            console.log('Initializing User Stories Swiper...');
+
+            // Get all videos
+            const videos = document.querySelectorAll('video[data-video-index]');
+            console.log(`Found ${videos.length} videos`);
+
+            // Initialize single swiper with responsive settings
+            const swiper = new Swiper('.userStoriesSwiper', {
+                // Responsive slides per view
+                slidesPerView: 1,
+                spaceBetween: 16,
+                loop: true,
+                speed: 300,
+                autoplay: {
+                    delay: 5000,
+                    disableOnInteraction: true,
+                },
+                navigation: false,
+                pagination: false,
+
+                // Responsive breakpoints
+                breakpoints: {
+                    // Mobile: 1 video
+                    0: {
+                        slidesPerView: 1,
+                        spaceBetween: 16,
                     },
-                    breakpoints: {
-                        1024: {
-                            slidesPerView: 1,
-                            spaceBetween: 30,
-                        },
-                    }
-                });
-            }
-
-            // Mobile Swiper (1 per slide)
-            if (document.querySelector('.userStoriesMobileSwiper')) {
-                const mobileSwiper = new Swiper('.userStoriesMobileSwiper', {
-                    slidesPerView: 1,
-                    spaceBetween: 20,
-                    pagination: {
-                        el: '.swiper-pagination',
-                        clickable: true,
+                    // Tablet: 3 videos (640px and up)
+                    640: {
+                        slidesPerView: 2,
+                        spaceBetween: 20,
                     },
-                    // No navigation buttons
-                    navigation: false,
+                    768: {
+                        slidesPerView: 3,
+                        spaceBetween: 24,
+                    },
+                    // Laptop: 4 videos (1024px and up)
+                    1024: {
+                        slidesPerView: 4,
+                        spaceBetween: 28,
+                    },
+                },
 
-                    // No pagination dots
-                    pagination: false,
+                on: {
+                    init: function() {
+                        console.log('Swiper initialized successfully');
+                        console.log('Current slides per view:', this.params.slidesPerView);
 
-                    breakpoints: {
-                        640: {
-                            slidesPerView: 2,
-                            spaceBetween: 20,
-                        },
+                        // Initialize video event listeners
+                        initVideoControls();
+                    },
+
+                    slideChange: function() {
+                        console.log('Slide changed to index:', this.activeIndex);
+
+                        // Pause all videos when slide changes
+                        pauseAllVideos();
+                    },
+
+                    resize: function() {
+                        console.log('Window resized, current slides per view:', this.params
+                            .slidesPerView);
                     }
-                });
-            }
+                }
+            });
 
-            // Pause other videos when one plays
-            document.querySelectorAll('video').forEach(video => {
-                video.addEventListener('play', function() {
-                    document.querySelectorAll('video').forEach(otherVideo => {
-                        if (otherVideo !== video && !otherVideo.paused) {
-                            otherVideo.pause();
+            // Initialize video controls
+            function initVideoControls() {
+                console.log('Initializing video controls...');
+
+                videos.forEach((video, index) => {
+                    const container = video.parentElement;
+                    const loadingIndicator = container.querySelector('.video-loading');
+
+                    console.log(`Setting up video ${index}:`, video.id);
+
+                    // Show loading indicator when video starts loading
+                    video.addEventListener('loadstart', function() {
+                        console.log(`Video ${index} loading started`);
+                        if (loadingIndicator) {
+                            loadingIndicator.classList.remove('hidden');
+                        }
+                    });
+
+                    // Hide loading indicator when video can play
+                    video.addEventListener('canplay', function() {
+                        console.log(`Video ${index} can play`);
+                        if (loadingIndicator) {
+                            loadingIndicator.classList.add('hidden');
+                        }
+                    });
+
+                    // Handle video errors
+                    video.addEventListener('error', function(e) {
+                        console.error(`Video ${index} error:`, this.error);
+                        console.error('Error details:', {
+                            code: this.error ? this.error.code : 'N/A',
+                            message: this.error ? this.error.message : 'N/A',
+                            networkState: this.networkState,
+                            readyState: this.readyState,
+                            src: this.currentSrc || this.src
+                        });
+
+                        if (loadingIndicator) {
+                            loadingIndicator.classList.add('hidden');
+                        }
+                    });
+
+                    // Log when video metadata is loaded
+                    video.addEventListener('loadedmetadata', function() {
+                        console.log(
+                            `Video ${index} metadata loaded - Duration: ${this.duration.toFixed(2)}s`
+                            );
+                    });
+
+                    // Pause other videos when one starts playing
+                    video.addEventListener('play', function() {
+                        console.log(`Video ${index} started playing`);
+
+                        // Pause all other videos
+                        videos.forEach((otherVideo, otherIndex) => {
+                            if (otherIndex !== index && !otherVideo.paused) {
+                                console.log(`Pausing other video ${otherIndex}`);
+                                otherVideo.pause();
+                            }
+                        });
+
+                        // Pause swiper autoplay when video plays
+                        if (swiper.autoplay.running) {
+                            console.log('Pausing swiper autoplay');
+                            swiper.autoplay.stop();
+                        }
+                    });
+
+                    // Resume swiper autoplay when video pauses
+                    video.addEventListener('pause', function() {
+                        console.log(`Video ${index} paused`);
+
+                        // Check if any video is still playing
+                        const anyVideoPlaying = Array.from(videos).some(v => !v.paused);
+
+                        if (!anyVideoPlaying && !swiper.autoplay.running) {
+                            console.log('Resuming swiper autoplay');
+                            swiper.autoplay.start();
+                        }
+                    });
+
+                    // Resume swiper autoplay when video ends
+                    video.addEventListener('ended', function() {
+                        console.log(`Video ${index} ended`);
+
+                        if (!swiper.autoplay.running) {
+                            console.log('Resuming swiper autoplay after video ended');
+                            swiper.autoplay.start();
                         }
                     });
                 });
+
+                console.log('Video controls initialized');
+            }
+
+            // Function to pause all videos
+            function pauseAllVideos() {
+                console.log('Pausing all videos...');
+                let pausedCount = 0;
+
+                videos.forEach((video, index) => {
+                    if (!video.paused) {
+                        video.pause();
+                        pausedCount++;
+                        console.log(`Paused video ${index}`);
+                    }
+                });
+
+                console.log(`Paused ${pausedCount} videos`);
+
+                // Restart swiper autoplay
+                if (!swiper.autoplay.running) {
+                    console.log('Restarting swiper autoplay');
+                    swiper.autoplay.start();
+                }
+            }
+
+            // Log initial video states
+            console.log('Initial video states:');
+            videos.forEach((video, index) => {
+                console.log(`Video ${index}:`, {
+                    id: video.id,
+                    src: video.currentSrc || video.src,
+                    paused: video.paused,
+                    readyState: video.readyState,
+                    networkState: video.networkState
+                });
             });
+
+            // Add click handler to pause all videos when clicking outside
+            document.addEventListener('click', function(e) {
+                // If click is not on a video or video controls
+                if (!e.target.closest('video') && !e.target.closest('.video-controls')) {
+                    pauseAllVideos();
+                }
+            });
+
+            console.log('User Stories section initialized successfully');
         });
     </script>
 @endpush

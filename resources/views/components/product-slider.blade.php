@@ -129,11 +129,11 @@
                 return;
             }
 
-            console.log('Initializing slider with config:', sliderConfig);
+            // console.log('Initializing slider with config:', sliderConfig);
 
             try {
                 const swiper = new Swiper(sliderElement, sliderConfig);
-                console.log('Slider initialized successfully');
+                // console.log('Slider initialized successfully');
             } catch (error) {
                 console.error('Slider initialization error:', error);
             }
