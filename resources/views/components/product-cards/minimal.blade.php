@@ -68,7 +68,7 @@
         <div class="mt-auto">
             <div class="flex items-center justify-between">
                 <span class="text-lg font-bold font-quantico text-gray-900">
-                    ${{ number_format($discountedPrice, 2) }}
+                    TK{{ number_format($discountedPrice, 2) }}
                 </span>
 
                 @if (!$inStock)
@@ -89,7 +89,7 @@
                         Save {{ $discountPercentage }}%
                     </span>
                     <span class="text-xs text-gray-500 line-through">
-                        ${{ number_format($originalPrice, 2) }}
+                        TK{{ number_format($originalPrice, 2) }}
                     </span>
                 </div>
             @endif

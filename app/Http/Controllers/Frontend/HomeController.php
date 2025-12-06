@@ -259,8 +259,8 @@ class HomeController extends Controller
                 'name' => 'Wireless Bluetooth Headphones',
                 'slug' => 'wireless-bluetooth-headphones',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/fr-07.jpg',
+                    'images/products/fr-08.jpg'
                 ],
                 'original_price' => 199.99,
                 'discounted_price' => 149.99,
@@ -276,8 +276,8 @@ class HomeController extends Controller
                 'name' => 'Smart Fitness Watch Series 5',
                 'slug' => 'smart-fitness-watch-series-5',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/ck-01.jpg',
+                    'images/products/ck-02.jpg'
                 ],
                 'original_price' => 299.99,
                 'discounted_price' => 299.99,
@@ -293,8 +293,8 @@ class HomeController extends Controller
                 'name' => 'Professional DSLR Camera',
                 'slug' => 'professional-dslr-camera',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/ac-04.jpg',
+                    'images/products/ac-03.jpg'
                 ],
                 'original_price' => 1299.99,
                 'discounted_price' => 999.99,
@@ -310,8 +310,8 @@ class HomeController extends Controller
                 'name' => 'Gaming Laptop Pro',
                 'slug' => 'gaming-laptop-pro',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/ck-03.jpg',
+                    'images/products/ck-04.jpg'
                 ],
                 'original_price' => 1999.99,
                 'discounted_price' => 1799.99,
@@ -327,8 +327,8 @@ class HomeController extends Controller
                 'name' => '4K Action Camera',
                 'slug' => '4k-action-camera',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/fr-09.jpg',
+                    'images/products/fr-010.jpg'
                 ],
                 'original_price' => 399.99,
                 'discounted_price' => 319.99,
@@ -344,8 +344,8 @@ class HomeController extends Controller
                 'name' => 'Noise-Cancelling Wireless Earbuds',
                 'slug' => 'noise-cancelling-wireless-earbuds',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/wm-01.jpg',
+                    'images/products/wm-01.jpg'
                 ],
                 'original_price' => 149.99,
                 'discounted_price' => 99.99,
@@ -361,8 +361,8 @@ class HomeController extends Controller
                 'name' => 'Smart Home Speaker',
                 'slug' => 'smart-home-speaker',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/stv-03.jpg',
+                    'images/products/stv-02.jpg'
                 ],
                 'original_price' => 99.99,
                 'discounted_price' => 69.99,
@@ -378,8 +378,8 @@ class HomeController extends Controller
                 'name' => '4K Ultra HD Monitor 27"',
                 'slug' => '4k-ultra-hd-monitor-27',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/ac-01.jpg',
+                    'images/products/ac-02.jpg'
                 ],
                 'original_price' => 349.99,
                 'discounted_price' => 299.99,
@@ -723,8 +723,8 @@ class HomeController extends Controller
                 'name' => 'Wireless Bluetooth Headphones',
                 'slug' => 'wireless-bluetooth-headphones',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/stv-03.jpg',
+                    'images/products/stv-01.jpg'
                 ],
                 'original_price' => 199.99,
                 'discounted_price' => 149.99,
@@ -740,8 +740,8 @@ class HomeController extends Controller
                 'name' => 'Smart Fitness Watch Series 5',
                 'slug' => 'smart-fitness-watch-series-5',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/stv-01.jpg',
+                    'images/products/stv-02.jpg'
                 ],
                 'original_price' => 299.99,
                 'discounted_price' => 299.99,
@@ -757,8 +757,8 @@ class HomeController extends Controller
                 'name' => 'Professional DSLR Camera',
                 'slug' => 'professional-dslr-camera',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/e-stv-03.jpg',
+                    'images/products/e-stv-02.jpg'
                 ],
                 'original_price' => 1299.99,
                 'discounted_price' => 999.99,
@@ -774,8 +774,8 @@ class HomeController extends Controller
                 'name' => 'Gaming Laptop Pro',
                 'slug' => 'gaming-laptop-pro',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/e-stv-02.jpg',
+                    'images/products/e-stv-03.jpg'
                 ],
                 'original_price' => 1999.99,
                 'discounted_price' => 1799.99,
@@ -785,7 +785,49 @@ class HomeController extends Controller
                 'rating' => 4.6,
                 'review_count' => 167,
                 'description' => 'High-performance gaming laptop with RTX graphics.'
-            ]
+            ],
+            [
+                'id' => 5,
+                'name' => 'Wireless Bluetooth Headphones',
+                'slug' => 'wireless-bluetooth-headphones',
+                'images' => [
+                    'images/products/fan-02.jpg',
+                    'images/products/fan-07.jpg'
+                ],
+                'original_price' => 199.99,
+                'discounted_price' => 149.99,
+                'discount_percentage' => 25,
+                'in_stock' => true,
+                'is_new' => true,
+            ],
+            [
+                'id' => 6,
+                'name' => 'Smart Fitness Watch Series 6',
+                'slug' => 'smart-fitness-watch-series-6',
+                'images' => [
+                    'images/products/fan-04.jpg',
+                    'images/products/fan-01.jpg'
+                ],
+                'original_price' => 299.99,
+                'discounted_price' => 299.99,
+                'discount_percentage' => 0,
+                'in_stock' => false,
+                'is_new' => false,
+            ],
+            [
+                'id' => 7,
+                'name' => 'Professional DSLR Camera Kit',
+                'slug' => 'professional-dslr-camera-kit',
+                'images' => [
+                    'images/products/bd-01.jpg',
+                    'images/products/bd-01.jpg'
+                ],
+                'original_price' => 1299.99,
+                'discounted_price' => 999.99,
+                'discount_percentage' => 23,
+                'in_stock' => true,
+                'is_new' => true,
+            ],
         ];
     }
     // ==========================================
@@ -846,7 +888,7 @@ class HomeController extends Controller
                     'user_name' => 'Sarah Johnson',
                     'user_avatar' => 'images/stories/user.jpg',
                     'video_path' => 'videos/stories/story.mp4', // You can use placeholder videos
-                    'thumbnail' => 'images/car.jpg',
+                    'thumbnail' => 'images/fr-09.jpg',
                     'caption' => 'Just got my new gaming headset! The sound quality is absolutely incredible and the comfort is next level.',
                     'likes_count' => 245,
                     'comments_count' => 32,
@@ -880,7 +922,7 @@ class HomeController extends Controller
                     'user_name' => 'Emma Wilson',
                     'user_avatar' => 'images/stories/user.jpg',
                     'video_path' => 'videos/stories/story.mp4',
-                    'thumbnail' => 'images/car.jpg',
+                    'thumbnail' => 'images/fr-07.jpg',
                     'caption' => 'My new smartwatch arrived! The battery life is amazing and fitness tracking is super accurate.',
                     'likes_count' => 312,
                     'comments_count' => 45,

@@ -10,8 +10,7 @@
         <!-- Products Grid -->
         <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6">
             @foreach ($products as $product)
-                <div
-                    class="group bg-white rounded-3xl overflow-hidden relative">
+                <div class="group bg-white rounded-3xl overflow-hidden relative">
                     <!-- Product Image with Overlay -->
                     <a href="{{ route('product.show', $product['slug']) }}" class="block relative">
                         <div class="relative w-full aspect-square bg-gray-100 overflow-hidden">
@@ -135,12 +134,12 @@
                             <div class="flex items-center space-x-2">
                                 @if ($product['discount_percentage'] > 0)
                                     <span
-                                        class="text-2xl font-bold text-gray-900">${{ number_format($product['discounted_price'], 2) }}</span>
+                                        class="text-2xl font-bold text-gray-900">৳{{ number_format($product['discounted_price'], 2) }}</span>
                                     <span
-                                        class="text-lg text-gray-500 line-through">${{ number_format($product['original_price'], 2) }}</span>
+                                        class="text-lg text-gray-500 line-through">৳{{ number_format($product['original_price'], 2) }}</span>
                                 @else
                                     <span
-                                        class="text-2xl font-bold text-gray-900">${{ number_format($product['original_price'], 2) }}</span>
+                                        class="text-2xl font-bold text-gray-900">৳{{ number_format($product['original_price'], 2) }}</span>
                                 @endif
                             </div>
 

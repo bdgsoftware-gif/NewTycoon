@@ -13,7 +13,7 @@
         cardStyle="modern" /> --}}
 
     {{-- Correct usage: --}}
-    <x-product-slider :slidingProducts="$recommendedProducts ?? []" title="New Arrival" sliderId="newArrival" :slidesPerView="5" :autoPlay="false"
+    <x-product-slider :slidingProducts="$newArrivals ?? []" title="New Arrival" sliderId="newArrival" :slidesPerView="5" :autoPlay="false"
         :showNavigation="true" :showPagination="false" cardStyle="minimal" />
 
     {{-- <x-product-slider :products="$newArrivals" title="New Arrivals" sliderId="newArrivalsSlider" cardStyle="elegant"
