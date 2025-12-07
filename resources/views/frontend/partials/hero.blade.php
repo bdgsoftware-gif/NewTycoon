@@ -12,12 +12,12 @@
                         </video>
                     @else
                         <img src="{{ asset($slide['background']) }}" alt="{{ $slide['title'] ?? '' }}"
-                            class="w-full h-full object-cover">
+                            class="w-full h-full object-contain">
                     @endif
 
                     <!-- Overlay -->
                     <div class="absolute inset-0 bg-black/40 {{ $slide['has_content'] ? '' : 'hidden' }}"></div>
-                    
+
                     <!-- Content -->
                     @if ($slide['has_content'])
                         <div class="absolute inset-0 flex items-center">

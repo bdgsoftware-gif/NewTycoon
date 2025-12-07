@@ -32,7 +32,7 @@ class FooterController extends Controller
         $brand = [
             'name' => 'TYCOON',
             'description' => 'Your premier destination for cutting-edge technology and electronics. We bring you the latest innovations with exceptional quality and service.',
-            'productImage' => 'images/footer-product.png', // Use your local image path
+            'productImage' => 'images/cat/pressure-cooker.png', // Use your local image path
         ];
 
         $payments = [

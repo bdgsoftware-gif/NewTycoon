@@ -25,12 +25,13 @@ class HomeController extends Controller
         $recommendedProducts = $this->getRecommendedProducts();
         $featuredProducts = $this->getFeaturedProducts();
         $newArrivals = $this->newArrivals();
-        $saleProducts = $this->saleProducts();
+        $bestsellers = $this->saleProducts();
 
         $adsBanners = $this->getAdsBanners();
+        $adsAnotherBanners = $this->getAnotherAdsBanners();
         $userStories = $this->getUserStories();
 
-        return view('frontend.home', compact('footerData', 'navigation', 'heroSlides', 'categories', 'products', 'smartSections', 'recommendedProducts', 'featuredProducts', 'saleProducts', 'newArrivals', 'adsBanners', 'userStories'));
+        return view('frontend.home', compact('footerData', 'navigation', 'heroSlides', 'categories', 'products', 'smartSections', 'recommendedProducts', 'featuredProducts', 'bestsellers', 'newArrivals', 'adsBanners', 'userStories', 'adsAnotherBanners'));
     }
 
     protected function getNavigation()
@@ -182,6 +183,17 @@ class HomeController extends Controller
                 'has_cta' => false,
                 'cta_buttons' => []
             ],
+            [
+                'type' => 'image',
+                'background' => 'images/hero/demo-banner.jpg',
+                'has_content' => false,
+                'content_position' => 'center',
+                'badge' => null,
+                'title' => null,
+                'subtitle' => null,
+                'has_cta' => false,
+                'cta_buttons' => []
+            ],
         ];
     }
 
@@ -190,63 +202,63 @@ class HomeController extends Controller
         return [
             [
                 'id' => 1,
-                'name' => 'Smart Phones',
-                'imageUrl' => 'images/cat/default.png',
+                'name' => 'Air Conditioner',
+                'imageUrl' => 'images/cat/ac.png',
             ],
             [
                 'id' => 2,
-                'name' => 'Tabs',
-                'imageUrl' => 'images/cat/default.png',
+                'name' => 'Fan',
+                'imageUrl' => 'images/cat/fan.png',
             ],
             [
                 'id' => 3,
-                'name' => 'Laptops',
-                'imageUrl' => 'images/cat/default.png',
+                'name' => 'Room Comforter',
+                'imageUrl' => 'images/cat/room-comporter.png',
             ],
             [
                 'id' => 4,
-                'name' => 'Smart Watches',
-                'imageUrl' => 'images/cat/default.png',
+                'name' => 'Cookware',
+                'imageUrl' => 'images/cat/cookware.png',
             ],
             [
                 'id' => 5,
-                'name' => 'Headphones',
-                'imageUrl' => 'images/cat/default.png',
+                'name' => 'Gas Burner',
+                'imageUrl' => 'images/cat/gas-burner.png',
             ],
             [
                 'id' => 6,
-                'name' => 'Earbuds',
-                'imageUrl' => 'images/cat/default.png',
+                'name' => 'Pressure Cooker',
+                'imageUrl' => 'images/cat/pressure-cooker.png',
             ],
             [
                 'id' => 7,
-                'name' => 'Power Tools',
-                'imageUrl' => 'images/cat/default.png',
+                'name' => 'Rice Cooker',
+                'imageUrl' => 'images/cat/rice-cooker.png',
             ],
             [
                 'id' => 8,
-                'name' => 'Game Consoles',
-                'imageUrl' => 'images/cat/default.png',
+                'name' => 'Electric Kettle',
+                'imageUrl' => 'images/cat/electric-kettle.png',
             ],
             [
                 'id' => 9,
-                'name' => 'Chargers',
-                'imageUrl' => 'images/cat/default.png',
+                'name' => 'Mixer Grinder',
+                'imageUrl' => 'images/cat/mixer-grinder.png',
             ],
             [
                 'id' => 10,
-                'name' => 'Cable & Others',
-                'imageUrl' => 'images/cat/default.png',
+                'name' => 'LED TV',
+                'imageUrl' => 'images/cat/led-tv.png',
             ],
             [
                 'id' => 11,
                 'name' => 'Monitor',
-                'imageUrl' => 'images/cat/default.png',
+                'imageUrl' => 'images/cat/monitor.png',
             ],
             [
                 'id' => 12,
-                'name' => 'Product Name',
-                'imageUrl' => 'images/cat/default.png',
+                'name' => 'Refrigerator',
+                'imageUrl' => 'images/cat/refrigerator.png',
             ],
         ];
     }
@@ -256,15 +268,15 @@ class HomeController extends Controller
         return [
             [
                 'id' => 1,
-                'name' => 'Wireless Bluetooth Headphones',
-                'slug' => 'wireless-bluetooth-headphones',
+                'name' => 'TYCOON Refrigerator-202 L TCN-A3DBP-202 630x630x1420',
+                'slug' => 'TYCOON-Refrigerator-202-L',
                 'images' => [
                     'images/products/fr-07.jpg',
                     'images/products/fr-08.jpg'
                 ],
-                'original_price' => 199.99,
-                'discounted_price' => 149.99,
-                'discount_percentage' => 25,
+                'original_price' => 39999,
+                'discounted_price' => 35899,
+                'discount_percentage' => 5,
                 'in_stock' => true,
                 'is_new' => true,
                 'rating' => 4.5,
@@ -273,14 +285,14 @@ class HomeController extends Controller
             ],
             [
                 'id' => 2,
-                'name' => 'Smart Fitness Watch Series 5',
-                'slug' => 'smart-fitness-watch-series-5',
+                'name' => 'Tycoon 2.8L Rice Cooker TRM-240 1Y 320x320x342mm',
+                'slug' => 'Tycoon-2.8L-Rice-Cooker',
                 'images' => [
                     'images/products/ck-01.jpg',
                     'images/products/ck-02.jpg'
                 ],
-                'original_price' => 299.99,
-                'discounted_price' => 299.99,
+                'original_price' => 3500,
+                'discounted_price' => 3350,
                 'discount_percentage' => 0,
                 'in_stock' => false,
                 'is_new' => false,
@@ -290,25 +302,8 @@ class HomeController extends Controller
             ],
             [
                 'id' => 3,
-                'name' => 'Professional DSLR Camera',
-                'slug' => 'professional-dslr-camera',
-                'images' => [
-                    'images/products/ac-04.jpg',
-                    'images/products/ac-03.jpg'
-                ],
-                'original_price' => 1299.99,
-                'discounted_price' => 999.99,
-                'discount_percentage' => 23,
-                'in_stock' => true,
-                'is_new' => true,
-                'rating' => 4.8,
-                'review_count' => 256,
-                'description' => 'Professional-grade DSLR camera for stunning photography.'
-            ],
-            [
-                'id' => 4,
-                'name' => 'Gaming Laptop Pro',
-                'slug' => 'gaming-laptop-pro',
+                'name' => 'Tycoon 2.8L Rice Cooker TRM-240 1Y 320x320x342mm',
+                'slug' => 'Tycoon-2.8L-Rice-Cooker',
                 'images' => [
                     'images/products/ck-03.jpg',
                     'images/products/ck-04.jpg'
@@ -317,56 +312,74 @@ class HomeController extends Controller
                 'discounted_price' => 1799.99,
                 'discount_percentage' => 10,
                 'in_stock' => true,
-                'is_new' => false,
+                'is_new' => true,
                 'rating' => 4.6,
                 'review_count' => 167,
                 'description' => 'High-performance gaming laptop with RTX graphics.'
             ],
             [
-                'id' => 5,
-                'name' => '4K Action Camera',
-                'slug' => '4k-action-camera',
+                'id' => 4,
+                'name' => 'TYCOON Refrigerator-202 L TCN-A3DLW 630x630x1420',
+                'slug' => 'TYCOON-Refrigerator-202-L',
                 'images' => [
                     'images/products/fr-09.jpg',
                     'images/products/fr-010.jpg'
                 ],
-                'original_price' => 399.99,
-                'discounted_price' => 319.99,
+                'original_price' => 59999,
+                'discounted_price' => 40750,
                 'discount_percentage' => 20,
                 'in_stock' => true,
-                'is_new' => true,
+                'is_new' => false,
                 'rating' => 4.4,
                 'review_count' => 54,
                 'description' => 'Compact 4K action camera for durable, high-quality footage.'
             ],
             [
-                'id' => 6,
-                'name' => 'Noise-Cancelling Wireless Earbuds',
-                'slug' => 'noise-cancelling-wireless-earbuds',
+                'id' => 5,
+                'name' => 'Tycoon Washing Machine 8.0 KG Top Loading',
+                'slug' => 'Tycoon-Washing-Machine-8.0-KG-Top-Loading',
                 'images' => [
                     'images/products/wm-01.jpg',
                     'images/products/wm-01.jpg'
                 ],
-                'original_price' => 149.99,
-                'discounted_price' => 99.99,
-                'discount_percentage' => 33,
+                'original_price' => 125870,
+                'discounted_price' => 105650,
+                'discount_percentage' => 23,
                 'in_stock' => true,
-                'is_new' => false,
+                'is_new' => true,
                 'rating' => 4.1,
                 'review_count' => 76,
                 'description' => 'Pocket-sized earbuds with active noise cancellation.'
             ],
             [
+                'id' => 6,
+                'name' => 'Tycoon Double Burner Glass LPG Stove TCN-DBLPGG-Fantasy Flower',
+                'slug' => 'Tycoon-Double-Burner-Glass-LPG-Stove',
+                'images' => [
+                    'images/products/stv-02.jpg',
+                    'images/products/stv-01.jpg'
+                ],
+                'original_price' => 6999,
+                'discounted_price' => 5950,
+                'discount_percentage' => 23,
+                'in_stock' => true,
+                'is_new' => false,
+                'rating' => 4.8,
+                'review_count' => 256,
+                'description' => 'Professional-grade DSLR camera for stunning photography.'
+            ],
+
+            [
                 'id' => 7,
-                'name' => 'Smart Home Speaker',
-                'slug' => 'smart-home-speaker',
+                'name' => 'Tycoon Double Burner Glass LPG Stove TCN-DBLPGG-Red Lily 720mmX380mmX115mm',
+                'slug' => 'Tycoon-Double-Burner-Glass-LPG-Stove',
                 'images' => [
                     'images/products/stv-03.jpg',
                     'images/products/stv-02.jpg'
                 ],
-                'original_price' => 99.99,
-                'discounted_price' => 69.99,
-                'discount_percentage' => 30,
+                'original_price' => 5999,
+                'discounted_price' => 4850,
+                'discount_percentage' => 20,
                 'in_stock' => true,
                 'is_new' => true,
                 'rating' => 4.3,
@@ -375,8 +388,8 @@ class HomeController extends Controller
             ],
             [
                 'id' => 8,
-                'name' => '4K Ultra HD Monitor 27"',
-                'slug' => '4k-ultra-hd-monitor-27',
+                'name' => 'Tycoon Hot & Cool AC 1.5 Ton Tycoon AC 1.5 Ton Hot & Cool Inverter WiFi (TCN 18K HC R410 INV WiFi) Indoor 920×306×195mm Outdoor - 853×349×602mm',
+                'slug' => 'Tycoon-Hot-&-Cool-AC-1.5-Ton',
                 'images' => [
                     'images/products/ac-01.jpg',
                     'images/products/ac-02.jpg'
@@ -429,143 +442,140 @@ class HomeController extends Controller
         return [
             [
                 'id' => 1,
-                'name' => 'Wireless Bluetooth Headphones',
-                'slug' => 'wireless-bluetooth-headphones-5',
+                'name' => 'TYCOON Refrigerator-202 L TCN-A3DBP-202 630x630x1420',
+                'slug' => 'TYCOON-Refrigerator-202-L',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/fr-07.jpg',
+                    'images/products/fr-08.jpg'
                 ],
-                'original_price' => 199.99,
-                'discounted_price' => 149.99,
-                'discount_percentage' => 25,
+                'original_price' => 39999,
+                'discounted_price' => 35899,
+                'discount_percentage' => 5,
                 'in_stock' => true,
                 'is_new' => true,
+                'rating' => 4.5,
+                'review_count' => 128,
+                'description' => 'High-quality wireless headphones with noise cancellation.'
             ],
             [
                 'id' => 2,
-                'name' => 'Smart Fitness Watch Series',
-                'slug' => 'smart-fitness-watch-series-5',
+                'name' => 'Tycoon 2.8L Rice Cooker TRM-240 1Y 320x320x342mm',
+                'slug' => 'Tycoon-2.8L-Rice-Cooker',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/ck-01.jpg',
+                    'images/products/ck-02.jpg'
                 ],
-                'original_price' => 299.99,
-                'discounted_price' => 299.99,
+                'original_price' => 3500,
+                'discounted_price' => 3350,
                 'discount_percentage' => 0,
                 'in_stock' => false,
                 'is_new' => false,
+                'rating' => 4.2,
+                'review_count' => 89,
+                'description' => 'Advanced fitness tracking with heart rate monitoring.'
             ],
             [
                 'id' => 3,
-                'name' => 'Professional DSLR Camera',
-                'slug' => 'professional-dslr-camera',
+                'name' => 'Tycoon 2.8L Rice Cooker TRM-240 1Y 320x320x342mm',
+                'slug' => 'Tycoon-2.8L-Rice-Cooker',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/ck-03.jpg',
+                    'images/products/ck-04.jpg'
                 ],
-                'original_price' => 1299.99,
-                'discounted_price' => 999.99,
-                'discount_percentage' => 23,
+                'original_price' => 1999.99,
+                'discounted_price' => 1799.99,
+                'discount_percentage' => 10,
                 'in_stock' => true,
                 'is_new' => true,
+                'rating' => 4.6,
+                'review_count' => 167,
+                'description' => 'High-performance gaming laptop with RTX graphics.'
             ],
             [
                 'id' => 4,
-                'name' => 'Gaming Laptop Pro',
-                'slug' => 'gaming-laptop-pro',
+                'name' => 'TYCOON Refrigerator-202 L TCN-A3DLW 630x630x1420',
+                'slug' => 'TYCOON-Refrigerator-202-L',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/fr-09.jpg',
+                    'images/products/fr-010.jpg'
                 ],
-                'original_price' => 1999.99,
-                'discounted_price' => 1799.99,
-                'discount_percentage' => 10,
+                'original_price' => 59999,
+                'discounted_price' => 40750,
+                'discount_percentage' => 20,
                 'in_stock' => true,
                 'is_new' => false,
+                'rating' => 4.4,
+                'review_count' => 54,
+                'description' => 'Compact 4K action camera for durable, high-quality footage.'
             ],
             [
                 'id' => 5,
-                'name' => 'Wireless Bluetooth Headphones',
-                'slug' => 'wireless-bluetooth-headphones',
+                'name' => 'Tycoon Washing Machine 8.0 KG Top Loading',
+                'slug' => 'Tycoon-Washing-Machine-8.0-KG-Top-Loading',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/wm-01.jpg',
+                    'images/products/wm-01.jpg'
                 ],
-                'original_price' => 199.99,
-                'discounted_price' => 149.99,
-                'discount_percentage' => 25,
-                'in_stock' => true,
-                'is_new' => true,
-            ],
-            [
-                'id' => 6,
-                'name' => 'Smart Fitness Watch Series 6',
-                'slug' => 'smart-fitness-watch-series-6',
-                'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
-                ],
-                'original_price' => 299.99,
-                'discounted_price' => 299.99,
-                'discount_percentage' => 0,
-                'in_stock' => false,
-                'is_new' => false,
-            ],
-            [
-                'id' => 7,
-                'name' => 'Professional DSLR Camera Kit',
-                'slug' => 'professional-dslr-camera-kit',
-                'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
-                ],
-                'original_price' => 1299.99,
-                'discounted_price' => 999.99,
+                'original_price' => 125870,
+                'discounted_price' => 105650,
                 'discount_percentage' => 23,
                 'in_stock' => true,
                 'is_new' => true,
+                'rating' => 4.1,
+                'review_count' => 76,
+                'description' => 'Pocket-sized earbuds with active noise cancellation.'
             ],
             [
-                'id' => 8,
-                'name' => 'Gaming Laptop Pro Max',
-                'slug' => 'gaming-laptop-pro-max',
+                'id' => 6,
+                'name' => 'Tycoon Double Burner Glass LPG Stove TCN-DBLPGG-Fantasy Flower',
+                'slug' => 'Tycoon-Double-Burner-Glass-LPG-Stove',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/stv-02.jpg',
+                    'images/products/stv-01.jpg'
                 ],
-                'original_price' => 1999.99,
-                'discounted_price' => 1799.99,
-                'discount_percentage' => 10,
+                'original_price' => 6999,
+                'discounted_price' => 5950,
+                'discount_percentage' => 23,
                 'in_stock' => true,
                 'is_new' => false,
+                'rating' => 4.8,
+                'review_count' => 256,
+                'description' => 'Professional-grade DSLR camera for stunning photography.'
             ],
+
             [
-                'id' => 9,
-                'name' => '4K Action Camera',
-                'slug' => '4k-action-camera',
+                'id' => 7,
+                'name' => 'Tycoon Double Burner Glass LPG Stove TCN-DBLPGG-Red Lily 720mmX380mmX115mm',
+                'slug' => 'Tycoon-Double-Burner-Glass-LPG-Stove',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/stv-03.jpg',
+                    'images/products/stv-02.jpg'
                 ],
-                'original_price' => 399.99,
-                'discounted_price' => 319.99,
+                'original_price' => 5999,
+                'discounted_price' => 4850,
                 'discount_percentage' => 20,
                 'in_stock' => true,
                 'is_new' => true,
+                'rating' => 4.3,
+                'review_count' => 142,
+                'description' => 'Voice-controlled smart speaker with crisp audio.'
             ],
             [
-                'id' => 10,
-                'name' => 'Noise-Cancelling Earbuds',
-                'slug' => 'noise-cancelling-wireless-earbuds',
+                'id' => 8,
+                'name' => 'Tycoon Hot & Cool AC 1.5 Ton Tycoon AC 1.5 Ton Hot & Cool Inverter WiFi (TCN 18K HC R410 INV WiFi) Indoor 920×306×195mm Outdoor - 853×349×602mm',
+                'slug' => 'Tycoon-Hot-&-Cool-AC-1.5-Ton',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/ac-01.jpg',
+                    'images/products/ac-02.jpg'
                 ],
-                'original_price' => 149.99,
-                'discounted_price' => 99.99,
-                'discount_percentage' => 33,
+                'original_price' => 349.99,
+                'discounted_price' => 299.99,
+                'discount_percentage' => 14,
                 'in_stock' => true,
                 'is_new' => false,
+                'rating' => 4.5,
+                'review_count' => 66,
+                'description' => 'Crisp 4K display with vibrant colors and wide viewing angles.'
             ],
         ];
     }
@@ -574,15 +584,15 @@ class HomeController extends Controller
         return [
             [
                 'id' => 1,
-                'name' => 'Wireless Bluetooth Headphones',
-                'slug' => 'wireless-bluetooth-headphones',
+                'name' => 'TYCOON Refrigerator-202 L TCN-A3DBP-202 630x630x1420',
+                'slug' => 'TYCOON-Refrigerator-202-L',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/fr-07.jpg',
+                    'images/products/fr-08.jpg'
                 ],
-                'original_price' => 199.99,
-                'discounted_price' => 149.99,
-                'discount_percentage' => 25,
+                'original_price' => 39999,
+                'discounted_price' => 35899,
+                'discount_percentage' => 5,
                 'in_stock' => true,
                 'is_new' => true,
                 'rating' => 4.5,
@@ -590,15 +600,66 @@ class HomeController extends Controller
                 'description' => 'High-quality wireless headphones with noise cancellation.'
             ],
             [
-                'id' => 2,
-                'name' => 'Smart Fitness Watch Series 5',
-                'slug' => 'smart-fitness-watch-series-5',
+                'id' => 3,
+                'name' => 'Tycoon 2.8L Rice Cooker TRM-240 1Y 320x320x342mm',
+                'slug' => 'Tycoon-2.8L-Rice-Cooker',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/ck-03.jpg',
+                    'images/products/ck-04.jpg'
                 ],
-                'original_price' => 299.99,
-                'discounted_price' => 299.99,
+                'original_price' => 1999.99,
+                'discounted_price' => 1799.99,
+                'discount_percentage' => 10,
+                'in_stock' => true,
+                'is_new' => true,
+                'rating' => 4.6,
+                'review_count' => 167,
+                'description' => 'High-performance gaming laptop with RTX graphics.'
+            ],
+            [
+                'id' => 3,
+                'name' => 'Tycoon Washing Machine 8.0 KG Top Loading',
+                'slug' => 'Tycoon-Washing-Machine-8.0-KG-Top-Loading',
+                'images' => [
+                    'images/products/wm-01.jpg',
+                    'images/products/wm-01.jpg'
+                ],
+                'original_price' => 125870,
+                'discounted_price' => 105650,
+                'discount_percentage' => 23,
+                'in_stock' => true,
+                'is_new' => true,
+                'rating' => 4.1,
+                'review_count' => 76,
+                'description' => 'Pocket-sized earbuds with active noise cancellation.'
+            ],
+            [
+                'id' => 4,
+                'name' => 'Tycoon Double Burner Glass LPG Stove TCN-DBLPGG-Red Lily 720mmX380mmX115mm',
+                'slug' => 'Tycoon-Double-Burner-Glass-LPG-Stove',
+                'images' => [
+                    'images/products/stv-03.jpg',
+                    'images/products/stv-02.jpg'
+                ],
+                'original_price' => 5999,
+                'discounted_price' => 4850,
+                'discount_percentage' => 20,
+                'in_stock' => true,
+                'is_new' => true,
+                'rating' => 4.3,
+                'review_count' => 142,
+                'description' => 'Voice-controlled smart speaker with crisp audio.'
+            ],
+            [
+                'id' => 5,
+                'name' => 'Tycoon 2.8L Rice Cooker TRM-240 1Y 320x320x342mm',
+                'slug' => 'Tycoon-2.8L-Rice-Cooker',
+                'images' => [
+                    'images/products/ck-01.jpg',
+                    'images/products/ck-02.jpg'
+                ],
+                'original_price' => 3500,
+                'discounted_price' => 3350,
                 'discount_percentage' => 0,
                 'in_stock' => false,
                 'is_new' => false,
@@ -607,39 +668,22 @@ class HomeController extends Controller
                 'description' => 'Advanced fitness tracking with heart rate monitoring.'
             ],
             [
-                'id' => 3,
-                'name' => 'Professional DSLR Camera',
-                'slug' => 'professional-dslr-camera',
+                'id' => 6,
+                'name' => 'Tycoon 2.8L Rice Cooker TRM-240 1Y 320x320x342mm',
+                'slug' => 'Tycoon-2.8L-Rice-Cooker',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
-                ],
-                'original_price' => 1299.99,
-                'discounted_price' => 999.99,
-                'discount_percentage' => 23,
-                'in_stock' => true,
-                'is_new' => true,
-                'rating' => 4.8,
-                'review_count' => 256,
-                'description' => 'Professional-grade DSLR camera for stunning photography.'
-            ],
-            [
-                'id' => 4,
-                'name' => 'Gaming Laptop Pro',
-                'slug' => 'gaming-laptop-pro',
-                'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/ck-03.jpg',
+                    'images/products/ck-04.jpg'
                 ],
                 'original_price' => 1999.99,
                 'discounted_price' => 1799.99,
                 'discount_percentage' => 10,
                 'in_stock' => true,
-                'is_new' => false,
+                'is_new' => true,
                 'rating' => 4.6,
                 'review_count' => 167,
                 'description' => 'High-performance gaming laptop with RTX graphics.'
-            ]
+            ],
         ];
     }
     protected function saleProducts()
@@ -647,15 +691,15 @@ class HomeController extends Controller
         return [
             [
                 'id' => 1,
-                'name' => 'Wireless Bluetooth Headphones',
-                'slug' => 'wireless-bluetooth-headphones',
+                'name' => 'TYCOON Refrigerator-202 L TCN-A3DBP-202 630x630x1420',
+                'slug' => 'TYCOON-Refrigerator-202-L',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/fr-07.jpg',
+                    'images/products/fr-08.jpg'
                 ],
-                'original_price' => 199.99,
-                'discounted_price' => 149.99,
-                'discount_percentage' => 25,
+                'original_price' => 39999,
+                'discounted_price' => 35899,
+                'discount_percentage' => 5,
                 'in_stock' => true,
                 'is_new' => true,
                 'rating' => 4.5,
@@ -663,15 +707,66 @@ class HomeController extends Controller
                 'description' => 'High-quality wireless headphones with noise cancellation.'
             ],
             [
-                'id' => 2,
-                'name' => 'Smart Fitness Watch Series 5',
-                'slug' => 'smart-fitness-watch-series-5',
+                'id' => 3,
+                'name' => 'Tycoon 2.8L Rice Cooker TRM-240 1Y 320x320x342mm',
+                'slug' => 'Tycoon-2.8L-Rice-Cooker',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/ck-03.jpg',
+                    'images/products/ck-04.jpg'
                 ],
-                'original_price' => 299.99,
-                'discounted_price' => 299.99,
+                'original_price' => 1999.99,
+                'discounted_price' => 1799.99,
+                'discount_percentage' => 10,
+                'in_stock' => true,
+                'is_new' => true,
+                'rating' => 4.6,
+                'review_count' => 167,
+                'description' => 'High-performance gaming laptop with RTX graphics.'
+            ],
+            [
+                'id' => 3,
+                'name' => 'Tycoon Washing Machine 8.0 KG Top Loading',
+                'slug' => 'Tycoon-Washing-Machine-8.0-KG-Top-Loading',
+                'images' => [
+                    'images/products/wm-01.jpg',
+                    'images/products/wm-01.jpg'
+                ],
+                'original_price' => 125870,
+                'discounted_price' => 105650,
+                'discount_percentage' => 23,
+                'in_stock' => true,
+                'is_new' => true,
+                'rating' => 4.1,
+                'review_count' => 76,
+                'description' => 'Pocket-sized earbuds with active noise cancellation.'
+            ],
+            [
+                'id' => 4,
+                'name' => 'Tycoon Double Burner Glass LPG Stove TCN-DBLPGG-Red Lily 720mmX380mmX115mm',
+                'slug' => 'Tycoon-Double-Burner-Glass-LPG-Stove',
+                'images' => [
+                    'images/products/stv-03.jpg',
+                    'images/products/stv-02.jpg'
+                ],
+                'original_price' => 5999,
+                'discounted_price' => 4850,
+                'discount_percentage' => 20,
+                'in_stock' => true,
+                'is_new' => true,
+                'rating' => 4.3,
+                'review_count' => 142,
+                'description' => 'Voice-controlled smart speaker with crisp audio.'
+            ],
+            [
+                'id' => 5,
+                'name' => 'Tycoon 2.8L Rice Cooker TRM-240 1Y 320x320x342mm',
+                'slug' => 'Tycoon-2.8L-Rice-Cooker',
+                'images' => [
+                    'images/products/ck-01.jpg',
+                    'images/products/ck-02.jpg'
+                ],
+                'original_price' => 3500,
+                'discounted_price' => 3350,
                 'discount_percentage' => 0,
                 'in_stock' => false,
                 'is_new' => false,
@@ -680,39 +775,22 @@ class HomeController extends Controller
                 'description' => 'Advanced fitness tracking with heart rate monitoring.'
             ],
             [
-                'id' => 3,
-                'name' => 'Professional DSLR Camera',
-                'slug' => 'professional-dslr-camera',
+                'id' => 6,
+                'name' => 'Tycoon 2.8L Rice Cooker TRM-240 1Y 320x320x342mm',
+                'slug' => 'Tycoon-2.8L-Rice-Cooker',
                 'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
-                ],
-                'original_price' => 1299.99,
-                'discounted_price' => 999.99,
-                'discount_percentage' => 23,
-                'in_stock' => true,
-                'is_new' => true,
-                'rating' => 4.8,
-                'review_count' => 256,
-                'description' => 'Professional-grade DSLR camera for stunning photography.'
-            ],
-            [
-                'id' => 4,
-                'name' => 'Gaming Laptop Pro',
-                'slug' => 'gaming-laptop-pro',
-                'images' => [
-                    'images/products/default1.png',
-                    'images/products/default2.png'
+                    'images/products/ck-03.jpg',
+                    'images/products/ck-04.jpg'
                 ],
                 'original_price' => 1999.99,
                 'discounted_price' => 1799.99,
                 'discount_percentage' => 10,
                 'in_stock' => true,
-                'is_new' => false,
+                'is_new' => true,
                 'rating' => 4.6,
                 'review_count' => 167,
                 'description' => 'High-performance gaming laptop with RTX graphics.'
-            ]
+            ],
         ];
     }
     protected function newArrivals()
@@ -720,15 +798,15 @@ class HomeController extends Controller
         return [
             [
                 'id' => 1,
-                'name' => 'Wireless Bluetooth Headphones',
-                'slug' => 'wireless-bluetooth-headphones',
+                'name' => 'TYCOON Refrigerator-202 L TCN-A3DBP-202 630x630x1420',
+                'slug' => 'TYCOON-Refrigerator-202-L',
                 'images' => [
-                    'images/products/stv-03.jpg',
-                    'images/products/stv-01.jpg'
+                    'images/products/fr-07.jpg',
+                    'images/products/fr-08.jpg'
                 ],
-                'original_price' => 199.99,
-                'discounted_price' => 149.99,
-                'discount_percentage' => 25,
+                'original_price' => 39999,
+                'discounted_price' => 35899,
+                'discount_percentage' => 5,
                 'in_stock' => true,
                 'is_new' => true,
                 'rating' => 4.5,
@@ -736,15 +814,66 @@ class HomeController extends Controller
                 'description' => 'High-quality wireless headphones with noise cancellation.'
             ],
             [
-                'id' => 2,
-                'name' => 'Smart Fitness Watch Series 5',
-                'slug' => 'smart-fitness-watch-series-5',
+                'id' => 3,
+                'name' => 'Tycoon 2.8L Rice Cooker TRM-240 1Y 320x320x342mm',
+                'slug' => 'Tycoon-2.8L-Rice-Cooker',
                 'images' => [
-                    'images/products/stv-01.jpg',
+                    'images/products/ck-03.jpg',
+                    'images/products/ck-04.jpg'
+                ],
+                'original_price' => 1999.99,
+                'discounted_price' => 1799.99,
+                'discount_percentage' => 10,
+                'in_stock' => true,
+                'is_new' => true,
+                'rating' => 4.6,
+                'review_count' => 167,
+                'description' => 'High-performance gaming laptop with RTX graphics.'
+            ],
+            [
+                'id' => 3,
+                'name' => 'Tycoon Washing Machine 8.0 KG Top Loading',
+                'slug' => 'Tycoon-Washing-Machine-8.0-KG-Top-Loading',
+                'images' => [
+                    'images/products/wm-01.jpg',
+                    'images/products/wm-01.jpg'
+                ],
+                'original_price' => 125870,
+                'discounted_price' => 105650,
+                'discount_percentage' => 23,
+                'in_stock' => true,
+                'is_new' => true,
+                'rating' => 4.1,
+                'review_count' => 76,
+                'description' => 'Pocket-sized earbuds with active noise cancellation.'
+            ],
+            [
+                'id' => 4,
+                'name' => 'Tycoon Double Burner Glass LPG Stove TCN-DBLPGG-Red Lily 720mmX380mmX115mm',
+                'slug' => 'Tycoon-Double-Burner-Glass-LPG-Stove',
+                'images' => [
+                    'images/products/stv-03.jpg',
                     'images/products/stv-02.jpg'
                 ],
-                'original_price' => 299.99,
-                'discounted_price' => 299.99,
+                'original_price' => 5999,
+                'discounted_price' => 4850,
+                'discount_percentage' => 20,
+                'in_stock' => true,
+                'is_new' => true,
+                'rating' => 4.3,
+                'review_count' => 142,
+                'description' => 'Voice-controlled smart speaker with crisp audio.'
+            ],
+            [
+                'id' => 5,
+                'name' => 'Tycoon 2.8L Rice Cooker TRM-240 1Y 320x320x342mm',
+                'slug' => 'Tycoon-2.8L-Rice-Cooker',
+                'images' => [
+                    'images/products/ck-01.jpg',
+                    'images/products/ck-02.jpg'
+                ],
+                'original_price' => 3500,
+                'discounted_price' => 3350,
                 'discount_percentage' => 0,
                 'in_stock' => false,
                 'is_new' => false,
@@ -753,83 +882,25 @@ class HomeController extends Controller
                 'description' => 'Advanced fitness tracking with heart rate monitoring.'
             ],
             [
-                'id' => 3,
-                'name' => 'Professional DSLR Camera',
-                'slug' => 'professional-dslr-camera',
+                'id' => 6,
+                'name' => 'Tycoon 2.8L Rice Cooker TRM-240 1Y 320x320x342mm',
+                'slug' => 'Tycoon-2.8L-Rice-Cooker',
                 'images' => [
-                    'images/products/e-stv-03.jpg',
-                    'images/products/e-stv-02.jpg'
-                ],
-                'original_price' => 1299.99,
-                'discounted_price' => 999.99,
-                'discount_percentage' => 23,
-                'in_stock' => true,
-                'is_new' => true,
-                'rating' => 4.8,
-                'review_count' => 256,
-                'description' => 'Professional-grade DSLR camera for stunning photography.'
-            ],
-            [
-                'id' => 4,
-                'name' => 'Gaming Laptop Pro',
-                'slug' => 'gaming-laptop-pro',
-                'images' => [
-                    'images/products/e-stv-02.jpg',
-                    'images/products/e-stv-03.jpg'
+                    'images/products/ck-03.jpg',
+                    'images/products/ck-04.jpg'
                 ],
                 'original_price' => 1999.99,
                 'discounted_price' => 1799.99,
                 'discount_percentage' => 10,
                 'in_stock' => true,
-                'is_new' => false,
+                'is_new' => true,
                 'rating' => 4.6,
                 'review_count' => 167,
                 'description' => 'High-performance gaming laptop with RTX graphics.'
             ],
-            [
-                'id' => 5,
-                'name' => 'Wireless Bluetooth Headphones',
-                'slug' => 'wireless-bluetooth-headphones',
-                'images' => [
-                    'images/products/fan-02.jpg',
-                    'images/products/fan-07.jpg'
-                ],
-                'original_price' => 199.99,
-                'discounted_price' => 149.99,
-                'discount_percentage' => 25,
-                'in_stock' => true,
-                'is_new' => true,
-            ],
-            [
-                'id' => 6,
-                'name' => 'Smart Fitness Watch Series 6',
-                'slug' => 'smart-fitness-watch-series-6',
-                'images' => [
-                    'images/products/fan-04.jpg',
-                    'images/products/fan-01.jpg'
-                ],
-                'original_price' => 299.99,
-                'discounted_price' => 299.99,
-                'discount_percentage' => 0,
-                'in_stock' => false,
-                'is_new' => false,
-            ],
-            [
-                'id' => 7,
-                'name' => 'Professional DSLR Camera Kit',
-                'slug' => 'professional-dslr-camera-kit',
-                'images' => [
-                    'images/products/bd-01.jpg',
-                    'images/products/bd-01.jpg'
-                ],
-                'original_price' => 1299.99,
-                'discounted_price' => 999.99,
-                'discount_percentage' => 23,
-                'in_stock' => true,
-                'is_new' => true,
-            ],
         ];
     }
+
     // ==========================================
 
     protected function getAdsBanners()
@@ -838,38 +909,92 @@ class HomeController extends Controller
             ->orderBy('order')
             ->get();
 
-        // If empty, return ads ads
         if ($adsBanners->isEmpty()) {
             $adsBanners = collect([
                 (object)[
-                    'image_path' => 'images/ads/ads2.png',
+                    'image_path' => 'images/ads/ads.jpg',
                     'link' => '#',
                     'target' => '_self',
-                    'title' => null,
-                    'description' => null,
-                    'alt_text' => 'Dummy Advertisement Banner 1'
+                    'title' => 'Air Conditioner',
+                    'description' => 'Stay cool with powerful and energy-efficient AC units.',
+                    'alt_text' => 'Air Conditioner Advertisement'
                 ],
                 (object)[
-                    'image_path' => 'images/ads/ads15.png',
+                    'image_path' => 'images/ads/adss.jpg',
                     'link' => '#',
                     'target' => '_self',
-                    'title' => null,
-                    'description' => null,
-                    'alt_text' => 'Dummy Advertisement Banner 2'
+                    'title' => 'Fan',
+                    'description' => 'Smooth airflow and modern fan designs for every room.',
+                    'alt_text' => 'Fan Advertisement'
                 ],
                 (object)[
-                    'image_path' => 'images/ads/ads3.png',
+                    'image_path' => 'images/ads/ads.jpg',
                     'link' => '#',
                     'target' => '_self',
-                    'title' => 'Best Products Just for You',
-                    'description' => 'Handpicked quality items curated for customers.',
-                    'alt_text' => 'Dummy Advertisement Banner 3'
+                    'title' => 'Room Comforter',
+                    'description' => 'Soft, warm, and cozy comforters for restful sleep.',
+                    'alt_text' => 'Room Comforter Banner'
+                ],
+                (object)[
+                    'image_path' => 'images/ads/adss.jpg',
+                    'link' => '#',
+                    'target' => '_self',
+                    'title' => 'Cookware',
+                    'description' => 'Durable and stylish cookware for everyday cooking.',
+                    'alt_text' => 'Cookware Advertisement'
                 ],
             ]);
         }
 
         return $adsBanners;
     }
+
+    protected function getAnotherAdsBanners()
+    {
+        $adsBanners = AdBanner::where('is_active', true)
+            ->orderBy('order')
+            ->get();
+
+        if ($adsBanners->isEmpty()) {
+            $adsBanners = collect([
+                (object)[
+                    'image_path' => 'images/ads/adss.jpg',
+                    'link' => '#',
+                    'target' => '_self',
+                    'title' => 'Gas Burner',
+                    'description' => 'Efficient and safe gas burners for perfect cooking.',
+                    'alt_text' => 'Gas Burner Advertisement'
+                ],
+                (object)[
+                    'image_path' => 'images/ads/ads.jpg',
+                    'link' => '#',
+                    'target' => '_self',
+                    'title' => 'Pressure Cooker',
+                    'description' => 'Cook faster with high-quality stainless steel pressure cookers.',
+                    'alt_text' => 'Pressure Cooker Banner'
+                ],
+                (object)[
+                    'image_path' => 'images/ads/adss.jpg',
+                    'link' => '#',
+                    'target' => '_self',
+                    'title' => 'Rice Cooker',
+                    'description' => 'Perfect rice every time with smart rice cookers.',
+                    'alt_text' => 'Rice Cooker Advertisement'
+                ],
+                (object)[
+                    'image_path' => 'images/ads/ads.jpg',
+                    'link' => '#',
+                    'target' => '_self',
+                    'title' => 'Electric Kettle',
+                    'description' => 'Fast-boiling, durable kettles for modern kitchens.',
+                    'alt_text' => 'Electric Kettle Banner'
+                ],
+            ]);
+        }
+
+        return $adsBanners;
+    }
+
 
     protected function getUserStories()
     {

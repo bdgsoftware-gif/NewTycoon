@@ -20,14 +20,14 @@
                             <!-- Product Badges -->
                             @if ($product['is_new'])
                                 <span
-                                    class="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold font-cambay">
+                                    class="absolute top-3 left-3 bg-gradient-to-r from-primary to-primary-dark text-white text-xs font-bold px-3 py-1 rounded-full font-inter">
                                     New
                                 </span>
                             @endif
 
                             @if ($product['discount_percentage'] > 0)
                                 <span
-                                    class="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold font-quantico">
+                                    class="absolute top-3 right-3 bg-gradient-to-r from-red-600 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold font-quantico shadow-md">
                                     -{{ $product['discount_percentage'] }}%
                                 </span>
                             @endif
@@ -97,57 +97,49 @@
                         </div>
                     </a>
 
-                    <!-- Product Info -->
+                    <!-- Product Info - Option 3: Elegant with Divider -->
                     <div class="p-5">
-                        <a href="{{ route('product.show', $product['slug']) }}" class="block">
-                            <h3 title="{{ $product['name'] }}"
-                                class="text-lg font-semibold text-gray-900 mb-2 hover:text-primary transition-colors duration-200 line-clamp-1 font-cambay">
+                        <!-- Product Name -->
+                        <a href="{{ route('product.show', $product['slug']) }}" class="block mb-1"
+                            title="{{ $product['name'] }}">
+                            <h3
+                                class="text-base font-medium text-gray-900 hover:text-primary transition-colors duration-200 line-clamp-2 mb-1 font-cambay">
                                 {{ $product['name'] }}
                             </h3>
                         </a>
 
-                        <!-- Rating -->
-                        @if ($product['rating'] > 0)
-                            <div class="flex items-center mb-3">
-                                <div class="flex text-yellow-400">
-                                    @for ($i = 1; $i <= 5; $i++)
-                                        @if ($i <= floor($product['rating']))
-                                            <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
-                                                <path
-                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
-                                        @else
-                                            <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.921-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                                            </svg>
-                                        @endif
-                                    @endfor
+                        <!-- Divider -->
+                        <div class="h-px bg-gray-200 mb-1"></div>
+
+                        <!-- Price Section -->
+                        <div class="space-y-1">
+                            @if ($product['discount_percentage'] > 0)
+                                <div class="flex items-end justify-between">
+                                    <div>
+                                        <span class="text-2xl font-bold text-gray-900 font-quantico">
+                                            TK{{ number_format($product['discounted_price'], 2) }}
+                                        </span>
+                                        <div class="mt-1">
+                                            <span class="text-sm text-gray-500 line-through font-cambay">
+                                                TK{{ number_format($product['original_price'], 2) }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs text-emerald-600 font-medium">
+                                        {{ $product['in_stock'] ? '✓ Available' : '✗ Sold Out' }}
+                                    </span>
                                 </div>
-                                <span class="text-sm text-gray-500 ml-2">({{ $product['review_count'] }})</span>
-                            </div>
-                        @endif
-
-                        <!-- Price -->
-                        <div class="flex items-center justify-between font-quantico">
-                            <div class="flex items-center space-x-2">
-                                @if ($product['discount_percentage'] > 0)
+                            @else
+                                <div class="flex items-center justify-between">
+                                    <span class="text-2xl font-bold text-gray-900 font-quantico">
+                                        TK{{ number_format($product['original_price'], 2) }}
+                                    </span>
                                     <span
-                                        class="text-2xl font-bold text-gray-900">৳{{ number_format($product['discounted_price'], 2) }}</span>
-                                    <span
-                                        class="text-lg text-gray-500 line-through">৳{{ number_format($product['original_price'], 2) }}</span>
-                                @else
-                                    <span
-                                        class="text-2xl font-bold text-gray-900">৳{{ number_format($product['original_price'], 2) }}</span>
-                                @endif
-                            </div>
-
-                            <!-- Stock Status -->
-                            <div
-                                class="text-sm {{ $product['in_stock'] ? 'text-green-600' : 'text-red-600' }} font-cambay">
-                                {{ $product['in_stock'] ? 'In Stock' : 'Out of Stock' }}
-                            </div>
+                                        class="text-xs {{ $product['in_stock'] ? 'text-emerald-600' : 'text-rose-600' }} font-medium">
+                                        {{ $product['in_stock'] ? '✓ In Stock' : '✗ Out of Stock' }}
+                                    </span>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
