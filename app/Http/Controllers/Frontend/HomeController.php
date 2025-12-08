@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Models\Product;
 use App\Models\AdBanner;
 use App\Models\UserStory;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -21,7 +23,7 @@ class HomeController extends Controller
         $categories = $this->categories();
         $products = $this->products();
         $smartSections = $this->smartSections();
-        // dd($categories);
+
         $recommendedProducts = $this->getRecommendedProducts();
         $featuredProducts = $this->getFeaturedProducts();
         $newArrivals = $this->newArrivals();
@@ -29,9 +31,31 @@ class HomeController extends Controller
 
         $adsBanners = $this->getAdsBanners();
         $adsAnotherBanners = $this->getAnotherAdsBanners();
+
+        // Get offer data
+        $offerAllData = $this->getOffersSection();
+        $offerData = $offerAllData['offerHeader'] ?? [];
+        $offerProducts = $offerAllData['offerProducts'] ?? [];
+
         $userStories = $this->getUserStories();
 
-        return view('frontend.home', compact('footerData', 'navigation', 'heroSlides', 'categories', 'products', 'smartSections', 'recommendedProducts', 'featuredProducts', 'bestsellers', 'newArrivals', 'adsBanners', 'userStories', 'adsAnotherBanners'));
+        return view('frontend.home', compact(
+            'footerData',
+            'navigation',
+            'heroSlides',
+            'categories',
+            'products',
+            'smartSections',
+            'recommendedProducts',
+            'featuredProducts',
+            'bestsellers',
+            'newArrivals',
+            'adsBanners',
+            'userStories',
+            'adsAnotherBanners',
+            'offerData',
+            'offerProducts'
+        ));
     }
 
     protected function getNavigation()
@@ -901,6 +925,7 @@ class HomeController extends Controller
         ];
     }
 
+
     // ==========================================
 
     protected function getAdsBanners()
@@ -1013,7 +1038,7 @@ class HomeController extends Controller
                     'user_name' => 'Sarah Johnson',
                     'user_avatar' => 'images/stories/user.jpg',
                     'video_path' => 'videos/stories/story.mp4', // You can use placeholder videos
-                    'thumbnail' => 'images/fr-09.jpg',
+                    'thumbnail' => 'images/stories/fr-09.jpg',
                     'caption' => 'Just got my new gaming headset! The sound quality is absolutely incredible and the comfort is next level.',
                     'likes_count' => 245,
                     'comments_count' => 32,
@@ -1030,7 +1055,7 @@ class HomeController extends Controller
                     'user_name' => 'Mike Chen',
                     'user_avatar' => 'images/stories/user.jpg',
                     'video_path' => 'videos/stories/storyOk.mp4',
-                    'thumbnail' => 'images/refrigerator.jpg',
+                    'thumbnail' => 'images/stories/bd-01.jpg',
                     'caption' => 'Unboxing the new wireless keyboard. The typing experience is so smooth!',
                     'likes_count' => 189,
                     'comments_count' => 21,
@@ -1047,7 +1072,7 @@ class HomeController extends Controller
                     'user_name' => 'Emma Wilson',
                     'user_avatar' => 'images/stories/user.jpg',
                     'video_path' => 'videos/stories/story.mp4',
-                    'thumbnail' => 'images/fr-07.jpg',
+                    'thumbnail' => 'images/stories/fr-07.jpg',
                     'caption' => 'My new smartwatch arrived! The battery life is amazing and fitness tracking is super accurate.',
                     'likes_count' => 312,
                     'comments_count' => 45,
@@ -1064,7 +1089,7 @@ class HomeController extends Controller
                     'user_name' => 'Alex Rodriguez',
                     'user_avatar' => 'images/stories/user.jpg',
                     'video_path' => 'videos/stories/storyOk.mp4',
-                    'thumbnail' => 'images/refrigerator.jpg',
+                    'thumbnail' => 'images/stories/wm-01.jpg',
                     'caption' => 'Testing out the new wireless earbuds. Noise cancellation is phenomenal!',
                     'likes_count' => 278,
                     'comments_count' => 38,
@@ -1081,7 +1106,7 @@ class HomeController extends Controller
                     'user_name' => 'Lisa Park',
                     'user_avatar' => 'images/stories/user.jpg',
                     'video_path' => 'videos/stories/story.mp4',
-                    'thumbnail' => 'images/car.jpg',
+                    'thumbnail' => 'images/stories/car.jpg',
                     'caption' => 'Just set up my new monitor. The colors are so vibrant and the refresh rate is buttery smooth.',
                     'likes_count' => 198,
                     'comments_count' => 27,
@@ -1098,7 +1123,7 @@ class HomeController extends Controller
                     'user_name' => 'David Miller',
                     'user_avatar' => 'images/stories/user.jpg',
                     'video_path' => 'videos/stories/story.mp4',
-                    'thumbnail' => 'images/car.jpg',
+                    'thumbnail' => 'images/stories/car.jpg',
                     'caption' => 'First impressions of the new gaming mouse. The precision is unbelievable for competitive gaming.',
                     'likes_count' => 265,
                     'comments_count' => 41,
@@ -1114,5 +1139,52 @@ class HomeController extends Controller
         }
 
         return $userStories;
+    }
+
+    // ==========================================
+    public function getOffersSection(): array
+    {
+        $offerHeadData = [
+            'background_type' => 'image', // options: image, video 
+            'background_image' => 'images/offers/offers-bg.gif',
+            'background_video' => 'videos/offers-bg.mp4',
+            'title' => 'Winter Dhamaka Offer 2025',
+            'subtitle' => 'Enjoy the coolest discounts of the season with up to 70% off!',
+            'main_banner_image' => 'images/offers/main-banner.jpeg',
+            'timer_enabled' => true,
+            'timer_end_date' => now()->addDays(7)->format('Y-m-d H:i:s'), // Fixed: 7 days from now
+            'view_all_link' => 'products.sale', // This will be converted to route
+        ];
+
+        $offerProducts = Product::take(15)
+            ->get()
+            ->map(function ($product) {
+                // Ensure main_image exists
+                $mainImage = $product->main_image ?? 'images/products/default.png';
+                if (!Str::startsWith($mainImage, 'images/')) {
+                    $mainImage = 'images/products/' . $mainImage;
+                }
+
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name ?? 'Unknown Product',
+                    'slug' => $product->slug ?? 'unknown',
+                    'images' => [$mainImage],
+                    'original_price' => $product->price ?? 0,
+                    'discounted_price' => $product->sale_price ?? ($product->price ?? 0),
+                    'discount_percentage' => $product->discount_percentage ?? 0,
+                    'is_new' => $product->is_new ?? false,
+                    'in_stock' => $product->in_stock ?? true,
+                ];
+            });
+
+        // If no products from database, use fallback data
+        if ($offerProducts->isEmpty()) {
+            $offerProducts = $this->products();
+        }
+        return [
+            'offerHeader' => $offerHeadData,
+            'offerProducts' => $offerProducts
+        ];
     }
 }

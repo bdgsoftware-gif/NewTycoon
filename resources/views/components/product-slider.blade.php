@@ -50,7 +50,8 @@
                                 <div class="swiper-wrapper">
                                     @foreach ($adsImages as $ad)
                                         <!-- Each Slide With Fixed Height -->
-                                        <div class="swiper-slide h-[400px] md:h-[425px] lg:h-[450px]">
+                                        <div
+                                            class="swiper-slide h-[400px] md:h-[425px] lg:h-[450px] border border-gray-200 hover:border-primary transition-all duration-300">
 
                                             <a href="{{ $ad['link'] ?? '#' }}"
                                                 @if (!empty($ad['link'])) target="_blank" @endif

@@ -40,13 +40,13 @@
             <div class="absolute top-3 left-3 flex flex-col space-y-1 z-10">
                 @if ($isNew)
                     <span
-                        class="bg-gradient-to-r from-primary to-primary-dark text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg font-quantico">
+                        class="bg-gradient-to-r from-primary to-primary-dark text-white text-xs font-bold px-3 py-1.5 font-quantico">
                         NEW
                     </span>
                 @endif
                 @if (!$inStock)
                     <span
-                        class="bg-gray-700/90 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg font-quantico">
+                        class="bg-gray-700/90 text-white text-xs font-bold px-3 py-1.5 font-quantico">
                         SOLD OUT
                     </span>
                 @endif
@@ -56,7 +56,7 @@
             @if ($discountPercentage > 0)
                 <div class="absolute top-3 right-3 z-10">
                     <span
-                        class="bg-gradient-to-r from-accent to-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg font-quantico">
+                        class="bg-gradient-to-r from-accent to-orange-500 text-white text-xs font-bold px-3 py-1.5 font-quantico">
                         -{{ $discountPercentage }}% OFF
                     </span>
                 </div>
@@ -66,7 +66,7 @@
         <!-- Product Info -->
         <div class="p-4 flex-grow flex flex-col">
             <!-- Product Name -->
-            <h3
+            <h3 title="{{ $productName }}"
                 class="font-medium text-gray-900 text-sm mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-200 font-cambay flex-grow">
                 {{ $productName }}
             </h3>
@@ -141,7 +141,7 @@
             <div class="bg-gradient-to-t from-black/90 via-black/70 to-transparent pt-6 pb-4 px-4">
                 <div class="flex space-x-2">
                     <a href="{{ route('checkout.direct', $productId) }}"
-                        class="flex-1 bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 rounded-lg transition-colors duration-200 text-sm shadow-lg font-quantico">
+                        class="flex-1 bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-quantico">
                         <span class="flex items-center justify-center">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -154,7 +154,7 @@
                     <form action="{{ route('cart.add', $productId) }}" method="POST" class="inline-block">
                         @csrf
                         <button type="submit"
-                            class="bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-4 rounded-lg transition-colors duration-200 text-sm shadow-lg">
+                            class="bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg">
                             <span class="flex items-center">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
