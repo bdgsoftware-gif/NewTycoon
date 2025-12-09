@@ -38,7 +38,7 @@
                                 <div
                                     class="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 space-y-3">
                                     @if ($product['in_stock'])
-                                        <form action="{{ route('checkout.direct', $product['id']) }}" method="POST"
+                                        <form action="{{ route('checkout.process', $product['id']) }}" method="POST"
                                             class="inline-block">
                                             @csrf
                                             <button type="submit" title="Click to Buy"

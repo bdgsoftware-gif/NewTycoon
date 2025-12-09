@@ -43,7 +43,7 @@
         <div
             class="absolute bottom-0 left-0 right-0 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-30">
             <div class="bg-gradient-to-t from-black/80 to-transparent pt-6 pb-3 px-4">
-                <a href="{{ route('checkout.direct', $productId) }}"
+                <a href="{{ route('checkout.process', $productId) }}"
                     class="block w-full bg-primary hover:bg-primary-dark text-white text-center font-semibold py-2.5 px-4 transition-colors duration-200 shadow-lg hover:shadow-xl transform">
                     <span class="flex items-center justify-center font-quantico">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

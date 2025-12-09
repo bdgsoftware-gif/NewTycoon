@@ -43,28 +43,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(UserProfile::class);
     }
 
-    // ADD SCOPES FOR ROLE-BASED QUERIES
-    public function scopeDoctors($query)
-    {
-        return $query->whereHas('roles', function ($q) {
-            $q->where('name', 'doctor');
-        });
-    }
-
-    public function scopePatients($query)
-    {
-        return $query->whereHas('roles', function ($q) {
-            $q->where('name', 'patient');
-        });
-    }
-
-    public function scopeStaff($query)
-    {
-        return $query->whereHas('roles', function ($q) {
-            $q->where('name', 'staff');
-        });
-    }
-
     // Role & Permission Methods
     public function assignRole($role)
     {

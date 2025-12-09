@@ -87,7 +87,7 @@
                                     Profile
                                 </a>
 
-                                <a href="{{ route('trackOrder') }}"
+                                <a href="{{ route('orders.track') }}"
                                     class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
                                     Track Order
                                 </a>
@@ -124,7 +124,7 @@
                                     Sign Up
                                 </a>
                                 <hr class="my-1">
-                                <a href="{{ route('trackOrder') }}"
+                                <a href="{{ route('orders.track') }}"
                                     class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
                                     Track Order
                                 </a>

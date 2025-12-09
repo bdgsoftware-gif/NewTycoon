@@ -17,8 +17,7 @@
     <!-- Logo -->
     <div class="h-20 flex items-center justify-center border-b border-gray-700">
         <a href="{{ route('admin.dashboard') }}" class="group flex flex-col items-center">
-            <img src="{{ asset('images/wh-logo.png') }}" alt="Azmion Admin Logo" loading="lazy"
-                class="h-8 md:h-10 w-auto">
+            <img src="{{ asset('images/wh-logo.png') }}" alt="Azmion Admin Logo" loading="lazy" class="h-8 md:h-10 w-auto">
 
             <span
                 class="mt-1 text-xs tracking-wide text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
@@ -137,7 +136,8 @@
 
         <!-- Brands -->
         @if (auth()->user()->hasPermission('manage_products'))
-            <a href="{{ route('admin.brands.index') }}"
+            {{-- {{ route('admin.brands.index') }} --}}
+            <a href="javascript:void(0);"
                 class="group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.brands.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
                 <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('admin.brands.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}"
                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -191,7 +191,8 @@
 
         <!-- Content -->
         @if (auth()->user()->hasPermission('manage_content'))
-            <a href="{{ route('admin.content.index') }}"
+        {{-- {{ route('admin.content.index') }} --}}
+            <a href="javascript:void(0);"
                 class="group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.content.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
                 <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('admin.content.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}"
                     fill="none" viewBox="0 0 24 24" stroke="currentColor">

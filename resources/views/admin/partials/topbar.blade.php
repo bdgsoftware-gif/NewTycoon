@@ -79,7 +79,7 @@
                         <p class="text-xs text-gray-500 truncate">{{ Auth::user()->email }}</p>
                     </div>
 
-                    <a href="{{ route('profile') }}"
+                    <a href="{{ route('admin.profile.index') }}"
                         class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">
                         <i class="fas fa-user-circle mr-3 text-gray-400"></i>
                         My Profile
