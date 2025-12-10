@@ -27,7 +27,7 @@
 
                                     @if (!empty($slide['badge']))
                                         <div
-                                            class="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-6 font-cambay">
+                                            class="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-6 font-inter">
                                             <span class="text-sm font-semibold text-white">{{ $slide['badge'] }}</span>
                                         </div>
                                     @endif
@@ -40,7 +40,7 @@
                                     @endif
 
                                     @if (!empty($slide['subtitle']))
-                                        <p class="text-xl md:text-2xl text-white/90 leading-relaxed mb-8 font-cambay">
+                                        <p class="text-xl md:text-2xl text-white/90 leading-relaxed mb-8 font-inter">
                                             {{ $slide['subtitle'] }}
                                         </p>
                                     @endif

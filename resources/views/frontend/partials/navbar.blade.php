@@ -14,34 +14,65 @@
                 <div class="flex space-x-4">
                     @foreach ($navigation as $item)
                         @if (isset($item['children']) && count($item['children']) > 0)
-                            <!-- Parent link with dropdown -->
+                            <!-- Parent link with three-level dropdown -->
                             <div class="relative group">
                                 <button
                                     class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-base font-semibold flex items-center">
                                     {{ $item['name'] }}
-                                    <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="ml-1 w-4 h-4 transition-transform duration-200 group-hover:rotate-180"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M19 9l-7 7-7-7"></path>
                                     </svg>
                                 </button>
 
-                                <!-- Dropdown menu -->
+                                <!-- First Level Dropdown -->
                                 <div
-                                    class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                                    <div class="py-1">
-                                        @foreach ($item['children'] as $child)
-                                            <a href="{{ $child['url'] }}"
-                                                class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
-                                                {{ $child['name'] }}
+                                    class="absolute left-0 top-full mt-2 w-96 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 border border-gray-200">
+                                    <div class="p-4">
+                                        <div class="grid grid-cols-2 gap-6">
+                                            @foreach ($item['children'] as $child)
+                                                <div class="space-y-2">
+                                                    <!-- Second Level Title -->
+                                                    <a href="{{ $child['url'] }}"
+                                                        class="block font-semibold text-gray-900 hover:text-primary text-base font-inter mb-3 pb-2 border-b border-gray-100">
+                                                        {{ $child['name'] }}
+                                                    </a>
+
+                                                    <!-- Third Level Links -->
+                                                    @if (isset($child['children']) && count($child['children']) > 0)
+                                                        <div class="space-y-2 ml-2">
+                                                            @foreach ($child['children'] as $grandchild)
+                                                                <a href="{{ $grandchild['url'] }}"
+                                                                    class="block text-gray-600 hover:text-primary text-sm font-inter hover:translate-x-1 transition-transform duration-200">
+                                                                    {{ $grandchild['name'] }}
+                                                                </a>
+                                                            @endforeach
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            @endforeach
+                                        </div>
+
+                                        <!-- View All Link -->
+                                        <div class="mt-4 pt-4 border-t border-gray-100">
+                                            <a href="{{ $item['url'] }}"
+                                                class="flex items-center justify-center text-primary hover:text-primary-dark font-medium text-sm font-inter">
+                                                <span>View All {{ $item['name'] }}</span>
+                                                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                                </svg>
                                             </a>
-                                        @endforeach
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         @else
                             <!-- Single link -->
                             <a href="{{ $item['url'] }}"
-                                class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-base font-semibold">
+                                class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-base font-semibold transition-colors duration-200">
                                 {{ $item['name'] }}
                             </a>
                         @endif
@@ -134,7 +165,8 @@
                 </div>
 
                 <!-- Cart Icon Button -->
-                <button id="cart-toggle" class="text-gray-600 hover:text-primary p-2 transition-all duration-300">
+                <a href="{{ route('cart.index') }}"
+                    class="text-gray-600 hover:text-primary p-2 transition-all duration-300 relative">
                     <svg class="w-6 h-6" id="Layer_1" enable-background="new 0 0 32 32" viewBox="0 0 32 32"
                         xmlns="http://www.w3.org/2000/svg">
                         <g id="_01">
@@ -148,7 +180,14 @@
                             </g>
                         </g>
                     </svg>
-                </button>
+                    @if ($cartCount > 0)
+                        <span
+                            class="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                            {{ $cartCount }}
+                        </span>
+                    @endif
+
+                </a>
 
                 <!-- Mobile menu button -->
                 <div class="md:hidden">
@@ -163,22 +202,49 @@
         </div>
     </div>
 
-    <!-- Mobile menu -->
-    <div class="md:hidden hidden" id="mobile-menu">
-        <div class="px-2 pt-2 pb-3 space-y-1 bg-white border-t">
+    <!-- Mobile menu (updated for three-level) -->
+    <div class="md:hidden hidden bg-white border-t" id="mobile-menu">
+        <div class="px-4 py-3 space-y-1">
             @foreach ($navigation as $item)
                 @if (isset($item['children']) && count($item['children']) > 0)
                     <div class="relative">
                         <button
-                            class="mobile-dropdown-toggle w-full text-left text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-semibold">
-                            {{ $item['name'] }}
+                            class="mobile-dropdown-toggle w-full text-left text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-semibold flex items-center justify-between">
+                            <span>{{ $item['name'] }}</span>
+                            <svg class="w-4 h-4 mobile-dropdown-arrow transition-transform duration-200"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
                         </button>
-                        <div class="mobile-dropdown hidden pl-4">
+                        <div class="mobile-dropdown hidden pl-4 border-l border-gray-200 ml-2">
                             @foreach ($item['children'] as $child)
-                                <a href="{{ $child['url'] }}"
-                                    class="block px-3 py-2 text-gray-600 hover:text-primary text-sm">
-                                    {{ $child['name'] }}
-                                </a>
+                                @if (isset($child['children']) && count($child['children']) > 0)
+                                    <div class="relative">
+                                        <button
+                                            class="mobile-subdropdown-toggle w-full text-left text-gray-600 hover:text-primary block px-3 py-2 rounded-md text-sm font-semibold flex items-center justify-between">
+                                            <span>{{ $child['name'] }}</span>
+                                            <svg class="w-3 h-3 mobile-subdropdown-arrow transition-transform duration-200"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        </button>
+                                        <div class="mobile-subdropdown hidden pl-4 border-l border-gray-200 ml-2">
+                                            @foreach ($child['children'] as $grandchild)
+                                                <a href="{{ $grandchild['url'] }}"
+                                                    class="block px-3 py-2 text-gray-500 hover:text-primary text-xs">
+                                                    {{ $grandchild['name'] }}
+                                                </a>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @else
+                                    <a href="{{ $child['url'] }}"
+                                        class="block px-3 py-2 text-gray-600 hover:text-primary text-sm">
+                                        {{ $child['name'] }}
+                                    </a>
+                                @endif
                             @endforeach
                         </div>
                     </div>
@@ -224,54 +290,68 @@
 </div>
 
 <!-- Add this script for mobile menu and search functionality -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const mobileDropdownToggles = document.querySelectorAll('.mobile-dropdown-toggle');
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileDropdownToggles = document.querySelectorAll('.mobile-dropdown-toggle');
+            const mobileSubdropdownToggles = document.querySelectorAll('.mobile-subdropdown-toggle');
 
-        // Search modal elements
-        const searchToggle = document.getElementById('search-toggle');
-        const searchModal = document.getElementById('search-modal');
-        const searchClose = document.getElementById('search-close');
-        const searchInput = document.getElementById('search-input');
+            // Search modal elements
+            const searchToggle = document.getElementById('search-toggle');
+            const searchModal = document.getElementById('search-modal');
+            const searchClose = document.getElementById('search-close');
+            const searchInput = document.getElementById('search-input');
 
-        // Mobile menu functionality
-        mobileMenuButton.addEventListener('click', function() {
-            mobileMenu.classList.toggle('hidden');
-        });
+            // Mobile menu functionality
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
 
-        mobileDropdownToggles.forEach(toggle => {
-            toggle.addEventListener('click', function() {
-                const dropdown = this.nextElementSibling;
-                dropdown.classList.toggle('hidden');
+            mobileDropdownToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const dropdown = this.nextElementSibling;
+                    const arrow = this.querySelector('.mobile-dropdown-arrow');
+                    dropdown.classList.toggle('hidden');
+                    arrow.classList.toggle('rotate-180');
+                });
+            });
+
+            mobileSubdropdownToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const dropdown = this.nextElementSibling;
+                    const arrow = this.querySelector('.mobile-subdropdown-arrow');
+                    dropdown.classList.toggle('hidden');
+                    arrow.classList.toggle('rotate-180');
+                });
+            });
+
+            // Search modal functionality
+            searchToggle.addEventListener('click', function() {
+                searchModal.classList.remove('hidden');
+                setTimeout(() => {
+                    searchInput.focus();
+                }, 100);
+            });
+
+            searchClose.addEventListener('click', function() {
+                searchModal.classList.add('hidden');
+            });
+
+            // Close modal on ESC key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && !searchModal.classList.contains('hidden')) {
+                    searchModal.classList.add('hidden');
+                }
+            });
+
+            // Close modal when clicking outside content (optional)
+            searchModal.addEventListener('click', function(e) {
+                if (e.target === searchModal) {
+                    searchModal.classList.add('hidden');
+                }
             });
         });
-
-        // Search modal functionality
-        searchToggle.addEventListener('click', function() {
-            searchModal.classList.remove('hidden');
-            setTimeout(() => {
-                searchInput.focus();
-            }, 100);
-        });
-
-        searchClose.addEventListener('click', function() {
-            searchModal.classList.add('hidden');
-        });
-
-        // Close modal on ESC key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && !searchModal.classList.contains('hidden')) {
-                searchModal.classList.add('hidden');
-            }
-        });
-
-        // Close modal when clicking outside content (optional)
-        searchModal.addEventListener('click', function(e) {
-            if (e.target === searchModal) {
-                searchModal.classList.add('hidden');
-            }
-        });
-    });
-</script>
+    </script>
+@endpush

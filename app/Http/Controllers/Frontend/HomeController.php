@@ -13,11 +13,11 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $footerController = new FooterController();
-        $footerData = $footerController->getFooterData();
+        // $footerController = new FooterController();
+        // $footerData = $footerController->getFooterData();
 
         // Get navigation data
-        $navigation = $this->getNavigation();
+        // $navigation = $this->getNavigation();
 
         $heroSlides = $this->heroSlides();
         $categories = $this->categories();
@@ -40,8 +40,8 @@ class HomeController extends Controller
         $userStories = $this->getUserStories();
 
         return view('frontend.home', compact(
-            'footerData',
-            'navigation',
+            // 'footerData',
+            // 'navigation',
             'heroSlides',
             'categories',
             'products',
@@ -58,7 +58,7 @@ class HomeController extends Controller
         ));
     }
 
-    protected function getNavigation()
+    public function getNavigation()
     {
         return [
             [
@@ -148,7 +148,7 @@ class HomeController extends Controller
         return [
             [
                 'type' => 'image',
-                'background' => 'images/hero/slide1.jpg',
+                'background' => 'images/hero/demo-banner.jpg',
                 'has_content' => true,
                 'content_position' => 'left',
                 'badge' => 'New Collection',
@@ -187,7 +187,7 @@ class HomeController extends Controller
             ],
             [
                 'type' => 'image',
-                'background' => 'images/hero/slide3.jpg',
+                'background' => 'images/hero/demo-banner.jpg',
                 'has_content' => true,
                 'content_position' => 'right',
                 'badge' => 'Featured',
@@ -1155,33 +1155,33 @@ class HomeController extends Controller
             'timer_end_date' => now()->addDays(7)->format('Y-m-d H:i:s'), // Fixed: 7 days from now
             'view_all_link' => 'products.sale', // This will be converted to route
         ];
+        $offerProducts = collect($this->saleProducts());
+        // $offerProducts = Product::take(15)
+        //     ->get()
+        //     ->map(function ($product) {
+        //         // Ensure main_image exists
+        //         $mainImage = $product->main_image ?? 'images/products/default.png';
+        //         if (!Str::startsWith($mainImage, 'images/')) {
+        //             $mainImage = 'images/products/' . $mainImage;
+        //         }
 
-        $offerProducts = Product::take(15)
-            ->get()
-            ->map(function ($product) {
-                // Ensure main_image exists
-                $mainImage = $product->main_image ?? 'images/products/default.png';
-                if (!Str::startsWith($mainImage, 'images/')) {
-                    $mainImage = 'images/products/' . $mainImage;
-                }
-
-                return [
-                    'id' => $product->id,
-                    'name' => $product->name ?? 'Unknown Product',
-                    'slug' => $product->slug ?? 'unknown',
-                    'images' => [$mainImage],
-                    'original_price' => $product->price ?? 0,
-                    'discounted_price' => $product->sale_price ?? ($product->price ?? 0),
-                    'discount_percentage' => $product->discount_percentage ?? 0,
-                    'is_new' => $product->is_new ?? false,
-                    'in_stock' => $product->in_stock ?? true,
-                ];
-            });
+        //         return [
+        //             'id' => $product->id,
+        //             'name' => $product->name ?? 'Unknown Product',
+        //             'slug' => $product->slug ?? 'unknown',
+        //             'images' => [$mainImage],
+        //             'original_price' => $product->price ?? 0,
+        //             'discounted_price' => $product->sale_price ?? ($product->price ?? 0),
+        //             'discount_percentage' => $product->discount_percentage ?? 0,
+        //             'is_new' => $product->is_new ?? false,
+        //             'in_stock' => $product->in_stock ?? true,
+        //         ];
+        //     });
 
         // If no products from database, use fallback data
-        if ($offerProducts->isEmpty()) {
-            $offerProducts = $this->products();
-        }
+        // if ($offerProducts->isEmpty()) {
+        //     $offerProducts = $this->products();
+        // }
         return [
             'offerHeader' => $offerHeadData,
             'offerProducts' => $offerProducts

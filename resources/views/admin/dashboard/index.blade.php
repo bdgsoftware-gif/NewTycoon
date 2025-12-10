@@ -24,7 +24,7 @@
                 <div>
                     <p class="text-sm font-inter font-medium text-gray-500 uppercase tracking-wider">Total Revenue</p>
                     <p class="text-3xl font-cambay font-bold text-gray-900 mt-2">
-                        ${{ number_format($stats['total_revenue'], 2) }}</p>
+                        ৳{{ number_format($stats['total_revenue'], 2) }}</p>
                     <div class="mt-3 flex items-center">
                         <span
                             class="text-sm font-medium {{ $stats['revenue_change'] >= 0 ? 'text-green-600' : 'text-red-600' }}">
@@ -39,7 +39,7 @@
                 </div>
             </div>
             <div class="mt-4 pt-4 border-t border-gray-100">
-                <p class="text-xs text-gray-500">Monthly: ${{ number_format($stats['monthly_revenue'], 2) }}</p>
+                <p class="text-xs text-gray-500">Monthly: ৳{{ number_format($stats['monthly_revenue'], 2) }}</p>
             </div>
         </div>
 

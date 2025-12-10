@@ -90,12 +90,12 @@ class Product extends Model
             if (empty($product->sku)) {
                 $product->sku = 'PROD-' . strtoupper(Str::random(8));
             }
-            
+
             // Generate slug if not provided
             if (empty($product->slug)) {
                 $product->slug = Str::slug($product->name);
             }
-            
+
             // Ensure unique slug
             $originalSlug = $product->slug;
             $count = 1;
@@ -109,7 +109,7 @@ class Product extends Model
             if ($product->isDirty('name') && empty($product->slug)) {
                 $product->slug = Str::slug($product->name);
             }
-            
+
             // Update stock status based on quantity
             if ($product->isDirty('quantity')) {
                 $product->updateStockStatus();
@@ -188,7 +188,7 @@ class Product extends Model
         } else {
             $this->stock_status = 'in_stock';
         }
-        
+
         if (!$this->isDirty('stock_status')) {
             $this->saveQuietly(['stock_status']);
         }
@@ -210,7 +210,7 @@ class Product extends Model
         if ($this->compare_price > $this->price) {
             return $this->compare_price - $this->price;
         }
-        
+
         return 0;
     }
 
@@ -223,11 +223,11 @@ class Product extends Model
             if (strpos($this->featured_image, 'http') === 0) {
                 return $this->featured_image;
             }
-            
+
             return Storage::url($this->featured_image);
         }
-        
-        return asset('images/default-product.png');
+
+        return asset('images/products/fr-06.jpg');
     }
 
     /**
@@ -238,12 +238,12 @@ class Product extends Model
         if (!$this->gallery_images || empty($this->gallery_images)) {
             return [$this->featured_image_url];
         }
-        
+
         return array_map(function ($image) {
             if (strpos($image, 'http') === 0) {
                 return $image;
             }
-            
+
             return Storage::url($image);
         }, $this->gallery_images);
     }
@@ -295,7 +295,7 @@ class Product extends Model
     {
         return $query->where(function ($q) {
             $q->where('stock_status', 'in_stock')
-              ->orWhere('stock_status', 'backorder');
+                ->orWhere('stock_status', 'backorder');
         });
     }
 
@@ -306,11 +306,11 @@ class Product extends Model
     {
         return $query->where(function ($q) use ($search) {
             $q->where('name', 'LIKE', "%{$search}%")
-              ->orWhere('sku', 'LIKE', "%{$search}%")
-              ->orWhere('short_description', 'LIKE', "%{$search}%")
-              ->orWhereHas('category', function ($q) use ($search) {
-                  $q->where('name', 'LIKE', "%{$search}%");
-              });
+                ->orWhere('sku', 'LIKE', "%{$search}%")
+                ->orWhere('short_description', 'LIKE', "%{$search}%")
+                ->orWhereHas('category', function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%");
+                });
         });
     }
 
@@ -337,7 +337,7 @@ class Product extends Model
     {
         $this->increment('total_sold', $quantity);
         $this->increment('total_revenue', $quantity * $price);
-        
+
         if ($this->track_quantity) {
             $this->decrement('quantity', $quantity);
             $this->updateStockStatus();
@@ -351,7 +351,7 @@ class Product extends Model
     {
         $this->decrement('total_sold', $quantity);
         $this->decrement('total_revenue', $quantity * $price);
-        
+
         if ($this->track_quantity) {
             $this->increment('quantity', $quantity);
             $this->updateStockStatus();
@@ -374,7 +374,7 @@ class Product extends Model
         if ($this->cost_price > 0 && $this->price > 0) {
             return (($this->price - $this->cost_price) / $this->price) * 100;
         }
-        
+
         return 0;
     }
 

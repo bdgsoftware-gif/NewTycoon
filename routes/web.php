@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\ProductController;
+use App\Http\Controllers\Frontend\CategoryController;
 use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\CheckoutController;
 use App\Http\Controllers\Frontend\OrderController;
@@ -24,8 +25,11 @@ Route::get('/products/category/{category:slug}', [ProductController::class, 'cat
 Route::get('/products/brand/{brand:slug}', [ProductController::class, 'brand'])->name('products.brand');
 Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
 
-// Categories & Brands
-Route::get('/categories', [ProductController::class, 'categories'])->name('categories.index');
+// Categories
+Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+Route::get('/category/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
+
+// Brands
 Route::get('/brands', [ProductController::class, 'brands'])->name('brands.index');
 
 // Search

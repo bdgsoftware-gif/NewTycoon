@@ -152,10 +152,10 @@
         @endphp
         @if (isset($loadMore) && $loadMore)
             <div class="text-center mt-12">
-                <button
+                <a href="{{ route('products.index') }}" target="_self"
                     class="bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-primary-dark transition-all duration-300 transform hover:scale-105 font-quantico">
-                    Load More Products
-                </button>
+                    View More Products
+                </a>
             </div>
         @endif
     </div>

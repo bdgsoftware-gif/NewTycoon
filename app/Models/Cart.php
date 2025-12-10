@@ -43,6 +43,16 @@ class Cart extends Model
     }
 
     /**
+     * Get the cart for the current user/session with caching
+     */
+    public static function getCurrentCartCached()
+    {
+        return cache()->remember("cart_" . (Auth::id() ?? session()->getId()), 10, function () {
+            return self::getCurrentCart();
+        });
+    }
+
+    /**
      * Merge another cart into this one
      */
     public function mergeCart(Cart $otherCart)
