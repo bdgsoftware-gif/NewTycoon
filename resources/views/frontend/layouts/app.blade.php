@@ -1,3 +1,4 @@
+<!-- view/frontend/layouts/app.blade.php -->
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="no-scrollbar">
 
@@ -31,14 +32,14 @@
     <!-- Additional Head Scripts & Styles -->
     @stack('head-scripts')
     @stack('styles')
-    
+
 </head>
 
 <body class="font-sans antialiased bg-white">
     <div class="min-h-screen mx-auto max-w-full">
         @include('frontend.partials.navbar')
 
-        <main>
+        <main class="pt-16">
             @yield('content')
         </main>
 

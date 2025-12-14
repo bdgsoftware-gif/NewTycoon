@@ -147,6 +147,11 @@ class CategoryController extends Controller
 
         // Get breadcrumb
         $breadcrumb = $this->getBreadcrumb($category);
+        // Get price range for the category
+        $priceRange = [
+            'min' => Product::whereIn('category_id', $categoryIds)->min('price') ?? 0,
+            'max' => Product::whereIn('category_id', $categoryIds)->max('price') ?? 10000
+        ];
 
         return view('frontend.categories.show', compact(
             'category',
@@ -156,6 +161,7 @@ class CategoryController extends Controller
             'search',
             'minPrice',
             'maxPrice',
+            'priceRange',
             'sort',
             'status'
         ));

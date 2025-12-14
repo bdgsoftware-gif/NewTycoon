@@ -14,10 +14,6 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        // $footerController = new FooterController();
-        // $footerData = $footerController->getFooterData();
-        // $homeController = new HomeController();
-        // $navigation = $homeController->getNavigation();
         // Get filter parameters
         $search = $request->query('search');
         $category = $request->query('category');
@@ -131,21 +127,7 @@ class ProductController extends Controller
             'max' => (int) Product::active()->max('price'),
         ];
 
-        // dd(compact(
-        //     'products',
-        //     'categories',
-        //     'priceRange',
-        //     'search',
-        //     'category',
-        //     'minPrice',
-        //     'maxPrice',
-        //     'sort',
-        //     'status'
-        // ));
-
         return view('frontend.products.index', compact(
-            // 'navigation',
-            // 'footerData',
             'products',
             'categories',
             'priceRange',
@@ -156,5 +138,31 @@ class ProductController extends Controller
             'sort',
             'status'
         ));
+    }
+
+    /**
+     * Display the specified product details.
+     */
+    public function show($slug)
+    {
+        $product = Product::with(['category', 'brand', 'reviews.user'])
+            ->where('slug', $slug)
+            ->where('status', 'active')
+            ->firstOrFail();
+
+        // Related products (same category)
+        $relatedProducts = Product::where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->where('status', 'active')
+            ->limit(4)
+            ->get();
+
+        // Recently viewed (store in session)
+        $recentlyViewed = session()->get('recently_viewed', []);
+        array_unshift($recentlyViewed, $product->id);
+        $recentlyViewed = array_slice(array_unique($recentlyViewed), 0, 4);
+        session()->put('recently_viewed', $recentlyViewed);
+
+        return view('frontend.products.show', compact('product', 'relatedProducts'));
     }
 }

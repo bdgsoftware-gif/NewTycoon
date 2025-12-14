@@ -191,7 +191,7 @@
 
         <!-- Content -->
         @if (auth()->user()->hasPermission('manage_content'))
-        {{-- {{ route('admin.content.index') }} --}}
+            {{-- {{ route('admin.content.index') }} --}}
             <a href="javascript:void(0);"
                 class="group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.content.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
                 <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('admin.content.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}"

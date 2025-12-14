@@ -5,3 +5,40 @@
 [x-cloak] {
     display: none !important;
 }
+
+@layer components {
+    .suggestion-item {
+        @apply p-3 rounded-lg cursor-pointer transform transition-transform transition-colors duration-200 hover:bg-gray-50;
+    }
+
+    .suggestion-item:hover {
+        @apply translate-x-1;
+    }
+
+    .suggestion-item.active {
+        @apply bg-primary/5;
+    }
+
+    .product-price {
+        @apply text-primary font-semibold;
+    }
+
+    .product-stock {
+        @apply text-xs px-2 py-1 rounded-full;
+    }
+
+    .in-stock {
+        @apply bg-green-100 text-green-800;
+    }
+
+    .out-of-stock {
+        @apply bg-red-100 text-red-800;
+    }
+
+    .category-path {
+        @apply text-xs text-gray-500 truncate;
+    }
+}
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}

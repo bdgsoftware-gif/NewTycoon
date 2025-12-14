@@ -1,11 +1,12 @@
 <!-- resources/views/components/navbar.blade.php -->
-<nav class="bg-white relative font-cambay border-b">
+<nav class="bg-white fixed top-0 left-0 right-0 z-50 font-cambay border-b">
     <div class="max-w-8xl mx-auto px-4">
         <div class="flex justify-between items-center h-16">
+
             <!-- Logo on the left -->
             <div class="flex-shrink-0">
                 <a href="{{ url('/') }}" aria-label="Home" class="inline-block" title="Tycoon Hi-Tech Park">
-                    <img src="{{ asset('images/bk-logo.png') }}" alt="BK Logo" loading="lazy" class="h-6 md:h-8 w-auto">
+                    <img src="{{ asset('images/bk-logo.png') }}" alt="BK Logo" class="h-6 md:h-8 w-auto">
                 </a>
             </div>
 
@@ -77,6 +78,11 @@
                             </a>
                         @endif
                     @endforeach
+                    <!-- Single link -->
+                    <a href="/support"
+                        class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-base font-semibold transition-colors duration-200">
+                        Support
+                    </a>
                 </div>
             </div>
 
@@ -199,12 +205,14 @@
                     </button>
                 </div>
             </div>
+
         </div>
     </div>
 
     <!-- Mobile menu (updated for three-level) -->
     <div class="md:hidden hidden bg-white border-t" id="mobile-menu">
         <div class="px-4 py-3 space-y-1">
+
             @foreach ($navigation as $item)
                 @if (isset($item['children']) && count($item['children']) > 0)
                     <div class="relative">
@@ -218,6 +226,7 @@
                             </svg>
                         </button>
                         <div class="mobile-dropdown hidden pl-4 border-l border-gray-200 ml-2">
+
                             @foreach ($item['children'] as $child)
                                 @if (isset($child['children']) && count($child['children']) > 0)
                                     <div class="relative">
@@ -246,6 +255,7 @@
                                     </a>
                                 @endif
                             @endforeach
+
                         </div>
                     </div>
                 @else
@@ -255,6 +265,7 @@
                     </a>
                 @endif
             @endforeach
+            
         </div>
     </div>
 </nav>
@@ -264,7 +275,7 @@
     <div class="container mx-auto px-4 pt-20">
         <!-- Close button -->
         <button id="search-close"
-            class="absolute top-6 right-6 text-gray-500 hover:text-primary transition-transform duration-300 hover:rotate-90">
+            class="absolute top-6 right-6 text-gray-500 hover:text-primary transition-transform duration-300 hover:rotate-90 z-10">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                 </path>
@@ -272,10 +283,10 @@
         </button>
 
         <!-- Search input -->
-        <div class="max-w-2xl mx-auto">
+        <div class="max-w-2xl mx-auto relative">
             <form action="{{ route('search') }}" method="GET" class="relative">
                 <input type="text" name="q" placeholder="What are you looking for?" autocomplete="off"
-                    class="w-full py-4 text-2xl md:text-4xl font-light border-0 border-b-2 border-gray-300 focus:border-primary focus:ring-0 outline-none transition-all duration-300"
+                    class="w-full py-4 text-2xl md:text-4xl font-light border-0 border-b-2 border-gray-300 focus:border-primary focus:ring-0 outline-none transition-all duration-300 bg-transparent pr-12"
                     id="search-input">
                 <button type="submit"
                     class="absolute right-0 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary p-2">
@@ -285,11 +296,46 @@
                     </svg>
                 </button>
             </form>
+
+            <!-- Search suggestions dropdown -->
+            <div id="search-suggestions"
+                class="absolute top-full left-0 right-0 bg-white shadow-xl rounded-b-lg mt-1 border border-gray-200 hidden max-h-96 overflow-y-auto z-50">
+                <div class="py-2">
+                    <!-- Loading state -->
+                    <div id="search-loading" class="hidden px-4 py-3 text-gray-500">
+                        <div class="flex items-center space-x-2">
+                            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                            <span>Searching...</span>
+                        </div>
+                    </div>
+
+                    <!-- No results -->
+                    <div id="search-empty" class="hidden px-4 py-3 text-gray-500">
+                        No results found
+                    </div>
+
+                    <!-- Suggestions list -->
+                    <div id="search-results">
+                        <!-- Results will be populated here dynamically -->
+                    </div>
+
+                    <!-- View all results -->
+                    <div id="search-view-all" class="hidden border-t border-gray-100 mt-2">
+                        <a href="#" id="search-view-all-link"
+                            class="flex items-center justify-center text-primary hover:text-primary-dark font-medium text-sm py-3 px-4">
+                            <span>View all results</span>
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Add this script for mobile menu and search functionality -->
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -303,6 +349,19 @@
             const searchModal = document.getElementById('search-modal');
             const searchClose = document.getElementById('search-close');
             const searchInput = document.getElementById('search-input');
+
+            const searchSuggestions = document.getElementById('search-suggestions');
+            const searchResults = document.getElementById('search-results');
+            const searchLoading = document.getElementById('search-loading');
+            const searchEmpty = document.getElementById('search-empty');
+            const searchViewAll = document.getElementById('search-view-all');
+            const searchViewAllLink = document.getElementById('search-view-all-link');
+            const searchForm = searchModal.querySelector('form');
+
+            // Search variables
+            let searchTimeout = null;
+            let currentSearchQuery = '';
+            const DEBOUNCE_DELAY = 300;
 
             // Mobile menu functionality
             mobileMenuButton.addEventListener('click', function() {
@@ -329,29 +388,273 @@
 
             // Search modal functionality
             searchToggle.addEventListener('click', function() {
-                searchModal.classList.remove('hidden');
-                setTimeout(() => {
-                    searchInput.focus();
-                }, 100);
+                openSearchModal();
             });
 
             searchClose.addEventListener('click', function() {
-                searchModal.classList.add('hidden');
+                closeSearchModal();
             });
 
-            // Close modal on ESC key
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && !searchModal.classList.contains('hidden')) {
-                    searchModal.classList.add('hidden');
+            // Search input events
+            searchInput.addEventListener('input', function(e) {
+                const query = e.target.value.trim();
+                currentSearchQuery = query;
+
+                if (query.length < 2) {
+                    hideSuggestions();
+                    return;
+                }
+
+                // Debounce search requests
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    fetchSearchSuggestions(query);
+                }, DEBOUNCE_DELAY);
+            });
+
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    hideSuggestions();
                 }
             });
 
-            // Close modal when clicking outside content (optional)
+            // Click outside to close suggestions
+            document.addEventListener('click', function(e) {
+                if (!searchModal.contains(e.target) && !searchToggle.contains(e.target)) {
+                    hideSuggestions();
+                }
+            });
+
+            // Form submission
+            searchForm.addEventListener('submit', function(e) {
+                if (currentSearchQuery.trim() === '') {
+                    e.preventDefault();
+                    return;
+                }
+
+                // If user submits form, close modal and clear input
+                setTimeout(() => {
+                    closeSearchModal();
+                }, 100);
+            });
+
+            // Functions
+            function openSearchModal() {
+                searchModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                setTimeout(() => {
+                    searchInput.focus();
+                }, 100);
+            }
+
+            function closeSearchModal() {
+                searchModal.classList.add('hidden');
+                document.body.style.overflow = '';
+                searchInput.value = '';
+                hideSuggestions();
+            }
+
+            function hideSuggestions() {
+                searchSuggestions.classList.add('hidden');
+                searchLoading.classList.add('hidden');
+                searchEmpty.classList.add('hidden');
+                searchViewAll.classList.add('hidden');
+                searchResults.innerHTML = '';
+            }
+
+            function showSuggestions() {
+                searchSuggestions.classList.remove('hidden');
+            }
+
+            function fetchSearchSuggestions(query) {
+                if (query.length < 2) return;
+
+                // Show loading state
+                searchLoading.classList.remove('hidden');
+                searchEmpty.classList.add('hidden');
+                searchViewAll.classList.add('hidden');
+                searchResults.innerHTML = '';
+                showSuggestions();
+
+                // Add a timeout to prevent hanging requests
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                fetch(`{{ route('search.suggest') }}?q=${encodeURIComponent(query)}`, {
+                        signal: controller.signal,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        clearTimeout(timeoutId);
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        searchLoading.classList.add('hidden');
+
+                        // Check if we got an error response
+                        if (data.error) {
+                            console.error('Server error:', data.message);
+                            searchEmpty.classList.remove('hidden');
+                            searchEmpty.textContent = 'Search temporarily unavailable';
+                            return;
+                        }
+
+                        if (data.length === 0) {
+                            searchEmpty.classList.remove('hidden');
+                            searchEmpty.textContent = 'No results found';
+                            searchViewAll.classList.add('hidden');
+                            return;
+                        }
+
+                        displaySearchResults(data, query);
+                    })
+                    .catch(error => {
+                        clearTimeout(timeoutId);
+                        console.error('Error fetching search suggestions:', error);
+                        searchLoading.classList.add('hidden');
+                        searchEmpty.classList.remove('hidden');
+
+                        if (error.name === 'AbortError') {
+                            searchEmpty.textContent = 'Request timed out';
+                        } else {
+                            searchEmpty.textContent = 'Error loading suggestions';
+                        }
+                    });
+            }
+
+            function displaySearchResults(results, query) {
+                searchResults.innerHTML = '';
+
+                results.forEach(result => {
+                    const resultElement = createResultElement(result);
+                    searchResults.appendChild(resultElement);
+                });
+
+                // Update view all link
+                if (results.length > 0) {
+                    searchViewAllLink.href = `{{ route('search') }}?q=${encodeURIComponent(query)}`;
+                    searchViewAll.classList.remove('hidden');
+                } else {
+                    searchViewAll.classList.add('hidden');
+                }
+
+                showSuggestions();
+            }
+
+            function createResultElement(result) {
+                const div = document.createElement('div');
+                div.className =
+                    'search-result-item px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors duration-200 border-b border-gray-100 last:border-b-0';
+                div.setAttribute('data-url', result.url);
+
+                if (result.type === 'product') {
+                    div.innerHTML = `
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0 w-12 h-12 bg-gray-100 rounded overflow-hidden">
+                                ${result.image ? `<img src="${result.image}" alt="${result.name}" class="w-full h-full object-cover">` : ''}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-medium text-gray-900 mb-1">
+                                    ${result.highlight}
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-primary font-semibold">
+                                        TK${result.price}
+                                    </span>
+                                    ${result.in_stock ? 
+                                        '<span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">In Stock</span>' : 
+                                        '<span class="text-xs text-red-600 bg-red-50 px-2 py-1 rounded">Out of Stock</span>'}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    div.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-blue-50 rounded">
+                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                                </svg>
+                            </div>
+                            <div class="text-sm font-medium text-gray-900">
+                                ${result.highlight}
+                                <span class="text-xs text-gray-500 ml-2">Category</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Add click handler
+                div.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const url = this.getAttribute('data-url');
+                    if (url) {
+                        window.location.href = url;
+                        closeSearchModal();
+                    }
+                });
+
+                return div;
+            }
+
+            // Close modal on ESC key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    if (!searchModal.classList.contains('hidden')) {
+                        closeSearchModal();
+                    }
+                }
+            });
+
+            // Close modal when clicking outside content
             searchModal.addEventListener('click', function(e) {
                 if (e.target === searchModal) {
-                    searchModal.classList.add('hidden');
+                    closeSearchModal();
                 }
             });
         });
     </script>
+@endpush
+
+
+@push('styles')
+    <style>
+        /* Add these styles to your main CSS file or in a style tag */
+        #search-suggestions::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #search-suggestions::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 0 0 6px 6px;
+        }
+
+        #search-suggestions::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        #search-suggestions::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+
+        .search-result-item:hover {
+            background-color: #f9fafb;
+        }
+
+        /* Ensure search suggestions appear above other content */
+        #search-modal {
+            z-index: 9999;
+        }
+
+        #search-suggestions {
+            z-index: 10000;
+        }
+    </style>
 @endpush

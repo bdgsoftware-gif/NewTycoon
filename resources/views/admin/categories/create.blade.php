@@ -21,7 +21,7 @@
 @endsection
 
 @section('content')
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-5xl mx-auto">
         <form action="{{ route('admin.categories.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 

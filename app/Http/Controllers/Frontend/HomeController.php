@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Models\Product;
 use App\Models\AdBanner;
+use App\Models\Category;
 use App\Models\UserStory;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -13,14 +14,8 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // $footerController = new FooterController();
-        // $footerData = $footerController->getFooterData();
-
-        // Get navigation data
-        // $navigation = $this->getNavigation();
-
         $heroSlides = $this->heroSlides();
-        $categories = $this->categories();
+        $categories = Category::active()->root()->limit(12)->get();
         $products = $this->products();
         $smartSections = $this->smartSections();
 

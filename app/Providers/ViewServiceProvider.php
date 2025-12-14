@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\FooterController;
+use Illuminate\Support\Facades\Auth;
 
 class ViewServiceProvider extends ServiceProvider
 {
@@ -45,7 +46,7 @@ class ViewServiceProvider extends ServiceProvider
 
             $cartCount = 0;
 
-            if (auth()->check()) {
+            if (Auth::check()) {
                 $cart = Cart::getCurrentCart();
                 $cartCount = $cart?->total_items ?? 0;
             } else {

@@ -1,16 +1,19 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Frontend\HomeController;
-use App\Http\Controllers\Frontend\ProductController;
-use App\Http\Controllers\Frontend\CategoryController;
-use App\Http\Controllers\Frontend\CartController;
-use App\Http\Controllers\Frontend\CheckoutController;
-use App\Http\Controllers\Frontend\OrderController;
-use App\Http\Controllers\Frontend\WishlistController;
-use App\Http\Controllers\Frontend\ReviewController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Frontend\CartController;
+use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\OrderController;
+use App\Http\Controllers\Frontend\ReviewController;
+use App\Http\Controllers\Frontend\SearchController;
+use App\Http\Controllers\Frontend\ProductController;
+use App\Http\Controllers\Frontend\CategoryController;
+use App\Http\Controllers\Frontend\CheckoutController;
+use App\Http\Controllers\Frontend\WishlistController;
+use App\Http\Controllers\Frontend\NewsletterController;
 
 // ==============================
 // PUBLIC FRONTEND ROUTES
@@ -32,8 +35,9 @@ Route::get('/category/{category:slug}', [CategoryController::class, 'show'])->na
 // Brands
 Route::get('/brands', [ProductController::class, 'brands'])->name('brands.index');
 
-// Search
-Route::get('/search', [HomeController::class, 'search'])->name('search');
+// Search Routes
+Route::get('/search/suggest', [SearchController::class, 'suggest'])->name('search.suggest');
+Route::get('/search', [SearchController::class, 'search'])->name('search');
 
 // Cart Routes (available for guests)
 Route::prefix('cart')->name('cart.')->group(function () {
@@ -89,8 +93,9 @@ Route::middleware('auth')->prefix('profile')->name('profile.')->group(function (
 });
 
 // Static Pages
-Route::view('/about', 'frontend.pages.about')->name('about');
+Route::view('/about-us', 'frontend.pages.about')->name('about');
 Route::view('/contact', 'frontend.pages.contact')->name('contact');
+Route::view('/support', 'frontend.pages.support')->name('support');
 Route::view('/terms', 'frontend.pages.terms')->name('terms');
 Route::view('/privacy', 'frontend.pages.privacy')->name('privacy');
 Route::view('/faq', 'frontend.pages.faq')->name('faq');
@@ -100,8 +105,9 @@ Route::view('/returns', 'frontend.pages.returns')->name('returns');
 // Contact Form
 Route::post('/contact', [HomeController::class, 'contactSubmit'])->name('contact.submit');
 
-// Newsletter
-Route::post('/newsletter', [HomeController::class, 'newsletter'])->name('newsletter.subscribe');
+// Newsletter routes
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+Route::post('/newsletter/unsubscribe', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
 
 // ==============================
 // AUTHENTICATED USER DASHBOARD
