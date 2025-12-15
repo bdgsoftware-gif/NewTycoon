@@ -23,7 +23,7 @@
                                 @if ($category->image)
                                     <div class="w-20 h-20 mb-4 rounded-full overflow-hidden bg-white/50">
                                         <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}"
-                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                                            class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300">
                                     </div>
                                 @endif
                                 <h3 class="text-xl font-bold text-gray-900 mb-2 font-quantico group-hover:text-primary">
@@ -59,7 +59,7 @@
                                     @if ($category->image)
                                         <div class="w-12 h-12 rounded-full overflow-hidden bg-gray-100">
                                             <img src="{{ asset('storage/' . $category->image) }}"
-                                                alt="{{ $category->name }}" class="w-full h-full object-cover">
+                                                alt="{{ $category->name }}" class="w-full h-full object-contain">
                                         </div>
                                     @endif
                                     <div>

@@ -14,11 +14,10 @@
             <div class="lg:col-span-4 flex justify-center lg:justify-start" data-aos="fade-up">
                 <div class="bg-white/5 p-8 rounded-2xl border border-white/10 backdrop-blur-sm max-w-sm w-full">
                     <!-- Logo -->
-                    <div class="text-center lg:text-left">                        
+                    <div class="text-center lg:text-left">
                         <a href="{{ url('/') }}" aria-label="Home" class="inline-block"
                             title="Tycoon Hi-Tech Park">
-                            <img src="{{ asset('images/wh-logo.png') }}" alt="BK Logo" loading="lazy"
-                                class="h-6 md:h-8 w-auto">
+                            <img src="{{ asset('images/wh-logo.png') }}" alt="BK Logo" class="h-6 md:h-8 w-auto">
                         </a>
                         <div class="w-16 h-1 bg-primary rounded-full mx-auto lg:mx-0 mb-6"></div>
                     </div>
@@ -41,19 +40,19 @@
 
                     <!-- Social Media -->
                     <div class="flex justify-center lg:justify-start gap-3 mt-6">
-                        <a href="#"
+                        <a href="{{ $footerData['social_links']['facebook'] ?? '#' }}"
                             class="social-icon w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary transition-all duration-300 group border border-white/10">
                             <i class="fab fa-facebook-f text-gray-400 group-hover:text-white text-sm"></i>
                         </a>
-                        <a href="#"
+                        <a href="{{ $footerData['social_links']['twitter'] ?? '#' }}"
                             class="social-icon w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary transition-all duration-300 group border border-white/10">
                             <i class="fab fa-twitter text-gray-400 group-hover:text-white text-sm"></i>
                         </a>
-                        <a href="#"
+                        <a href="{{ $footerData['social_links']['instagram'] ?? '#' }}"
                             class="social-icon w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary transition-all duration-300 group border border-white/10">
                             <i class="fab fa-instagram text-gray-400 group-hover:text-white text-sm"></i>
                         </a>
-                        <a href="#"
+                        <a href="{{ $footerData['social_links']['linkedin'] ?? '#' }}"
                             class="social-icon w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary transition-all duration-300 group border border-white/10">
                             <i class="fab fa-linkedin-in text-gray-400 group-hover:text-white text-sm"></i>
                         </a>
@@ -71,12 +70,12 @@
                         <ul class="space-y-3">
                             @foreach ($column['links'] as $link)
                                 <li class="font-quantico">
-                                    <a href="#"
+                                    <a href="{{ url($link['url'] ?? '#') }}"
                                         class="group flex items-center text-gray-300 hover:text-white transition-all duration-300 py-1">
                                         <span
                                             class="w-1.5 h-1.5 bg-primary rounded-full mr-3 opacity-0 group-hover:opacity-100 transform -translate-x-2 group-hover:translate-x-0 transition-all duration-300"></span>
                                         <span
-                                            class="text-base hover:text-primary transition-colors">{{ $link }}</span>
+                                            class="text-base hover:text-primary transition-colors">{{ $link['title'] }}</span>
                                     </a>
                                 </li>
                             @endforeach

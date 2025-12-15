@@ -1,4 +1,4 @@
-<div class="w-full py-12 max-w-8xl mx-auto px-4">
+<div class="w-full py-12 max-w-8xl mx-auto px-4 relative">
     <h2 class="text-4xl font-bold text-gray-900 mb-10 leading-tight capitalize font-quantico">
         The best way to buy the <br> products you love.
     </h2>
@@ -27,4 +27,12 @@
             <p class="text-gray-500 col-span-full text-center">No featured categories found.</p>
         @endif
     </div>
+
+    <div class="absolute right-4 md:-right-10 bottom-4 md:bottom-[4.5rem]">
+        <a href="{{ route('categories.index') }}"
+            class="inline-block transform rotate-90 px-2.5 py-1 bg-primary text-white text-xs font-inter font-normal tracking-wide rounded-md">
+            View All
+        </a>
+    </div>
+
 </div>

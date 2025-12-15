@@ -3,39 +3,44 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
+use App\Models\FooterColumn;
+use App\Models\FooterSetting;
 
 class FooterController extends Controller
 {
     public function getFooterData()
     {
-        $columns = [
-            [
-                'title' => 'Information',
-                'links' => ['About Us', 'Careers', 'Press & Media', 'Brand Partners', 'Affiliates'],
-            ],
-            [
-                'title' => 'Customer Service',
-                'links' => ['Contact Us', 'Shipping Info', 'Returns', 'Size Guide', 'FAQ'],
-            ],
-            [
-                'title' => 'Legal',
-                'links' => ['Privacy Policy', 'Terms of Service', 'Shipping Policy', 'Refund Policy', 'Cookie Policy'],
-            ],
-            [
-                'title' => 'Shop',
-                'links' => ['New Arrivals', 'Best Sellers', 'Sale', 'Gift Cards', 'Store Locator'],
-            ],
-        ];
+        // Get all active columns with their active links
+        $columns = FooterColumn::with(['activeLinks' => function ($query) {
+            $query->select('id', 'footer_column_id', 'title', 'url', 'sort_order');
+        }])
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get()
+            ->map(function ($column) {
+                return [
+                    'title' => $column->title,
+                    'links' => $column->activeLinks->map(function ($link) {
+                        return [
+                            'title' => $link->title,
+                            'url' => $link->url
+                        ];
+                    })->toArray()
+                ];
+            })
+            ->toArray();
+
+        // Get footer settings
+        $settings = FooterSetting::first();
 
         $brand = [
-            'name' => 'TYCOON',
-            'description' => 'Your premier destination for cutting-edge technology and electronics. We bring you the latest innovations with exceptional quality and service.',
-            'productImage' => 'images/cat/pressure-cooker.png', // Use your local image path
+            'name' => $settings->brand_name ?? 'TYCOON',
+            'description' => $settings->brand_description ?? '',
+            'productImage' => $settings->product_image ?? 'images/cat/pressure-cooker.png',
+            'productLink' => $settings->product_link ?? '/',
         ];
 
-        $payments = [
+        $payments = $settings->payment_methods ?? [
             'https://cdn-icons-png.flaticon.com/512/196/196578.png',
             'https://cdn-icons-png.flaticon.com/512/196/196561.png',
             'https://cdn-icons-png.flaticon.com/512/196/196539.png',
@@ -44,10 +49,18 @@ class FooterController extends Controller
             'https://cdn-icons-png.flaticon.com/512/888/888870.png',
         ];
 
+        $socialLinks = $settings->social_links ?? [
+            'facebook' => '#',
+            'twitter' => '#',
+            'instagram' => '#',
+            'linkedin' => '#'
+        ];
+
         return [
             'columns' => $columns,
             'brand' => $brand,
             'payments' => $payments,
+            'social_links' => $socialLinks
         ];
     }
 }

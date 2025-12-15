@@ -26,6 +26,10 @@ return new class extends Migration
             $table->integer('alert_quantity')->default(5);
             $table->boolean('track_quantity')->default(true);
             $table->boolean('allow_backorder')->default(false);
+            $table->string('model_number')->nullable()->index();
+            $table->string('warranty_period')->nullable(); // e.g. "1 Year"
+            $table->enum('warranty_type', ['replacement', 'service', 'parts'])->nullable();
+            $table->json('specifications')->nullable();
 
             // Media
             $table->string('featured_image')->nullable();
@@ -72,6 +76,8 @@ return new class extends Migration
             $table->index('stock_status');
             $table->index('is_featured');
             $table->index('price');
+            $table->index('slug');
+            $table->index('sku');
         });
     }
 

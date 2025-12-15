@@ -1,0 +1,341 @@
+ public function up(): void
+    {
+        Schema::create('products', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('sku')->unique();
+            $table->string('slug')->unique();
+            $table->text('short_description')->nullable();
+            $table->longText('description')->nullable();
+            $table->decimal('price', 10, 2);
+            $table->decimal('compare_price', 10, 2)->nullable();
+            $table->decimal('cost_price', 10, 2)->nullable();
+            $table->integer('discount_percentage')->default(0);
+            $table->integer('quantity')->default(0);
+            $table->integer('alert_quantity')->default(5);
+            $table->boolean('track_quantity')->default(true);
+            $table->boolean('allow_backorder')->default(false);
+            $table->string('model_number')->nullable()->index();
+            $table->string('warranty_period')->nullable(); // e.g. "1 Year"
+            $table->enum('warranty_type', ['replacement', 'service', 'parts'])->nullable();
+            $table->json('specifications')->nullable();
+
+            // Media
+            $table->string('featured_image')->nullable();
+            $table->json('gallery_images')->nullable();
+
+            // Attributes
+            $table->decimal('weight', 8, 2)->nullable();
+            $table->decimal('length', 8, 2)->nullable();
+            $table->decimal('width', 8, 2)->nullable();
+            $table->decimal('height', 8, 2)->nullable();
+
+            // SEO
+            $table->string('meta_title')->nullable();
+            $table->text('meta_description')->nullable();
+            $table->string('meta_keywords')->nullable();
+
+            // Status flags
+            $table->boolean('is_featured')->default(false);
+            $table->boolean('is_bestseller')->default(false);
+            $table->boolean('is_new')->default(true);
+            $table->enum('status', ['draft', 'active', 'inactive', 'archived'])->default('draft');
+            $table->enum('stock_status', ['in_stock', 'out_of_stock', 'backorder'])->default('in_stock');
+
+            // Ratings
+            $table->decimal('average_rating', 3, 2)->default(0);
+            $table->integer('rating_count')->default(0);
+
+            // Sales data
+            $table->integer('total_sold')->default(0);
+            $table->decimal('total_revenue', 12, 2)->default(0);
+
+            // Relationships
+            $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('brand_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('vendor_id')->nullable()->constrained('users')->nullOnDelete();
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            // Indexes for performance
+            $table->index('category_id');
+            $table->index('vendor_id');
+            $table->index('status');
+            $table->index('stock_status');
+            $table->index('is_featured');
+            $table->index('price');
+            $table->index('slug');
+            $table->index('sku');
+        });
+    }
+
+5. Should categories be visible even if empty?
+
+1. Product name (marketing name)
+2. Model number (unique?)
+3. SKU (manual or auto?)
+
+
+## 5. Inventory & Availability
+
+1. Do you want stock tracking?
+
+   * Yes (exact quantity)
+   * No (just availability)
+
+2. Product availability states:
+
+   * In stock
+   * Out of stock
+   * Pre-order
+   * Discontinued
+
+3. Should customers see:
+
+   * Exact stock number
+   * Only “In stock / Out of stock”
+
+4. Allow ordering when out of stock?
+
+---
+
+## 6. Product Media (Critical for electronics)
+
+1. How many images per product?
+
+2. Image types:
+
+   * Front
+   * Back
+   * Side
+   * Usage/lifestyle
+
+3. Do you want:
+
+   * Image zoom
+   * Fullscreen gallery
+   * Video (product demo)
+
+4. Who provides media?
+
+   * Client
+   * You (editing/optimization)
+
+---
+
+## 7. Product Description & Information (This is where most sites fail)
+
+### Description Structure
+
+1. Short description (1–2 lines)
+2. Long description (marketing + explanation)
+
+### Technical Information
+
+For each product, confirm if you want fields for:
+
+* Power consumption
+* Voltage
+* Capacity
+* Size / dimensions
+* Weight
+* Material
+* Country of origin
+* Manufacturing year
+
+> Or should this be a **dynamic specification table** (key → value)?
+
+### Compliance & Trust
+
+1. Warranty duration?
+
+2. Warranty type:
+
+   * Replacement
+   * Service
+   * Parts only
+
+3. Certification:
+
+   * ISO
+   * BSTI
+   * Energy rating
+
+---
+
+## 8. New Arrival Logic (Simple, but decide)
+
+1. What defines “New Arrival”?
+
+   * Admin manually marks product
+   * Product created within X days
+
+2. Should “New” badge expire automatically?
+
+3. Show “New Arrival” on:
+
+   * Homepage
+   * Category page
+   * Product card
+
+---
+
+## 9. Featured Products (Homepage authority)
+
+1. Who selects featured products?
+
+   * Admin manual selection
+
+2. Max number of featured products?
+
+3. Can a product be:
+
+   * Featured + New + Offer at the same time?
+
+4. Should featured products override category sorting?
+
+---
+
+## 10. Special Offers & Campaigns
+
+1. Offer types:
+
+   * Product-specific discount
+   * Category-wide discount
+
+2. Offer duration:
+
+   * Start date
+   * End date
+
+3. Show countdown timer?
+
+4. Highlight offer products with:
+
+   * Badge
+   * Dedicated section
+
+---
+
+## 11. Recommended Products (Keep it honest)
+
+1. Recommendation logic:
+
+   * Same category products
+   * Admin-selected related products
+   * Best sellers
+
+2. Show recommendations on:
+
+   * Product page
+   * Cart page
+
+3. Limit number?
+
+---
+
+## 12. Ads & Banner Sections
+
+1. Homepage banners:
+
+   * Static
+   * Slider
+
+2. Banner actions:
+
+   * Link to product
+   * Link to category
+   * External campaign
+
+3. Banner scheduling:
+
+   * Start/end date
+   * Priority order
+
+---
+
+## 13. Search, Filter & Sorting
+
+1. Search fields:
+
+   * Product name
+   * Model number
+
+2. Filters:
+
+   * Price range
+   * Category
+   * Availability
+
+3. Sorting:
+
+   * Newest
+   * Price
+   * Popularity
+
+---
+
+## 14. Reviews & Ratings
+
+1. Allow product reviews?
+
+2. Who can review?
+
+   * Logged-in users
+   * Verified buyers only
+
+3. Review moderation required?
+
+---
+
+## 15. Checkout & Delivery
+
+1. Checkout type:
+
+   * Guest checkout
+   * Login required
+
+2. Payment methods:
+
+   * Cash on delivery
+   * Online payment
+
+3. Delivery charge:
+
+   * Flat rate
+   * Location-based
+
+---
+
+## 16. Admin Panel Expectations
+
+1. Who manages:
+
+   * Products
+   * Prices
+   * Offers
+   * Orders
+
+2. Need activity logs?
+
+3. Need soft delete (restore products)?
+
+---
+
+## Final Pressure Test (Ask this last)
+
+> “If we freeze features today, will you request major changes after launch?”
+
+If they hesitate—document everything.
+
+---
+
+If you want next:
+
+* I can convert this into **client-ready form (Google Form / PDF)**
+* Map answers → **exact DB fields**
+* Design **admin product input UI**
+* Create **homepage section logic diagram**
+
+Choose the next move.

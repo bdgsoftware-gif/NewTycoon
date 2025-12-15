@@ -50,9 +50,10 @@
                     @if ($categories->count() > 0)
                         <div class="mb-6">
                             <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Categories</h3>
-                            <div class="space-y-2 max-h-96 overflow-y-auto no-scrollbar border-b border-gray-200 shadow-sm pb-2">
+                            <div
+                                class="space-y-2 max-h-96 overflow-y-auto no-scrollbar border-b border-gray-200 shadow-sm pb-2">
                                 <a href="{{ route('search', array_merge(request()->except('category'), ['category' => null])) }}"
-                                    class="block px-3 py-2 rounded-lg {{ !request('category') ? 'bg-primary-light text-primary border border-primary' : 'hover:bg-gray-50 border border-gray-200' }} font-inter transition-colors">
+                                    class="block px-3 py-2 rounded-lg {{ !  request('category') ? 'bg-primary-light text-primary border border-primary' : 'hover:bg-gray-50 border border-gray-200' }} font-inter transition-colors">
                                     All Categories
                                 </a>
                                 @foreach ($categories as $cat)

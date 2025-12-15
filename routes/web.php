@@ -92,15 +92,41 @@ Route::middleware('auth')->prefix('profile')->name('profile.')->group(function (
     Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
 });
 
-// Static Pages
+// ========================= Start Static Pages =========================
+// =========================
+// About & Brand
+// =========================
 Route::view('/about-us', 'frontend.pages.about')->name('about');
+Route::view('/technology-and-innovation', 'frontend.pages.technology')->name('technology');
+Route::view('/certifications', 'frontend.pages.certifications')->name('certifications');
+Route::view('/partners', 'frontend.pages.partners')->name('partners');
+Route::view('/sustainability', 'frontend.pages.sustainability')->name('sustainability');
+
+// =========================
+// Support & Service
+// =========================
 Route::view('/contact', 'frontend.pages.contact')->name('contact');
 Route::view('/support', 'frontend.pages.support')->name('support');
-Route::view('/terms', 'frontend.pages.terms')->name('terms');
-Route::view('/privacy', 'frontend.pages.privacy')->name('privacy');
-Route::view('/faq', 'frontend.pages.faq')->name('faq');
+Route::view('/warranty', 'frontend.pages.warranty')->name('warranty');
+Route::view('/service-centers', 'frontend.pages.service-centers')->name('service-centers');
+Route::view('/manuals', 'frontend.pages.manuals')->name('manuals');
+Route::view('/spare-parts', 'frontend.pages.spare-parts')->name('spare-parts');
+
+// =========================
+// Customer Help
+// =========================
+Route::view('/how-to-order', 'frontend.pages.how-to-order')->name('how-to-order');
 Route::view('/shipping', 'frontend.pages.shipping')->name('shipping');
 Route::view('/returns', 'frontend.pages.returns')->name('returns');
+Route::view('/faq', 'frontend.pages.faq')->name('faq');
+
+// =========================
+// Legal
+// =========================
+Route::view('/terms', 'frontend.pages.terms')->name('terms');
+Route::view('/privacy', 'frontend.pages.privacy')->name('privacy');
+
+// ========================= End Static Pages =========================
 
 // Contact Form
 Route::post('/contact', [HomeController::class, 'contactSubmit'])->name('contact.submit');
