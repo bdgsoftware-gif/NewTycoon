@@ -1,5 +1,5 @@
 <!-- resources/views/components/product-slider.blade.php -->
-<section class="max-w-8xl mx-auto py-12" data-slider-section="{{ $sliderId }}">
+<section class="max-w-8xl mx-auto py-12 px-4 2xl:px-0" data-slider-section="{{ $sliderId }}">
     <!-- Debug: Check all products are being passed -->
     <div class="hidden">
         <p>Total Products: {{ count($slidingProducts) }}</p>
@@ -40,14 +40,14 @@
     @if ($cardStyle === 'modern')
         <div class="relative">
             <!-- Main Layout Container -->
-            <div class="grid grid-cols-1 lg:grid-cols-6 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-12 xl:grid-cols-6 gap-4">
                 <!-- Ads Section (Left - Desktop, Top - Mobile) -->
-                <div class="lg:col-span-2">
+                <div class="lg:col-span-5 xl:col-span-2">
                     @if (isset($adsImages) && count($adsImages) > 0)
                         <div class="sticky top-6">
                             <!-- Ads Swiper -->
                             <div class="swiper ads-modern-swiper-{{ $sliderId }} overflow-hidden">
-                                <div class="swiper-wrapper">
+                                <div class="swiper-wrapper py-2">
                                     @foreach ($adsImages as $ad)
                                         <!-- Each Slide With Fixed Height -->
                                         <div
@@ -97,10 +97,10 @@
                 </div>
 
                 <!-- Products Section (Right - Desktop, Bottom - Mobile) -->
-                <div class="lg:col-span-4">
+                <div class="lg:col-span-7 xl:col-span-4">
                     @if (count($slidingProducts) > 0)
                         <div class="swiper swiper-{{ $sliderId }} relative">
-                            <div class="swiper-wrapper">
+                            <div class="swiper-wrapper py-2">
                                 @foreach ($slidingProducts as $product)
                                     <div class="swiper-slide !h-auto">
                                         @include('components.product-cards.modern', [
@@ -164,7 +164,7 @@
                 480 => ['slidesPerView' => min(2, count($slidingProducts)), 'spaceBetween' => 14],
                 768 => ['slidesPerView' => min(3, count($slidingProducts)), 'spaceBetween' => 16],
                 1024 => [
-                    'slidesPerView' => min($slidesPerView, count($slidingProducts)),
+                    'slidesPerView' => min($slidesPerView - 1, count($slidingProducts)),
                     'spaceBetween' => $spaceBetween,
                 ],
                 1280 => [

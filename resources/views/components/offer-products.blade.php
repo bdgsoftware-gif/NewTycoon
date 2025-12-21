@@ -1,5 +1,5 @@
 <!-- Offers Section -->
-<section class="relative w-full py-12 md:py-16 overflow-hidden">
+<section class="relative w-full py-12 md:py-16 overflow-hidden px-4">
     {{-- Top Blur/Shadow Effect for smooth transition from previous section --}}
     <div class="absolute top-0 left-0 right-0 h-10 bg-gradient-to-b from-gray-50 via-cyan-400/20 to-transparent z-20">
     </div>
@@ -216,24 +216,68 @@ if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
                                     <!-- Buy Now Overlay -->
                                     @if ($inStock)
                                         <div
-                                            class="absolute bottom-0 left-0 right-0 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-30">
-                                            <div class="bg-gradient-to-t from-black/80 to-transparent pt-6 pb-3 px-4">
-                                                <a href="{{ route('checkout.process', $productId) }}"
-                                                    class="block w-full bg-primary hover:bg-primary-dark text-white text-center font-semibold py-2.5 px-4 transition-colors duration-200 shadow-lg hover:shadow-xl transform">
-                                                    <span class="flex items-center justify-center font-quantico">
-                                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                                        </svg>
-                                                        Buy Now
-                                                    </span>
-                                                </a>
+                                            class="absolute bottom-0 left-0 right-0 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
+                                            <div
+                                                class="bg-gradient-to-t from-black/90 via-black/70 to-transparent pt-6 pb-4 px-4">
+                                                <div class="flex space-x-2">
+                                                    <a href="{{ route('checkout.process', $productId) }}"
+                                                        class="flex-1 bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-quantico">
+                                                        <span class="flex items-center justify-center">
+                                                            <svg class="w-4 h-4 mr-2 hidden 2xl:block" fill="none"
+                                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                                            </svg>
+                                                            Buy Now
+                                                        </span>
+                                                    </a>
+
+                                                    <form action="{{ route('cart.add', $productId) }}" method="POST"
+                                                        class="inline-block">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg">
+                                                            <span class="flex items-center">
+                                                                <svg class="w-4 h-4 mr-1" fill="none"
+                                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round"
+                                                                        stroke-linejoin="round" stroke-width="2"
+                                                                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                                </svg>
+                                                                Cart
+                                                            </span>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </div>
                                         </div>
                                     @endif
-
+                                    
+                                    @if (!$inStock)
+                                        <div
+                                            class="absolute bottom-0 left-0 right-0 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
+                                            <div
+                                                class="bg-gradient-to-t from-black/90 via-black/70 to-transparent pt-6 pb-4 px-4">
+                                                <div class="flex space-x-2">
+                                                    <a href="{{ route('contact') }}" title="+8801714XXXXXX"
+                                                        class="flex-1 bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-quantico">
+                                                        <span class="flex items-center justify-center">
+                                                            <!-- Contact/Phone Icon -->
+                                                            <svg class="w-4 h-4 mr-2" fill="none"
+                                                                stroke="currentColor" viewBox="0 0 24 24"
+                                                                xmlns="http://www.w3.org/2000/svg">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                                            </svg>
+                                                            Contact Us
+                                                        </span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
                                     <!-- Product Info -->
                                     <div class="p-4 border-t border-gray-100 flex-grow flex flex-col">
                                         <a href="{{ route('product.show', $productSlug) }}"
@@ -310,10 +354,11 @@ if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
             const offerSwiperElement = document.querySelector('.offer-products-swiper');
             if (offerSwiperElement) {
                 const productCount = {{ count($offerProducts) }};
+                console.log('Initializing Swiper with product count:', productCount);
                 const swiperConfig = {
                     slidesPerView: 1.3,
                     spaceBetween: 16,
-                    loop: productCount > 1,
+                    loop: true,
                     grabCursor: true,
                     speed: 500,
                     breakpoints: {
@@ -337,7 +382,8 @@ if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
                             slidesPerView: Math.min(5, productCount),
                             spaceBetween: 24,
                         },
-                    }
+                    },
+
                 };
 
                 // Add navigation if more than 1 product

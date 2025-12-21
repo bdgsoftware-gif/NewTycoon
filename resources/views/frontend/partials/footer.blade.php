@@ -9,7 +9,7 @@
 
     <div class="max-w-8xl mx-auto relative z-10">
         <!-- Top Footer Section - Grid Layout -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-16">
             <!-- Brand Section - Centered -->
             <div class="lg:col-span-4 flex justify-center lg:justify-start" data-aos="fade-up">
                 <div class="bg-white/5 p-8 rounded-2xl border border-white/10 backdrop-blur-sm max-w-sm w-full">
@@ -61,7 +61,7 @@
             </div>
 
             <!-- Links Sections -->
-            <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 @foreach ($footerData['columns'] as $index => $column)
                     <div class="flex-1" data-aos="fade-up" data-aos-delay="{{ ($index + 1) * 100 }}">
                         <h3 class="text-xl font-semibold mb-6 text-white border-l-4 border-primary pl-3 font-cambay">

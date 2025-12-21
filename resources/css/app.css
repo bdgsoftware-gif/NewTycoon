@@ -42,3 +42,52 @@
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
+/* ================================
+   Swiper + Shimmer Animations
+   ================================ */
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(200%);
+    }
+}
+/* Custom Swiper progress bar styles */
+.heroSwiper .swiper-progress-fill {
+    will-change: transform;
+    transform-origin: left center;
+}
+
+/* Optional glowing effect */
+.heroSwiper .swiper-progress-fill::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 4px;
+    background: white;
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+.heroSwiper .swiper-navigation-icon {
+    display: none !important;
+}
+/*  Categories Section */
+@keyframes gradient-x {
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.categories .animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradient-x 3s ease infinite;
+}

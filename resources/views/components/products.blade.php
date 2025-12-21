@@ -97,7 +97,7 @@
                         </div>
                     </a>
 
-                    <!-- Product Info - Option 3: Elegant with Divider -->
+                    <!-- Product Info - Elegant with Divider -->
                     <div class="p-5">
                         <!-- Product Name -->
                         <a href="{{ route('product.show', $product['slug']) }}" class="block mb-1"
@@ -125,19 +125,84 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <span class="text-xs text-emerald-600 font-medium">
-                                        {{ $product['in_stock'] ? '✓ Available' : '✗ Sold Out' }}
-                                    </span>
+                                    <div>
+                                        <!-- Action Buttons -->
+                                        <div class="flex items-center justify-between pt-1">
+                                            <div class="flex items-center space-x-1">
+                                                <!-- Wishlist Icon -->
+                                                <button type="button"
+                                                    class="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                                                    title="Add to Wishlist">
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                        class="h-5 w-5 text-gray-400 hover:text-red-500" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                    </svg>
+                                                </button>
+
+                                                <!-- Cart Icon -->
+                                                <button type="button"
+                                                    class="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                                                    title="Add to Cart">
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                        class="h-5 w-5 text-gray-400 hover:text-primary" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <span class="text-xs text-emerald-600 font-medium">
+                                            {{ $product['in_stock'] ? '✓ Available' : '✗ Sold Out' }}
+                                        </span>
+                                    </div>
                                 </div>
                             @else
-                                <div class="flex items-center justify-between">
+                                <div class="flex items-start justify-between">
                                     <span class="text-2xl font-bold text-gray-900 font-quantico">
                                         TK{{ number_format($product['original_price'], 2) }}
                                     </span>
-                                    <span
-                                        class="text-xs {{ $product['in_stock'] ? 'text-emerald-600' : 'text-rose-600' }} font-medium">
-                                        {{ $product['in_stock'] ? '✓ In Stock' : '✗ Out of Stock' }}
-                                    </span>
+                                    <div>
+                                        <!-- Action Buttons -->
+                                        <div class="flex items-center justify-between pt-1">
+                                            <div class="flex items-center space-x-1">
+                                                <!-- Wishlist Icon -->
+                                                <button type="button"
+                                                    class="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                                                    title="Add to Wishlist">
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                        class="h-5 w-5 text-gray-400 hover:text-red-500"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                    </svg>
+                                                </button>
+
+                                                <!-- Cart Icon -->
+                                                <button type="button"
+                                                    class="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                                                    title="Add to Cart">
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                        class="h-5 w-5 text-gray-400 hover:text-primary"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <span class="text-xs text-primary font-medium">
+                                            {{ $product['in_stock'] ? '✓ Available' : '✗ Sold Out' }}
+                                        </span>
+                                    </div>
                                 </div>
                             @endif
                         </div>

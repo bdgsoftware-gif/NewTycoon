@@ -6,21 +6,21 @@
             <!-- Logo on the left -->
             <div class="flex-shrink-0">
                 <a href="{{ url('/') }}" aria-label="Home" class="inline-block" title="Tycoon Hi-Tech Park">
-                    <img src="{{ asset('images/bk-logo.png') }}" alt="BK Logo" class="h-6 md:h-8 w-auto">
+                    <img src="{{ asset('images/bk-logo.png') }}" alt="BK Logo" class="h-4 md:h-7 2xl:h-8 w-auto">
                 </a>
             </div>
 
             <!-- Centered navigation links -->
             <div class="hidden md:flex items-center justify-start flex-1 pl-4">
-                <div class="flex space-x-4">
+                <div class="flex md:space-x-1 2xl:space-x-3">
                     @foreach ($navigation as $item)
                         @if (isset($item['children']) && count($item['children']) > 0)
                             <!-- Parent link with three-level dropdown -->
                             <div class="relative group">
                                 <button
-                                    class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-base font-semibold flex items-center">
+                                    class="text-gray-700 hover:text-primary p-2 2xl:px-3 2xl:py-2 rounded-md text-base font-semibold flex items-center">
                                     {{ $item['name'] }}
-                                    <svg class="ml-1 w-4 h-4 transition-transform duration-200 group-hover:rotate-180"
+                                    <svg class="md:ml-0 xl:ml-1 w-4 h-4 transition-transform duration-200 group-hover:rotate-180"
                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M19 9l-7 7-7-7"></path>
@@ -82,6 +82,10 @@
                     <a href="/support"
                         class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-base font-semibold transition-colors duration-200">
                         Support
+                    </a>
+                    <a href="{{ route('categories.index') }}"
+                        class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-base font-semibold transition-colors duration-200">
+                        Categories
                     </a>
                 </div>
             </div>
@@ -265,7 +269,7 @@
                     </a>
                 @endif
             @endforeach
-            
+
         </div>
     </div>
 </nav>
