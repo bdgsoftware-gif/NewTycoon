@@ -21,10 +21,9 @@
         rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <!-- Core Styles -->
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @endif
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css" />
@@ -37,6 +36,11 @@
 
 <body class="font-sans antialiased bg-white">
     <div class="min-h-screen mx-auto max-w-full">
+        <!-- Flash Messages Container -->
+        <x-flash-container />
+        <!-- Server Flash Messages (fallback) -->
+        <x-server-flash />
+
         @include('frontend.partials.navbar')
 
         <main class="pt-16">
@@ -51,6 +55,24 @@
 
     <!-- Additional Scripts -->
     @stack('scripts')
+
+    <!-- Flash System Initialization -->
+    <script>
+        // Handle any queued flash messages
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.queuedFlashMessages && window.queuedFlashMessages.length > 0) {
+                setTimeout(() => {
+                    if (window.flashSystem && window.flashSystem.add) {
+                        window.queuedFlashMessages.forEach(msg => {
+                            window.flashSystem.add(msg);
+                        });
+                        window.queuedFlashMessages = [];
+                    }
+                }, 500);
+            }
+        });
+    </script>
+
 </body>
 
 </html>

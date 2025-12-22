@@ -49,6 +49,18 @@ export default {
                     "0%": { transform: "translateY(10px)", opacity: "0" },
                     "100%": { transform: "translateY(0)", opacity: "1" },
                 },
+                slideInRight: {
+                    "0%": { transform: "translateX(100%)", opacity: "0" },
+                    "100%": { transform: "translateX(0)", opacity: "1" },
+                },
+                slideOutRight: {
+                    "0%": { transform: "translateX(0)", opacity: "1" },
+                    "100%": { transform: "translateX(100%)", opacity: "0" },
+                },
+                progressShrink: {
+                    "0%": { width: "100%" },
+                    "100%": { width: "0%" },
+                },
             },
         },
     },
@@ -66,6 +78,5 @@ export default {
                 },
             });
         },
-        
     ],
 };

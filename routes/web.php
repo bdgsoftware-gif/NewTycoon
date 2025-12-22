@@ -157,6 +157,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // ==============================
+// TESTING WER ROUTES
+// ==============================
+Route::get('/test-flash', function () {
+    flash('Success! Progress bar should work now.', 'success', 8000);
+    flash('Error test with longer description.', 'error', 6000, 'Detailed error message here');
+    flash('Warning message', 'warning', 4000);
+    flash('Info message', 'info', 10000, 'This should show a progress bar');
+
+    return view('test-flash');
+});
+
+Route::get('/test-flash-ajax', function () {
+    return response()->json(['success' => true]);
+});
+
+// ==============================
 // AUTH ROUTES
 // ==============================
 require __DIR__ . '/auth.php';

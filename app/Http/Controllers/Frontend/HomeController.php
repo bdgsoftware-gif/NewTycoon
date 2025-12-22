@@ -34,9 +34,9 @@ class HomeController extends Controller
 
         $userStories = $this->getUserStories();
 
+        // flash('Welcome Home', 'success');
+
         return view('frontend.home', compact(
-            // 'footerData',
-            // 'navigation',
             'heroSlides',
             'categories',
             'products',
