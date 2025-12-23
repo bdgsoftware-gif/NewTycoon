@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
 {
@@ -17,9 +19,17 @@ class Category extends Model
         'description',
         'image',
         'parent_id',
+
+        // Ordering
         'order',
+        'nav_order',
+
+        // Flags
         'is_featured',
+        'show_in_nav',
         'is_active',
+
+        // SEO
         'meta_title',
         'meta_description',
         'meta_keywords',
@@ -27,13 +37,15 @@ class Category extends Model
 
     protected $casts = [
         'is_featured' => 'boolean',
+        'show_in_nav' => 'boolean',
         'is_active' => 'boolean',
         'order' => 'integer',
+        'nav_order' => 'integer',
     ];
 
-    /**
-     * Boot the model.
-     */
+    /* ---------------------------------
+     | Boot
+     |---------------------------------*/
     protected static function boot()
     {
         parent::boot();
@@ -51,74 +63,66 @@ class Category extends Model
         });
     }
 
-    /**
-     * Get the parent category.
-     */
-    public function parent()
+    /* ---------------------------------
+     | Relationships
+     |---------------------------------*/
+    public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');
     }
 
-    /**
-     * Get the child categories.
-     */
-    public function children()
+    public function children(): HasMany
     {
-        return $this->hasMany(Category::class, 'parent_id');
+        return $this->hasMany(Category::class, 'parent_id')
+            ->orderBy('nav_order')
+            ->orderBy('order');
     }
 
-    /**
-     * Get all descendants (children, grandchildren, etc.).
-     */
-    public function descendants()
-    {
-        return $this->children()->with('descendants');
-    }
-
-    /**
-     * Get all ancestors (parent, grandparent, etc.).
-     */
-    public function ancestors()
-    {
-        return $this->parent()->with('ancestors');
-    }
-
-    /**
-     * Get products in this category.
-     */
-    public function products()
+    public function products(): HasMany
     {
         return $this->hasMany(Product::class);
     }
 
     /**
-     * Scope a query to only include featured categories.
+     * Get all ancestors (parent, grandparent, etc.).
      */
-    public function scopeFeatured($query)
-    {
-        return $query->where('is_featured', true);
-    }
 
-    /**
-     * Scope a query to only include active categories.
-     */
+    public function ancestors()
+    {
+        return $this->parent()->with('ancestors');
+    }
+    /* ---------------------------------
+     | Scopes
+     |---------------------------------*/
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
     }
 
-    /**
-     * Scope a query to include only root categories (no parent).
-     */
+    public function scopeFeatured($query)
+    {
+        return $query->where('is_featured', true);
+    }
+
     public function scopeRoot($query)
     {
         return $query->whereNull('parent_id');
     }
 
-    /**
-     * Get the category's full path.
-     */
-    public function getFullPathAttribute()
+    public function scopeShowInNav($query)
+    {
+        return $query->where('show_in_nav', true);
+    }
+
+    /* ---------------------------------
+     | Accessors
+     |---------------------------------*/
+    public function getUrlAttribute(): string
+    {
+        return route('categories.show', $this->slug);
+    }
+
+    public function getFullPathAttribute(): string
     {
         $path = collect([$this->name]);
         $parent = $this->parent;
@@ -131,37 +135,15 @@ class Category extends Model
         return $path->implode(' > ');
     }
 
-    /**
-     * Get the category's URL.
-     */
-    public function getUrlAttribute()
-    {
-        return route('categories.show', $this->slug);
-    }
-
-    /**
-     * Check if category has children.
-     */
-    public function hasChildren()
+    /* ---------------------------------
+     | Helpers
+     |---------------------------------*/
+    public function hasChildren(): bool
     {
         return $this->children()->exists();
     }
 
-    /**
-     * Get all products including from child categories.
-     */
-    public function getAllProducts()
-    {
-        $categoryIds = $this->getAllDescendantIds();
-        $categoryIds[] = $this->id;
-
-        return Product::whereIn('category_id', $categoryIds);
-    }
-
-    /**
-     * Get all descendant category IDs.
-     */
-    private function getAllDescendantIds()
+    public function getAllDescendantIds(): array
     {
         $ids = [];
 
@@ -171,5 +153,12 @@ class Category extends Model
         }
 
         return $ids;
+    }
+
+    public function getAllProducts()
+    {
+        $categoryIds = array_merge([$this->id], $this->getAllDescendantIds());
+
+        return Product::whereIn('category_id', $categoryIds);
     }
 }

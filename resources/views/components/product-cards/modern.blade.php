@@ -3,10 +3,10 @@
     $productSlug = $product['slug'] ?? '#';
     $productId = $product['id'] ?? '#';
     $productName = $product['name'] ?? 'Product Name';
-    $primaryImage = $product['images'][0] ?? 'images/placeholder.jpg';
-    $secondaryImage = $product['images'][1] ?? $primaryImage;
-    $discountedPrice = $product['discounted_price'] ?? ($product['original_price'] ?? 0);
-    $originalPrice = $product['original_price'] ?? 0;
+    $primaryImage = $product['featured_images'][0] ?? 'images/placeholder.jpg';
+    $secondaryImage = $product['featured_images'][1] ?? $primaryImage;
+    $discountedPrice = $product['price'] ?? ($product['compare_price'] ?? 0);
+    $originalPrice = $product['compare_price'] ?? 0;
     $discountPercentage = $product['discount_percentage'] ?? 0;
     $inStock = $product['in_stock'] ?? true;
     $isNew = $product['is_new'] ?? false;
@@ -189,5 +189,5 @@
             </div>
         </div>
     @endif
-    
+
 </div>

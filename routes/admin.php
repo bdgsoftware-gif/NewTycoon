@@ -110,25 +110,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::post('/bulk/deactivate', [CategoryController::class, 'bulkDeactivate'])->name('bulk.deactivate');
     });
 
-    // Brands Management
-    Route::prefix('brands')->name('brands.')->group(function () {
-        Route::get('/', [BrandController::class, 'index'])->name('index');
-        Route::get('/create', [BrandController::class, 'create'])->name('create');
-        Route::post('/', [BrandController::class, 'store'])->name('store');
-        Route::get('/{brand}', [BrandController::class, 'show'])->name('show');
-        Route::get('/{brand}/edit', [BrandController::class, 'edit'])->name('edit');
-        Route::put('/{brand}', [BrandController::class, 'update'])->name('update');
-        Route::delete('/{brand}', [BrandController::class, 'destroy'])->name('destroy');
-
-        // Actions
-        Route::post('/{brand}/toggle-feature', [BrandController::class, 'toggleFeature'])->name('toggle.feature');
-        Route::post('/{brand}/toggle-status', [BrandController::class, 'toggleStatus'])->name('toggle.status');
-
-        // Bulk Actions
-        Route::post('/bulk/delete', [BrandController::class, 'bulkDelete'])->name('bulk.delete');
-        Route::post('/bulk/activate', [BrandController::class, 'bulkActivate'])->name('bulk.activate');
-    });
-
     // Orders Management
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('/', [OrderController::class, 'index'])->name('index');

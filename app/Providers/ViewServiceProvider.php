@@ -24,7 +24,9 @@ class ViewServiceProvider extends ServiceProvider
         // Global Navigation using real Category data 
         View::composer('*', function ($view) {
             $navigation = Category::active()
-                ->featured()
+                ->showInNav()
+                ->root()
+                ->orderBy('nav_order')
                 ->with(['children' => function ($query) {
                     $query->active()->with(['children' => function ($query) {
                         $query->active();

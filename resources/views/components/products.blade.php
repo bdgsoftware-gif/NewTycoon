@@ -14,7 +14,7 @@
                     <!-- Product Image with Overlay -->
                     <a href="{{ route('product.show', $product['slug']) }}" class="block relative">
                         <div class="relative w-full aspect-square bg-gray-100 overflow-hidden">
-                            <img src="{{ asset($product['images'][0]) }}"
+                            <img src="{{ asset($product['image']) }}"
                                 class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105">
 
                             <!-- Product Badges -->
@@ -117,11 +117,11 @@
                                 <div class="flex items-end justify-between">
                                     <div>
                                         <span class="text-2xl font-bold text-gray-900 font-quantico">
-                                            TK{{ number_format($product['discounted_price'], 2) }}
+                                            TK{{ number_format($product['price'], 2) }}
                                         </span>
                                         <div class="mt-1">
                                             <span class="text-sm text-gray-500 line-through font-cambay">
-                                                TK{{ number_format($product['original_price'], 2) }}
+                                                TK{{ number_format($product['compare_price'], 2) }}
                                             </span>
                                         </div>
                                     </div>
@@ -165,7 +165,7 @@
                             @else
                                 <div class="flex items-start justify-between">
                                     <span class="text-2xl font-bold text-gray-900 font-quantico">
-                                        TK{{ number_format($product['original_price'], 2) }}
+                                        TK{{ number_format($product['price'], 2) }}
                                     </span>
                                     <div>
                                         <!-- Action Buttons -->

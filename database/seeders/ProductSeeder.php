@@ -11,592 +11,503 @@ use Illuminate\Support\Str;
 
 class ProductSeeder extends Seeder
 {
+    /**
+     * Image mapping for products
+     */
+    private $productImages = [
+        // Air Conditioners
+        'split-ac' => ['ac-01.jpg', 'ac-02.jpg'],
+        'window-ac' => ['ac-03.jpg', 'ac-04.jpg'],
+        'portable-ac' => ['ac-05.jpg', 'ac-06.jpg'],
+        'inverter-ac' => ['ac-07.jpg', 'ac-08.jpg'],
+
+        // Fans
+        'ceiling-fan' => ['fan-01.jpg', 'fan-02.jpg'],
+        'tower-fan' => ['fan-03.jpg', 'fan-04.jpg'],
+        'table-fan' => ['fan-05.jpg', 'fan-06.jpg'],
+        'wall-fan' => ['fan-07.jpg', 'fan-08.jpg'],
+
+        // Room Comforters
+        'air-cooler' => ['cooler-01.jpg', 'cooler-02.jpg'],
+        'heater' => ['heater-01.jpg', 'heater-02.jpg'],
+        'humidifier' => ['humidifier-01.jpg', 'humidifier-02.jpg'],
+        'air-purifier' => ['purifier-01.jpg', 'purifier-02.jpg'],
+
+        // Cookware
+        'cookware-sets' => ['cookware-01.jpg', 'cookware-02.jpg'],
+        'fry-pans' => ['pan-01.jpg', 'pan-02.jpg'],
+        'saucepans' => ['saucepan-01.jpg', 'saucepan-02.jpg'],
+
+        // Gas Burners
+        'gas-stoves' => ['stove-01.jpg', 'stove-02.jpg'],
+        'induction-cooktops' => ['induction-01.jpg', 'induction-02.jpg'],
+
+        // Pressure Cookers
+        'pressure-cooker' => ['cooker-01.jpg', 'cooker-02.jpg'],
+
+        // Rice Cookers
+        'rice-cooker' => ['rice-cooker-01.jpg', 'rice-cooker-02.jpg'],
+
+        // Electric Kettles
+        'electric-kettle' => ['kettle-01.jpg', 'kettle-02.jpg'],
+
+        // Mixer Grinders
+        'mixer-grinder' => ['mixer-01.jpg', 'mixer-02.jpg'],
+
+        // LED TVs
+        'led-tv' => ['tv-01.jpg', 'tv-02.jpg'],
+        'smart-tv' => ['tv-03.jpg', 'tv-04.jpg'],
+
+        // Monitors
+        'monitor' => ['monitor-01.jpg', 'monitor-02.jpg'],
+
+        // Refrigerators
+        'refrigerator' => ['fridge-01.jpg', 'fridge-02.jpg'],
+        'single-door-fridges' => ['fridge-03.jpg', 'fridge-04.jpg'],
+        'double-door-fridges' => ['fridge-05.jpg', 'fridge-06.jpg'],
+    ];
+
     public function run(): void
     {
-        $categories = Category::all();
-        $brands = Brand::all();
-        $vendors = User::role('customer')->get();
+        // Get vendor (first admin user)
+        $vendor = User::role('admin')->first() ?? User::first();
 
-        $products = [
-            // Your real data (8 products)
+        if (!$vendor) {
+            $this->command->error('No users found! Please run UserSeeder first.');
+            return;
+        }
+
+        // Get or create a brand
+        $brand = Brand::firstOrCreate(
+            ['name' => 'TYCOON'],
             [
-                'name' => 'TYCOON Refrigerator-202 L TCN-A3DBP-202 630x630x1420',
-                'short_description' => '202L capacity refrigerator with energy efficient design',
-                'description' => 'High-quality refrigerator with 202 liters capacity, frost-free technology, and energy-saving features. Perfect for medium-sized families.',
-                'price' => 35899,
-                'compare_price' => 39999,
-                'quantity' => 45,
-                'is_featured' => true,
-                'is_new' => true,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon 2.8L Rice Cooker TRM-240 1Y 320x320x342mm',
-                'short_description' => '2.8L capacity rice cooker with non-stick inner pot',
-                'description' => 'Efficient rice cooker with 2.8 liters capacity, perfect for cooking various types of rice with automatic keep-warm function.',
-                'price' => 3350,
-                'compare_price' => 3500,
+                'slug' => 'tycoon',
+                'description' => 'Premium home appliances and electronics brand',
+                'is_active' => true,
+            ]
+        );
+
+        // Get all leaf categories (categories that don't have children)
+        $leafCategories = Category::whereDoesntHave('children')->get();
+
+        if ($leafCategories->isEmpty()) {
+            $this->command->error('No categories found! Please run CategorySeeder first.');
+            return;
+        }
+
+        // Create 50 products with realistic data
+        for ($i = 1; $i <= 50; $i++) {
+            // Randomly select a leaf category
+            $category = $leafCategories->random();
+
+            // Determine product type based on category
+            $productType = $this->determineProductType($category);
+
+            // Generate product data
+            $productData = $this->generateProductData($productType, $i);
+
+            // Generate realistic SKU
+            $sku = 'TYC-' . date('Ym') . '-' . str_pad($i, 4, '0', STR_PAD_LEFT);
+
+            // Create the product
+            Product::create([
+                'name' => $productData['name'],
+                'sku' => $sku,
+                'slug' => Str::slug($productData['name'] . ' ' . $i),
+                'short_description' => $productData['short_description'],
+                'description' => $productData['description'],
+                'price' => $productData['price'],
+                'compare_price' => $productData['compare_price'],
+                'cost_price' => $productData['price'] * 0.65, // 35% margin
+                'quantity' => $productData['quantity'],
+                'alert_quantity' => 5,
+                'track_quantity' => true,
+                'allow_backorder' => false,
+                'model_number' => 'TYC-' . strtoupper(Str::random(3)) . '-' . rand(1000, 9999),
+                'warranty_period' => $productData['warranty'],
+                'warranty_type' => 'replacement',
+                'specifications' => $productData['specifications'],
+                'featured_images' => $productData['featured_images'],
+                'gallery_images' => $productData['gallery_images'],
+                'weight' => $productData['weight'],
+                'length' => $productData['dimensions']['length'],
+                'width' => $productData['dimensions']['width'],
+                'height' => $productData['dimensions']['height'],
+                'meta_title' => $productData['name'] . ' - Buy Online',
+                'meta_description' => $productData['short_description'],
+                'meta_keywords' => $this->generateKeywords($productData['name']),
+                'is_featured' => $productData['is_featured'],
+                'is_bestseller' => $productData['is_bestseller'],
+                'is_new' => $productData['is_new'],
+                'status' => $productData['status'],
+                'stock_status' => $productData['stock_status'],
+                'average_rating' => rand(38, 50) / 10,
+                'rating_count' => rand(10, 200),
+                'total_sold' => rand(5, 150),
+                'total_revenue' => $productData['price'] * rand(5, 150),
+                'category_id' => $category->id,               
+            ]);
+        }
+
+        // Create some out of stock products (10 products)
+        for ($i = 51; $i <= 60; $i++) {
+            $category = $leafCategories->random();
+            $productType = $this->determineProductType($category);
+            $productData = $this->generateProductData($productType, $i);
+
+            Product::create([
+                'name' => $productData['name'] . ' - Out of Stock',
+                'sku' => 'TYC-' . date('Ym') . '-' . str_pad($i, 4, '0', STR_PAD_LEFT),
+                'slug' => Str::slug($productData['name'] . ' ' . $i . ' out of stock'),
+                'short_description' => $productData['short_description'] . ' (Currently out of stock)',
+                'description' => $productData['description'] . ' This product is temporarily out of stock. New stock arriving soon.',
+                'price' => $productData['price'],
+                'compare_price' => $productData['compare_price'],
+                'cost_price' => $productData['price'] * 0.65,
                 'quantity' => 0,
-                'is_bestseller' => true,
+                'alert_quantity' => 5,
+                'track_quantity' => true,
+                'allow_backorder' => true,
+                'model_number' => 'TYC-OOS-' . strtoupper(Str::random(3)) . '-' . rand(1000, 9999),
+                'warranty_period' => $productData['warranty'],
+                'warranty_type' => 'replacement',
+                'specifications' => $productData['specifications'],
+                'featured_images' => $productData['featured_images'],
+                'gallery_images' => $productData['gallery_images'],
+                'weight' => $productData['weight'],
+                'length' => $productData['dimensions']['length'],
+                'width' => $productData['dimensions']['width'],
+                'height' => $productData['dimensions']['height'],
+                'meta_title' => $productData['name'] . ' - Out of Stock',
+                'meta_description' => 'Currently out of stock. Will be available soon.',
+                'meta_keywords' => $this->generateKeywords($productData['name']) . ', out of stock',
+                'is_featured' => false,
+                'is_bestseller' => false,
+                'is_new' => false,
                 'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon 2.8L Rice Cooker TRM-240 1Y 320x320x342mm',
-                'short_description' => 'Another variant of 2.8L rice cooker',
-                'description' => 'Premium rice cooker with advanced cooking technology and durable non-stick coating.',
-                'price' => 1799.99,
-                'compare_price' => 1999.99,
-                'quantity' => 25,
-                'is_new' => true,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'TYCOON Refrigerator-202 L TCN-A3DLW 630x630x1420',
-                'short_description' => '202L refrigerator with double door design',
-                'description' => 'Modern double door refrigerator with 202 liters capacity, LED lighting, and adjustable shelves.',
-                'price' => 40750,
-                'compare_price' => 59999,
-                'quantity' => 30,
-                'is_featured' => true,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Washing Machine 8.0 KG Top Loading',
-                'short_description' => '8KG top loading washing machine',
-                'description' => 'Heavy-duty washing machine with 8KG capacity, multiple wash programs, and energy-efficient operation.',
-                'price' => 105650,
-                'compare_price' => 125870,
-                'quantity' => 15,
-                'is_featured' => true,
-                'is_new' => true,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Double Burner Glass LPG Stove TCN-DBLPGG-Fantasy Flower',
-                'short_description' => 'Double burner glass top LPG stove',
-                'description' => 'Elegant glass top LPG stove with two burners, easy-to-clean surface, and safety features.',
-                'price' => 5950,
-                'compare_price' => 6999,
-                'quantity' => 50,
-                'is_bestseller' => true,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Double Burner Glass LPG Stove TCN-DBLPGG-Red Lily 720mmX380mmX115mm',
-                'short_description' => 'Red Lily design double burner stove',
-                'description' => 'Stylish double burner LPG stove with Red Lily pattern, tempered glass surface, and efficient burners.',
-                'price' => 4850,
-                'compare_price' => 5999,
-                'quantity' => 35,
-                'is_new' => true,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Hot & Cool AC 1.5 Ton Tycoon AC 1.5 Ton Hot & Cool Inverter WiFi',
-                'short_description' => '1.5 Ton Inverter AC with Hot & Cool feature',
-                'description' => 'Smart WiFi enabled 1.5 ton inverter AC with heating and cooling capabilities, energy-efficient operation.',
-                'price' => 299.99,
-                'compare_price' => 349.99,
-                'quantity' => 20,
-                'is_featured' => true,
-                'is_bestseller' => true,
-                'status' => 'active',
-            ],
+                'stock_status' => 'out_of_stock',
+                'average_rating' => rand(38, 50) / 10,
+                'rating_count' => rand(10, 200),
+                'total_sold' => rand(20, 100),
+                'total_revenue' => $productData['price'] * rand(20, 100),
+                'category_id' => $category->id,
+                'brand_id' => $brand->id,
+                'vendor_id' => $vendor->id,
+            ]);
+        }
 
-            // Additional Tycoon Appliances (17 products)
-            [
-                'name' => 'Tycoon Microwave Oven 20L TCN-MW20 450x350x260mm',
-                'short_description' => '20L capacity microwave oven',
-                'description' => 'Compact 20L microwave oven with multiple cooking modes, digital display, and child lock feature.',
-                'price' => 8999,
-                'compare_price' => 10999,
-                'quantity' => 40,
-                'is_new' => true,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Water Dispenser Hot & Cold TCN-WD25',
-                'short_description' => '25L water dispenser with hot and cold water',
-                'description' => 'Water dispenser with 25L capacity, hot and cold water options, and safety child lock.',
-                'price' => 12999,
-                'compare_price' => 14999,
-                'quantity' => 25,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Food Processor 3-in-1 TCN-FP300',
-                'short_description' => '3-in-1 food processor with multiple attachments',
-                'description' => 'Versatile food processor with blending, grinding, and juicing functions, includes multiple blades and containers.',
-                'price' => 4999,
-                'compare_price' => 5999,
-                'quantity' => 60,
-                'is_bestseller' => true,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Air Fryer 5.5L TCN-AF55',
-                'short_description' => '5.5L digital air fryer',
-                'description' => 'Large capacity air fryer with digital controls, multiple cooking presets, and non-stick basket.',
-                'price' => 6999,
-                'compare_price' => 8499,
-                'quantity' => 45,
-                'is_featured' => true,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Induction Cooktop 2000W TCN-IC20',
-                'short_description' => '2000W induction cooktop',
-                'description' => 'Powerful induction cooktop with touch controls, multiple power levels, and safety auto-shutoff.',
-                'price' => 4599,
-                'compare_price' => 5499,
-                'quantity' => 55,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Electric Kettle 1.8L TCN-EK18',
-                'short_description' => '1.8L stainless steel electric kettle',
-                'description' => 'Fast-boiling electric kettle with 1.8L capacity, auto shut-off, and boil-dry protection.',
-                'price' => 1899,
-                'compare_price' => 2299,
-                'quantity' => 120,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Mixer Grinder 750W TCN-MG750',
-                'short_description' => '750W mixer grinder with 3 jars',
-                'description' => 'Powerful mixer grinder with 750W motor, 3 stainless steel jars, and multiple speed settings.',
-                'price' => 4299,
-                'compare_price' => 4999,
-                'quantity' => 70,
-                'is_bestseller' => true,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Vacuum Cleaner 2000W TCN-VC2000',
-                'short_description' => '2000W bagless vacuum cleaner',
-                'description' => 'High-power vacuum cleaner with HEPA filter, multiple attachments, and 2L dust capacity.',
-                'price' => 8999,
-                'compare_price' => 10999,
-                'quantity' => 30,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Hair Dryer 2200W TCN-HD2200',
-                'short_description' => '2200W professional hair dryer',
-                'description' => 'Ionic hair dryer with 2200W power, multiple heat/speed settings, and cool shot button.',
-                'price' => 2499,
-                'compare_price' => 2999,
-                'quantity' => 85,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Iron Steam 2400W TCN-IS2400',
-                'short_description' => '2400W steam iron',
-                'description' => 'Powerful steam iron with non-stick soleplate, steam burst function, and anti-drip system.',
-                'price' => 1799,
-                'compare_price' => 2199,
-                'quantity' => 95,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Blender 1000W TCN-BL1000',
-                'short_description' => '1000W professional blender',
-                'description' => 'High-speed blender with 1000W motor, glass jar, and multiple blending programs.',
-                'price' => 5499,
-                'compare_price' => 6499,
-                'quantity' => 40,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Sandwich Maker TCN-SM01',
-                'short_description' => 'Non-stick sandwich maker',
-                'description' => 'Compact sandwich maker with non-stick plates, adjustable temperature, and indicator light.',
-                'price' => 1499,
-                'compare_price' => 1899,
-                'quantity' => 110,
-                'is_new' => true,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Toaster 4-Slice TCN-TS04',
-                'short_description' => '4-slice pop-up toaster',
-                'description' => 'Automatic toaster with 4 slices capacity, multiple browning settings, and bun warmer.',
-                'price' => 2999,
-                'compare_price' => 3599,
-                'quantity' => 65,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Coffee Maker TCN-CM500',
-                'short_description' => 'Programmable coffee maker',
-                'description' => '12-cup programmable coffee maker with auto shut-off and brew pause function.',
-                'price' => 3999,
-                'compare_price' => 4799,
-                'quantity' => 50,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Hand Mixer 5-Speed TCN-HM05',
-                'short_description' => '5-speed hand mixer',
-                'description' => 'Lightweight hand mixer with 5 speed settings, includes beaters and dough hooks.',
-                'price' => 2199,
-                'compare_price' => 2699,
-                'quantity' => 75,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Water Purifier RO+UV TCN-WP100',
-                'short_description' => 'RO+UV water purifier',
-                'description' => '7-stage water purification system with RO, UV, and mineralizer, 10L storage capacity.',
-                'price' => 18999,
-                'compare_price' => 22999,
-                'quantity' => 20,
-                'is_featured' => true,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Air Cooler 55L TCN-AC55',
-                'short_description' => '55L desert air cooler',
-                'description' => 'Large capacity air cooler with 55L water tank, 4-way air deflection, and remote control.',
-                'price' => 11999,
-                'compare_price' => 13999,
-                'quantity' => 35,
-                'status' => 'active',
-            ],
+        $this->command->info('Products seeded successfully!');
+        $this->command->info('Total products created: ' . Product::count());
+        $this->command->info('In-stock products: ' . Product::where('stock_status', 'in_stock')->count());
+        $this->command->info('Out-of-stock products: ' . Product::where('stock_status', 'out_of_stock')->count());
+        $this->command->info('Featured products: ' . Product::where('is_featured', true)->count());
+        $this->command->info('Best sellers: ' . Product::where('is_bestseller', true)->count());
+        $this->command->info('New products: ' . Product::where('is_new', true)->count());
+    }
 
-            // More products to reach 50 (25 more products)
-            [
-                'name' => 'Tycoon Ceiling Fan 56" TCN-CF56',
-                'short_description' => '56-inch energy efficient ceiling fan',
-                'description' => 'High-speed ceiling fan with remote control, reversible function, and energy-efficient BLDC motor.',
-                'price' => 3499,
-                'compare_price' => 4299,
-                'quantity' => 80,
-                'is_bestseller' => true,
-                'status' => 'active',
+    /**
+     * Determine product type based on category name
+     */
+    private function determineProductType(Category $category): string
+    {
+        $categoryName = strtolower($category->name);
+        $parentCategory = $category->parent;
+
+        // Get parent category name if available
+        $parentName = $parentCategory ? strtolower($parentCategory->name) : '';
+
+        // Check specific category names
+        if (str_contains($categoryName, 'ac') || str_contains($categoryName, 'air conditioner')) {
+            if (str_contains($categoryName, 'split')) return 'split-ac';
+            if (str_contains($categoryName, 'window')) return 'window-ac';
+            if (str_contains($categoryName, 'portable')) return 'portable-ac';
+            if (str_contains($categoryName, 'inverter')) return 'inverter-ac';
+            return 'split-ac';
+        }
+
+        if (str_contains($categoryName, 'fan')) {
+            if (str_contains($categoryName, 'ceiling')) return 'ceiling-fan';
+            if (str_contains($categoryName, 'tower')) return 'tower-fan';
+            if (str_contains($categoryName, 'table')) return 'table-fan';
+            if (str_contains($categoryName, 'wall')) return 'wall-fan';
+            return 'ceiling-fan';
+        }
+
+        if (
+            str_contains($categoryName, 'cooler') || str_contains($categoryName, 'heater') ||
+            str_contains($categoryName, 'humidifier') || str_contains($categoryName, 'purifier')
+        ) {
+            if (str_contains($categoryName, 'cooler')) return 'air-cooler';
+            if (str_contains($categoryName, 'heater')) return 'heater';
+            if (str_contains($categoryName, 'humidifier')) return 'humidifier';
+            if (str_contains($categoryName, 'purifier')) return 'air-purifier';
+            return 'air-cooler';
+        }
+
+        if (str_contains($categoryName, 'cookware') || str_contains($parentName, 'cookware')) {
+            return 'cookware-sets';
+        }
+
+        if (
+            str_contains($categoryName, 'gas') || str_contains($categoryName, 'stove') ||
+            str_contains($categoryName, 'induction')
+        ) {
+            if (str_contains($categoryName, 'induction')) return 'induction-cooktops';
+            return 'gas-stoves';
+        }
+
+        if (str_contains($categoryName, 'pressure cooker')) {
+            return 'pressure-cooker';
+        }
+
+        if (str_contains($categoryName, 'rice cooker')) {
+            return 'rice-cooker';
+        }
+
+        if (str_contains($categoryName, 'kettle')) {
+            return 'electric-kettle';
+        }
+
+        if (str_contains($categoryName, 'mixer') || str_contains($categoryName, 'grinder')) {
+            return 'mixer-grinder';
+        }
+
+        if (str_contains($categoryName, 'tv') || str_contains($categoryName, 'television')) {
+            if (str_contains($categoryName, 'smart')) return 'smart-tv';
+            return 'led-tv';
+        }
+
+        if (str_contains($categoryName, 'monitor')) {
+            return 'monitor';
+        }
+
+        if (str_contains($categoryName, 'refrigerator') || str_contains($categoryName, 'fridge')) {
+            if (str_contains($categoryName, 'single')) return 'single-door-fridges';
+            if (str_contains($categoryName, 'double')) return 'double-door-fridges';
+            return 'refrigerator';
+        }
+
+        // Default based on parent
+        if ($parentCategory) {
+            return $this->determineProductType($parentCategory);
+        }
+
+        return 'electronics';
+    }
+
+    /**
+     * Generate product data based on type
+     */
+    private function generateProductData(string $type, int $index): array
+    {
+        $dataTemplates = [
+            'split-ac' => [
+                'name_prefix' => 'TYCOON Split AC',
+                'capacity' => ['1 Ton', '1.5 Ton', '2 Ton'][rand(0, 2)],
+                'price_range' => [35000, 85000],
+                'warranty' => '5 Years Compressor, 1 Year General',
+                'specifications' => ['Inverter Technology', '5 Star Rating', 'Anti-bacterial Filter', 'Wi-Fi Enabled'],
+                'weight_range' => [30, 50],
+                'dimensions' => ['length' => [80, 100], 'width' => [25, 35], 'height' => [25, 35]],
             ],
-            [
-                'name' => 'Tycoon LED TV 32" TCN-LED32',
-                'short_description' => '32-inch HD LED TV',
-                'description' => 'Smart LED TV with HD resolution, built-in apps, and multiple connectivity options.',
-                'price' => 12999,
-                'compare_price' => 14999,
-                'quantity' => 25,
-                'is_featured' => true,
-                'status' => 'active',
+            'window-ac' => [
+                'name_prefix' => 'TYCOON Window AC',
+                'capacity' => ['1 Ton', '1.5 Ton', '2 Ton'][rand(0, 2)],
+                'price_range' => [25000, 45000],
+                'warranty' => '3 Years Compressor, 1 Year General',
+                'specifications' => ['Auto Restart', 'Sleep Mode', 'Dehumidifier', 'Energy Saving'],
+                'weight_range' => [40, 60],
+                'dimensions' => ['length' => [50, 70], 'width' => [40, 60], 'height' => [40, 60]],
             ],
-            [
-                'name' => 'Tycoon Soundbar 2.1 TCN-SB21',
-                'short_description' => '2.1 channel soundbar with subwoofer',
-                'description' => 'Wireless soundbar with separate subwoofer, Bluetooth connectivity, and multiple sound modes.',
-                'price' => 6999,
-                'compare_price' => 8499,
-                'quantity' => 40,
-                'status' => 'active',
+            'ceiling-fan' => [
+                'name_prefix' => 'TYCOON Ceiling Fan',
+                'size' => ['56"', '48"', '52"'][rand(0, 2)],
+                'price_range' => [2500, 5000],
+                'warranty' => '2 Years',
+                'specifications' => ['Energy Efficient', 'Remote Control', 'Reversible', 'LED Light'],
+                'weight_range' => [5, 8],
+                'dimensions' => ['length' => [120, 150], 'width' => [20, 30], 'height' => [20, 30]],
             ],
-            [
-                'name' => 'Tycoon Wireless Earbuds TCN-WE50',
-                'short_description' => 'True wireless earbuds with charging case',
-                'description' => 'Bluetooth 5.0 earbuds with touch controls, IPX7 waterproof rating, and 24-hour battery life.',
-                'price' => 2499,
-                'compare_price' => 2999,
-                'quantity' => 150,
-                'is_new' => true,
-                'status' => 'active',
+            'refrigerator' => [
+                'name_prefix' => 'TYCOON Refrigerator',
+                'capacity' => ['185L', '220L', '260L'][rand(0, 2)],
+                'price_range' => [25000, 45000],
+                'warranty' => '1 Year Comprehensive',
+                'specifications' => ['Frost Free', 'Digital Display', 'Energy Star', 'Multi-airflow'],
+                'weight_range' => [45, 75],
+                'dimensions' => ['length' => [55, 70], 'width' => [55, 70], 'height' => [140, 170]],
             ],
-            [
-                'name' => 'Tycoon Power Bank 20000mAh TCN-PB20',
-                'short_description' => '20000mAh fast charging power bank',
-                'description' => 'High-capacity power bank with 18W fast charging, dual USB ports, and LED indicators.',
-                'price' => 1999,
-                'compare_price' => 2499,
-                'quantity' => 200,
-                'status' => 'active',
+            'led-tv' => [
+                'name_prefix' => 'TYCOON LED TV',
+                'size' => ['32"', '43"', '50"'][rand(0, 2)],
+                'price_range' => [15000, 45000],
+                'warranty' => '1 Year',
+                'specifications' => ['Full HD', 'Smart Features', 'Multiple Ports', 'Wall Mountable'],
+                'weight_range' => [5, 15],
+                'dimensions' => ['length' => [70, 110], 'width' => [5, 10], 'height' => [40, 70]],
             ],
-            [
-                'name' => 'Tycoon Smart Watch TCN-SW01',
-                'short_description' => 'Fitness smart watch with health monitoring',
-                'description' => 'Smart watch with heart rate monitoring, sleep tracking, and multiple sports modes.',
-                'price' => 3999,
-                'compare_price' => 4999,
-                'quantity' => 90,
-                'is_bestseller' => true,
-                'status' => 'active',
+            'smart-tv' => [
+                'name_prefix' => 'TYCOON Smart TV',
+                'size' => ['43"', '55"', '65"'][rand(0, 2)],
+                'price_range' => [35000, 85000],
+                'warranty' => '2 Years',
+                'specifications' => ['4K UHD', 'Android TV', 'Voice Control', 'HDR Support'],
+                'weight_range' => [10, 25],
+                'dimensions' => ['length' => [95, 145], 'width' => [5, 10], 'height' => [55, 85]],
             ],
-            [
-                'name' => 'Tycoon Electric Shaver TCN-ES300',
-                'short_description' => '3-head electric shaver',
-                'description' => 'Wet and dry electric shaver with floating heads, LED display, and quick charge.',
-                'price' => 2999,
-                'compare_price' => 3699,
-                'quantity' => 70,
-                'status' => 'active',
+            'rice-cooker' => [
+                'name_prefix' => 'TYCOON Rice Cooker',
+                'capacity' => ['1.8L', '3L', '5L'][rand(0, 2)],
+                'price_range' => [2000, 5000],
+                'warranty' => '1 Year',
+                'specifications' => ['Non-stick Pot', 'Keep Warm', 'Auto Shut-off', 'Steam Tray'],
+                'weight_range' => [2, 4],
+                'dimensions' => ['length' => [25, 35], 'width' => [25, 35], 'height' => [25, 35]],
             ],
-            [
-                'name' => 'Tycoon Hair Straightener TCN-HS01',
-                'short_description' => 'Ceramic hair straightener',
-                'description' => 'Tourmaline ceramic straightener with adjustable temperature and fast heat-up.',
-                'price' => 1599,
-                'compare_price' => 1999,
-                'quantity' => 85,
-                'status' => 'active',
+            'mixer-grinder' => [
+                'name_prefix' => 'TYCOON Mixer Grinder',
+                'power' => ['500W', '750W', '1000W'][rand(0, 2)],
+                'price_range' => [3000, 8000],
+                'warranty' => '2 Years',
+                'specifications' => ['Stainless Steel Jars', 'Overload Protection', 'Multiple Speed', 'Copper Motor'],
+                'weight_range' => [4, 7],
+                'dimensions' => ['length' => [20, 30], 'width' => [20, 30], 'height' => [30, 40]],
             ],
-            [
-                'name' => 'Tycoon Massage Gun TCN-MG01',
-                'short_description' => 'Deep tissue massage gun',
-                'description' => 'Professional massage gun with 6 attachments, multiple speed levels, and quiet operation.',
-                'price' => 4999,
-                'compare_price' => 5999,
-                'quantity' => 35,
-                'is_new' => true,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Electric Toothbrush TCN-ET01',
-                'short_description' => 'Sonic electric toothbrush',
-                'description' => 'Waterproof electric toothbrush with multiple brushing modes and replacement brush heads.',
-                'price' => 1999,
-                'compare_price' => 2499,
-                'quantity' => 120,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Blood Pressure Monitor TCN-BP01',
-                'short_description' => 'Digital blood pressure monitor',
-                'description' => 'Automatic upper arm blood pressure monitor with large display and memory function.',
-                'price' => 2999,
-                'compare_price' => 3599,
-                'quantity' => 55,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Weighing Scale TCN-WS01',
-                'short_description' => 'Digital body weight scale',
-                'description' => 'High-precision digital scale with tempered glass platform and auto-calibration.',
-                'price' => 1299,
-                'compare_price' => 1699,
-                'quantity' => 130,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Security Camera TCN-SC01',
-                'short_description' => 'Wireless security camera',
-                'description' => '1080p security camera with night vision, motion detection, and two-way audio.',
-                'price' => 3999,
-                'compare_price' => 4999,
-                'quantity' => 45,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Robot Vacuum TCN-RV01',
-                'short_description' => 'Smart robot vacuum cleaner',
-                'description' => 'Automatic robot vacuum with app control, scheduling, and auto recharge.',
-                'price' => 17999,
-                'compare_price' => 21999,
-                'quantity' => 15,
-                'is_featured' => true,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Air Purifier TCN-AP01',
-                'short_description' => 'HEPA air purifier',
-                'description' => 'Air purifier with true HEPA filter, air quality sensor, and sleep mode.',
-                'price' => 8999,
-                'compare_price' => 10999,
-                'quantity' => 30,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Humidifier TCN-HU01',
-                'short_description' => 'Ultrasonic cool mist humidifier',
-                'description' => 'Large capacity humidifier with adjustable mist, night light, and auto shut-off.',
-                'price' => 3499,
-                'compare_price' => 4299,
-                'quantity' => 60,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Electric Blanket TCN-EB01',
-                'short_description' => 'Heated electric blanket',
-                'description' => 'Soft electric blanket with multiple heat settings, auto shut-off, and machine washable.',
-                'price' => 2999,
-                'compare_price' => 3699,
-                'quantity' => 75,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Water Heater 25L TCN-WH25',
-                'short_description' => '25L instant water heater',
-                'description' => 'Instant water heater with 25L capacity, temperature control, and safety features.',
-                'price' => 7999,
-                'compare_price' => 9499,
-                'quantity' => 40,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Inverter Battery 150Ah TCN-IB150',
-                'short_description' => '150Ah solar inverter battery',
-                'description' => 'Maintenance-free inverter battery with 150Ah capacity and long life.',
-                'price' => 18999,
-                'compare_price' => 22999,
-                'quantity' => 20,
-                'is_bestseller' => true,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Solar Panel 300W TCN-SP300',
-                'short_description' => '300W monocrystalline solar panel',
-                'description' => 'High-efficiency solar panel with 300W output, corrosion-resistant frame.',
-                'price' => 14999,
-                'compare_price' => 17999,
-                'quantity' => 25,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Electric Scooter TCN-ES01',
-                'short_description' => 'Foldable electric scooter',
-                'description' => 'Portable electric scooter with 25km range, LED display, and lightweight design.',
-                'price' => 24999,
-                'compare_price' => 29999,
-                'quantity' => 10,
-                'is_featured' => true,
-                'is_new' => true,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Drone Camera TCN-DC01',
-                'short_description' => '4K camera drone with GPS',
-                'description' => 'Foldable drone with 4K camera, GPS positioning, and intelligent flight modes.',
-                'price' => 29999,
-                'compare_price' => 36999,
-                'quantity' => 8,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Gaming Mouse TCN-GM01',
-                'short_description' => 'RGB gaming mouse',
-                'description' => 'Wired gaming mouse with programmable buttons, RGB lighting, and high DPI sensor.',
-                'price' => 1999,
-                'compare_price' => 2499,
-                'quantity' => 150,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Mechanical Keyboard TCN-MK01',
-                'short_description' => 'RGB mechanical keyboard',
-                'description' => 'Full-size mechanical keyboard with RGB backlight, multimedia keys, and wrist rest.',
-                'price' => 3999,
-                'compare_price' => 4999,
-                'quantity' => 80,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Office Chair TCN-OC01',
-                'short_description' => 'Ergonomic office chair',
-                'description' => 'Mesh back office chair with adjustable height, lumbar support, and swivel base.',
-                'price' => 7999,
-                'compare_price' => 9999,
-                'quantity' => 35,
-                'is_bestseller' => true,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Tycoon Standing Desk TCN-SD01',
-                'short_description' => 'Electric height adjustable desk',
-                'description' => 'Motorized standing desk with memory presets, cable management, and sturdy construction.',
-                'price' => 24999,
-                'compare_price' => 29999,
-                'quantity' => 12,
-                'is_featured' => true,
-                'status' => 'active',
+            'electric-kettle' => [
+                'name_prefix' => 'TYCOON Electric Kettle',
+                'capacity' => ['1.5L', '1.8L', '2L'][rand(0, 2)],
+                'price_range' => [1500, 3000],
+                'warranty' => '1 Year',
+                'specifications' => ['Auto Shut-off', 'Boil-dry Protection', '360° Base', 'Water Level Indicator'],
+                'weight_range' => [1, 2],
+                'dimensions' => ['length' => [20, 25], 'width' => [20, 25], 'height' => [25, 30]],
             ],
         ];
 
-        foreach ($products as $productData) {
-            $category = $categories->random();
-            $brand = $brands->random();
-            $vendor = $vendors->random();
+        // Default template if type not found
+        $template = $dataTemplates[$type] ?? $dataTemplates['electronics'] ?? [
+            'name_prefix' => 'TYCOON Product',
+            'price_range' => [5000, 50000],
+            'warranty' => '1 Year',
+            'specifications' => ['High Quality', 'Durable', 'Energy Efficient'],
+            'weight_range' => [5, 20],
+            'dimensions' => ['length' => [30, 50], 'width' => [30, 50], 'height' => [30, 50]],
+        ];
 
-            // Generate realistic product data
-            $costPrice = $productData['price'] * 0.6; // 40% margin
-            $weight = rand(100, 5000) / 100; // 1g to 5kg
+        // Generate product name
+        $name = $template['name_prefix'];
+        if (isset($template['capacity'])) {
+            $name .= ' ' . $template['capacity'];
+        } elseif (isset($template['size'])) {
+            $name .= ' ' . $template['size'];
+        } elseif (isset($template['power'])) {
+            $name .= ' ' . $template['power'];
+        }
+        $name .= ' ' . strtoupper(Str::random(3)) . '-' . rand(1000, 9999);
 
-            Product::create(array_merge($productData, [
-                'sku' => 'PROD-' . strtoupper(Str::random(8)),
-                'slug' => Str::slug($productData['name']),
-                'category_id' => $category->id,
-                'brand_id' => $brand->id,
-                'vendor_id' => $vendor->id,
-                'cost_price' => $costPrice,
-                'alert_quantity' => 10,
-                'track_quantity' => true,
-                'allow_backorder' => rand(0, 1) == 1,
-                'featured_image' => null,
-                'gallery_images' => null,
-                'weight' => $weight,
-                'length' => rand(10, 100) / 10,
-                'width' => rand(10, 100) / 10,
-                'height' => rand(10, 100) / 10,
-                'meta_title' => $productData['name'],
-                'meta_description' => $productData['short_description'],
-                'meta_keywords' => implode(', ', explode(' ', $productData['name'])),
-                'stock_status' => $productData['quantity'] > 0 ? 'in_stock' : 'out_of_stock',
-                'average_rating' => rand(35, 50) / 10, // 3.5 to 5.0
-                'rating_count' => rand(5, 200),
-                'total_sold' => rand(0, $productData['quantity'] * 2),
-                'total_revenue' => rand(100, 10000),
-            ]));
+        // Generate price
+        $price = rand($template['price_range'][0], $template['price_range'][1]);
+        $comparePrice = $price * (1 + (rand(10, 25) / 100)); // 10-25% higher
+
+        // Get images for this product type
+        $featuredImages = $this->getProductImages($type);
+
+        // Random status flags (some products are featured, bestseller, or new)
+        $isFeatured = rand(0, 10) > 7; // 30% chance
+        $isBestseller = rand(0, 10) > 8; // 20% chance
+        $isNew = rand(0, 10) > 6; // 40% chance
+
+        // Generate quantity
+        $quantity = rand(0, 100);
+        $stockStatus = $quantity > 0 ? 'in_stock' : 'out_of_stock';
+
+        // Status
+        $status = $quantity > 0 ? 'active' : (rand(0, 1) ? 'active' : 'inactive');
+
+        return [
+            'name' => $name,
+            'short_description' => $this->generateShortDescription($type, $template),
+            'description' => $this->generateDescription($type, $template),
+            'price' => $price,
+            'compare_price' => $comparePrice,
+            'quantity' => $quantity,
+            'warranty' => $template['warranty'],
+            'specifications' => $template['specifications'],
+            'featured_images' => $featuredImages,
+            'gallery_images' => $featuredImages, // Using same images for gallery
+            'weight' => rand($template['weight_range'][0], $template['weight_range'][1]) / 10, // Convert to kg
+            'dimensions' => [
+                'length' => rand($template['dimensions']['length'][0], $template['dimensions']['length'][1]) / 10,
+                'width' => rand($template['dimensions']['width'][0], $template['dimensions']['width'][1]) / 10,
+                'height' => rand($template['dimensions']['height'][0], $template['dimensions']['height'][1]) / 10,
+            ],
+            'is_featured' => $isFeatured,
+            'is_bestseller' => $isBestseller,
+            'is_new' => $isNew,
+            'status' => $status,
+            'stock_status' => $stockStatus,
+        ];
+    }
+
+    /**
+     * Get product images based on type
+     */
+    private function getProductImages(string $type): array
+    {
+        // Default images
+        $defaultImages = ['products/default-01.jpg', 'products/default-02.jpg'];
+
+        // Check if we have images for this type
+        if (isset($this->productImages[$type])) {
+            $imageFiles = $this->productImages[$type];
+            return array_map(function ($file) {
+                return 'images/products/' . $file;
+            }, $imageFiles);
         }
 
-        // Create some draft and inactive products
-        for ($i = 1; $i <= 5; $i++) {
-            $category = $categories->random();
-            $brand = $brands->random();
-            $vendor = $vendors->random();
+        // Return default images
+        return $defaultImages;
+    }
 
-            Product::create([
-                'name' => 'Tycoon Draft Product ' . $i,
-                'sku' => 'DRAFT-' . strtoupper(Str::random(6)),
-                'slug' => 'tycoon-draft-product-' . $i,
-                'short_description' => 'This is a draft product',
-                'description' => 'This Tycoon product is in draft status and will be published soon.',
-                'price' => rand(2000, 10000),
-                'quantity' => rand(0, 10),
-                'category_id' => $category->id,
-                'brand_id' => $brand->id,
-                'vendor_id' => $vendor->id,
-                'cost_price' => rand(1000, 5000),
-                'status' => 'draft',
-                'stock_status' => 'out_of_stock',
-                'alert_quantity' => 5,
-                'meta_title' => 'Tycoon Draft Product ' . $i,
-                'meta_description' => 'Draft product description',
-            ]);
-        }
+    /**
+     * Generate short description
+     */
+    private function generateShortDescription(string $type, array $template): string
+    {
+        $descriptions = [
+            'split-ac' => 'Energy efficient split air conditioner with inverter technology and smart features.',
+            'window-ac' => 'Compact window AC with auto restart, sleep mode, and energy saving function.',
+            'ceiling-fan' => 'Premium ceiling fan with remote control, reversible function, and LED light.',
+            'refrigerator' => 'Frost-free refrigerator with digital display and energy efficient cooling.',
+            'led-tv' => 'Full HD LED television with smart features and multiple connectivity options.',
+            'smart-tv' => '4K Smart TV with Android operating system and voice control support.',
+            'rice-cooker' => 'Automatic rice cooker with non-stick pot and keep warm function.',
+            'mixer-grinder' => 'Powerful mixer grinder with stainless steel jars and multiple speed settings.',
+            'electric-kettle' => 'Electric kettle with auto shut-off and boil-dry protection.',
+        ];
 
-        // Create some out of stock products
-        for ($i = 1; $i <= 5; $i++) {
-            $category = $categories->random();
-            $brand = $brands->random();
-            $vendor = $vendors->random();
+        return $descriptions[$type] ?? 'High quality product with excellent features and durability.';
+    }
 
-            Product::create([
-                'name' => 'Tycoon Out of Stock Product ' . $i,
-                'sku' => 'OOS-' . strtoupper(Str::random(6)),
-                'slug' => 'tycoon-out-of-stock-product-' . $i,
-                'short_description' => 'This Tycoon product is temporarily out of stock',
-                'description' => 'We are expecting more stock soon. Please check back later.',
-                'price' => rand(5000, 20000),
-                'quantity' => 0,
-                'category_id' => $category->id,
-                'brand_id' => $brand->id,
-                'vendor_id' => $vendor->id,
-                'cost_price' => rand(2000, 10000),
-                'status' => 'active',
-                'stock_status' => 'out_of_stock',
-                'allow_backorder' => rand(0, 1) == 1,
-                'alert_quantity' => 5,
-            ]);
-        }
+    /**
+     * Generate full description
+     */
+    private function generateDescription(string $type, array $template): string
+    {
+        $baseDescription = $this->generateShortDescription($type, $template);
+
+        $features = implode(', ', $template['specifications']);
+
+        return $baseDescription . " This product features " . $features . ". It comes with " . $template['warranty'] . " warranty. Perfect for home or office use with energy efficient operation and modern design.";
+    }
+
+    /**
+     * Generate SEO keywords
+     */
+    private function generateKeywords(string $productName): string
+    {
+        $words = explode(' ', $productName);
+        $mainWords = array_slice($words, 0, 4);
+        return implode(', ', $mainWords) . ', buy online, best price, TYCOON, Bangladesh';
     }
 }

@@ -9,18 +9,31 @@ use App\Models\UserStory;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Services\Product\ProductService;
+use App\Http\Resources\FeaturedProductViewResource;
 
 class HomeController extends Controller
 {
+    public function __construct(
+        protected ProductService $productService
+    ) {}
+
     public function index()
     {
         $heroSlides = $this->heroSlides();
-        $categories = Category::active()->root()->limit(12)->get();
-        $products = $this->products();
+        $categories = Category::active()->root()->featured()->limit(12)->get();
+        // $products = $this->products();
+        $featuredProducts = FeaturedProductViewResource::collection(
+            $this->productService->getFeaturedProducts()
+        )->resolve();
+        $products = $this->productService->getHomepageProducts();
+        // dd($featuredProducts);
+        // dd($featuredProducts->resolve());
+
+        // dd($products);
         $smartSections = $this->smartSections();
 
         $recommendedProducts = $this->getRecommendedProducts();
-        $featuredProducts = $this->getFeaturedProducts();
         $newArrivals = $this->newArrivals();
         $bestsellers = $this->saleProducts();
 

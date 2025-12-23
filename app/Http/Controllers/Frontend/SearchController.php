@@ -20,7 +20,7 @@ class SearchController extends Controller
             }
 
             // Search products
-            $products = Product::where('status', 'active')
+            $products = Product::active()
                 ->where(function ($q) use ($query) {
                     $q->where('name', 'LIKE', "%{$query}%")
                         ->orWhere('sku', 'LIKE', "%{$query}%")
@@ -30,7 +30,7 @@ class SearchController extends Controller
                 ->get(['id', 'name', 'slug', 'price', 'featured_image', 'stock_status', 'is_new', 'discount_percentage']);
 
             // Search categories
-            $categories = Category::where('is_active', true)
+            $categories = Category::active()
                 ->where('name', 'LIKE', "%{$query}%")
                 ->limit(5)
                 ->get(['id', 'name', 'slug']);
@@ -66,6 +66,7 @@ class SearchController extends Controller
 
             return response()->json($suggestions);
         } catch (\Exception $e) {
+            flash('Search suggestion error', 'success');
             Log::error('Search suggestion error', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()

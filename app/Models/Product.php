@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
@@ -29,7 +29,7 @@ class Product extends Model
         'warranty_period',
         'warranty_type',
         'specifications',
-        'featured_image',
+        'featured_images',
         'gallery_images',
         'weight',
         'length',
@@ -50,6 +50,7 @@ class Product extends Model
         'category_id',
         'brand_id',
         'vendor_id',
+        'discount_percentage',
     ];
 
     protected $casts = [
@@ -60,6 +61,8 @@ class Product extends Model
         'alert_quantity' => 'integer',
         'track_quantity' => 'boolean',
         'allow_backorder' => 'boolean',
+        'specifications' => 'array',
+        'featured_images' => 'array',
         'gallery_images' => 'array',
         'weight' => 'decimal:2',
         'length' => 'decimal:2',
@@ -72,68 +75,30 @@ class Product extends Model
         'rating_count' => 'integer',
         'total_sold' => 'integer',
         'total_revenue' => 'decimal:2',
+        'discount_percentage' => 'decimal:2',
     ];
 
-    /**
-     * The attributes that should be hidden for arrays.
-     */
     protected $hidden = [
         'cost_price',
         'vendor_id',
     ];
 
-    /**
-     * Boot the model.
-     */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($product) {
-            // Generate SKU if not provided
-            if (empty($product->sku)) {
-                $product->sku = 'PROD-' . strtoupper(Str::random(8));
-            }
-
-            // Generate slug if not provided
-            if (empty($product->slug)) {
-                $product->slug = Str::slug($product->name);
-            }
-
-            // Ensure unique slug
-            $originalSlug = $product->slug;
-            $count = 1;
-            while (static::where('slug', $product->slug)->exists()) {
-                $product->slug = $originalSlug . '-' . $count++;
-            }
-        });
-
-        static::updating(function ($product) {
-            // Update slug if name changed
-            if ($product->isDirty('name') && empty($product->slug)) {
-                $product->slug = Str::slug($product->name);
-            }
-
-            // Update stock status based on quantity
-            if ($product->isDirty('quantity')) {
-                $product->updateStockStatus();
-            }
-        });
-
-        static::saving(function ($product) {
-            // Calculate discount percentage
-            if ($product->compare_price > $product->price) {
-                $product->discount_percentage = round(($product->compare_price - $product->price) / $product->compare_price * 100);
-            } else {
-                $product->discount_percentage = 0;
-            }
-        });
-    }
+    protected $appends = [
+        'in_stock',
+        'discount_amount',
+        'featured_images_urls',
+        'gallery_images_urls',
+        'url',
+        'is_low_stock',
+        'profit_margin',
+        'profit_per_unit',
+        'specifications_array',
+    ];
 
     /**
      * Get the category that owns the product.
      */
-    public function category()
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
@@ -141,23 +106,23 @@ class Product extends Model
     /**
      * Get the brand that owns the product.
      */
-    public function brand()
-    {
-        return $this->belongsTo(Brand::class);
-    }
+    // public function brand(): BelongsTo
+    // {
+    //     return $this->belongsTo(Brand::class);
+    // }
 
     /**
      * Get the vendor that owns the product.
      */
-    public function vendor()
-    {
-        return $this->belongsTo(User::class, 'vendor_id');
-    }
+    // public function vendor(): BelongsTo
+    // {
+    //     return $this->belongsTo(User::class, 'vendor_id');
+    // }
 
     /**
      * Get the product's reviews.
      */
-    public function reviews()
+    public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
     }
@@ -165,7 +130,7 @@ class Product extends Model
     /**
      * Get the product's order items.
      */
-    public function orderItems()
+    public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
     }
@@ -173,91 +138,9 @@ class Product extends Model
     /**
      * Get the product's wishlist items.
      */
-    public function wishlists()
+    public function wishlists(): HasMany
     {
         return $this->hasMany(Wishlist::class);
-    }
-
-    /**
-     * Update stock status based on quantity.
-     */
-    public function updateStockStatus()
-    {
-        if ($this->quantity <= 0) {
-            if ($this->allow_backorder) {
-                $this->stock_status = 'backorder';
-            } else {
-                $this->stock_status = 'out_of_stock';
-            }
-        } else {
-            $this->stock_status = 'in_stock';
-        }
-
-        if (!$this->isDirty('stock_status')) {
-            $this->saveQuietly(['stock_status']);
-        }
-    }
-
-    /**
-     * Check if product is in stock.
-     */
-    public function getInStockAttribute()
-    {
-        return $this->stock_status === 'in_stock' || $this->stock_status === 'backorder';
-    }
-
-    /**
-     * Get the discount amount.
-     */
-    public function getDiscountAmountAttribute()
-    {
-        if ($this->compare_price > $this->price) {
-            return $this->compare_price - $this->price;
-        }
-
-        return 0;
-    }
-
-    /**
-     * Get the product's main image URL.
-     */
-    public function getFeaturedImageUrlAttribute()
-    {
-        if ($this->featured_image) {
-            if (strpos($this->featured_image, 'http') === 0) {
-                return $this->featured_image;
-            }
-
-            return Storage::url($this->featured_image);
-        }
-
-        return asset('images/products/fr-06.jpg');
-    }
-
-    /**
-     * Get the product's gallery images URLs.
-     */
-    public function getGalleryImagesUrlsAttribute()
-    {
-        if (!$this->gallery_images || empty($this->gallery_images)) {
-            return [$this->featured_image_url];
-        }
-
-        return array_map(function ($image) {
-            if (strpos($image, 'http') === 0) {
-                return $image;
-            }
-
-            return Storage::url($image);
-        }, $this->gallery_images);
-    }
-
-    /**
-     * Get the product's URL.
-     */
-    public function getUrlAttribute()
-    {
-        return route('products.show', $this->slug);
     }
 
     /**
@@ -279,7 +162,7 @@ class Product extends Model
     /**
      * Scope a query to only include bestseller products.
      */
-    public function scopeBestseller($query)
+    public function scopeBestsell($query)
     {
         return $query->where('is_bestseller', true);
     }
@@ -311,6 +194,7 @@ class Product extends Model
         return $query->where(function ($q) use ($search) {
             $q->where('name', 'LIKE', "%{$search}%")
                 ->orWhere('sku', 'LIKE', "%{$search}%")
+                ->orWhere('model_number', 'LIKE', "%{$search}%")
                 ->orWhere('short_description', 'LIKE', "%{$search}%")
                 ->orWhereHas('category', function ($q) use ($search) {
                     $q->where('name', 'LIKE', "%{$search}%");
@@ -332,61 +216,5 @@ class Product extends Model
     public function scopeByCategory($query, $categoryId)
     {
         return $query->where('category_id', $categoryId);
-    }
-
-    /**
-     * Increment sold quantity and revenue.
-     */
-    public function incrementSold($quantity, $price)
-    {
-        $this->increment('total_sold', $quantity);
-        $this->increment('total_revenue', $quantity * $price);
-
-        if ($this->track_quantity) {
-            $this->decrement('quantity', $quantity);
-            $this->updateStockStatus();
-        }
-    }
-
-    /**
-     * Decrement sold quantity and revenue (for refunds/cancellations).
-     */
-    public function decrementSold($quantity, $price)
-    {
-        $this->decrement('total_sold', $quantity);
-        $this->decrement('total_revenue', $quantity * $price);
-
-        if ($this->track_quantity) {
-            $this->increment('quantity', $quantity);
-            $this->updateStockStatus();
-        }
-    }
-
-    /**
-     * Check if product quantity is low.
-     */
-    public function getIsLowStockAttribute()
-    {
-        return $this->quantity <= $this->alert_quantity;
-    }
-
-    /**
-     * Calculate profit margin.
-     */
-    public function getProfitMarginAttribute()
-    {
-        if ($this->cost_price > 0 && $this->price > 0) {
-            return (($this->price - $this->cost_price) / $this->price) * 100;
-        }
-
-        return 0;
-    }
-
-    /**
-     * Calculate profit per unit.
-     */
-    public function getProfitPerUnitAttribute()
-    {
-        return $this->price - $this->cost_price;
     }
 }

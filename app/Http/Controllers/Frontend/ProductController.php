@@ -5,67 +5,151 @@ namespace App\Http\Controllers\Frontend;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductResource;
+use App\Services\Product\ProductService;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\Admin\UpdateProductRequest;
 
 class ProductController extends Controller
 {
+    public function __construct(
+        protected ProductService $productService
+    ) {}
+
     /**
-     * Display a listing of all products.
+     * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        // Get filter parameters
-        $search = $request->query('search');
-        $category = $request->query('category');
-        $minPrice = $request->query('min_price');
-        $maxPrice = $request->query('max_price');
-        $sort = $request->query('sort', 'latest');
-        $status = $request->query('status', 'all');
+        $perPage = $request->get('per_page', 24);
+        $search = $request->get('search');
+        $categoryId = $request->get('category_id');
+        $minPrice = $request->get('min_price');
+        $maxPrice = $request->get('max_price');
+        $sort = $request->get('sort', 'newest');
+        $status = $request->get('status');
 
-        // Start query
-        $query = Product::active();
-
-        // Apply search filter
-        if ($search) {
-            $query->search($search);
-        }
-
-        // Apply category filter
-        if ($category) {
-            $query->byCategory($category);
-        }
-
-        // Apply price range filter
-        if ($minPrice) {
-            $query->where('price', '>=', $minPrice);
-        }
-        if ($maxPrice) {
-            $query->where('price', '<=', $maxPrice);
-        }
-
-        // Apply status filter
-        if ($status !== 'all') {
-            switch ($status) {
-                case 'in_stock':
-                    $query->inStock();
-                    break;
-                case 'new':
-                    $query->new();
-                    break;
-                case 'featured':
-                    $query->featured();
-                    break;
-                case 'bestseller':
-                    $query->bestseller();
-                    break;
-                case 'discounted':
-                    $query->where('compare_price', '>', 0)
-                        ->whereColumn('compare_price', '>', 'price');
-                    break;
-            }
-        }
+        $query = Product::with(['category'])
+            ->when($search, function ($q) use ($search) {
+                $q->search($search);
+            })
+            ->when($categoryId, function ($q) use ($categoryId) {
+                $q->byCategory($categoryId);
+            })
+            ->when($minPrice && $maxPrice, function ($q) use ($minPrice, $maxPrice) {
+                $q->priceRange($minPrice, $maxPrice);
+            })
+            ->when($status, function ($q) use ($status) {
+                $q->where('status', $status);
+            });
 
         // Apply sorting
+        $this->applySorting($query, $sort);
+
+        $products = $query->paginate($perPage);
+
+        return ProductResource::collection($products);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreProductRequest $request)
+    {
+        $product = $this->productService->create($request->validated());
+
+        return response()->json([
+            'message' => 'Product created successfully',
+            'data' => new ProductResource($product)
+        ], Response::HTTP_CREATED);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Product $product)
+    {
+        $product->load(['category', 'vendor', 'reviews.user']);
+
+        return new ProductResource($product);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateProductRequest $request, Product $product)
+    {
+        $product = $this->productService->update($product, $request->validated());
+
+        return response()->json([
+            'message' => 'Product updated successfully',
+            'data' => new ProductResource($product)
+        ]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Product $product)
+    {
+        $this->productService->delete($product);
+
+        return response()->json([
+            'message' => 'Product deleted successfully'
+        ]);
+    }
+
+    /**
+     * Get homepage products
+     */
+    public function homepage()
+    {
+        $products = $this->productService->getHomepageProducts();
+
+        return response()->json([
+            'data' => $products
+        ]);
+    }
+
+    /**
+     * Search products
+     */
+    public function search(Request $request)
+    {
+        $search = $request->get('q');
+        $filters = $request->only(['category_id', 'min_price', 'max_price', 'sort']);
+        $perPage = $request->get('per_page', 24);
+
+        if (!$search) {
+            return response()->json(['data' => []], 400);
+        }
+
+        $products = $this->productService->search($search, $filters, $perPage);
+
+        return ProductResource::collection($products);
+    }
+
+    /**
+     * Get products by category
+     */
+    public function byCategory(Request $request, $categoryId)
+    {
+        $category = Category::findOrFail($categoryId);
+        $filters = $request->only(['min_price', 'max_price', 'sort']);
+        $perPage = $request->get('per_page', 24);
+
+        $products = $this->productService->getProductsByCategory($category, $filters, $perPage);
+
+        return ProductResource::collection($products);
+    }
+
+    /**
+     * Apply sorting to query
+     */
+    protected function applySorting($query, string $sort): void
+    {
         switch ($sort) {
             case 'price_low':
                 $query->orderBy('price', 'asc');
@@ -73,11 +157,8 @@ class ProductController extends Controller
             case 'price_high':
                 $query->orderBy('price', 'desc');
                 break;
-            case 'name_asc':
-                $query->orderBy('name', 'asc');
-                break;
-            case 'name_desc':
-                $query->orderBy('name', 'desc');
+            case 'newest':
+                $query->orderBy('created_at', 'desc');
                 break;
             case 'popular':
                 $query->orderBy('total_sold', 'desc');
@@ -85,84 +166,8 @@ class ProductController extends Controller
             case 'rating':
                 $query->orderBy('average_rating', 'desc');
                 break;
-            case 'latest':
             default:
                 $query->orderBy('created_at', 'desc');
-                break;
         }
-
-        // Get paginated products
-        $products = $query->paginate(20);
-
-        // Transform products for frontend
-        $products->getCollection()->transform(function ($product) {
-            return [
-                'id' => $product->id,
-                'slug' => $product->slug,
-                'name' => $product->name,
-                'original_price' => (float) $product->price,
-                'discounted_price' => $product->compare_price > $product->price
-                    ? (float) $product->price
-                    : (float) $product->price,
-                'discount_percentage' => (int) $product->discount_percentage ?? 0,
-                'images' => $product->gallery_images_urls,
-                'in_stock' => $product->in_stock,
-                'is_new' => $product->is_new,
-                'rating' => (float) $product->average_rating,
-                'review_count' => $product->rating_count,
-                'stock_status' => $product->stock_status,
-                'short_description' => $product->short_description,
-            ];
-        });
-
-        // Get categories for filter dropdown (if you have a Category model)
-        $categories = Category::active()
-            ->withCount('products')
-            ->orderBy('name')
-            ->get();
-
-        // Get price range for filter
-        $priceRange = [
-            'min' => (int) Product::active()->min('price'),
-            'max' => (int) Product::active()->max('price'),
-        ];
-
-        return view('frontend.products.index', compact(
-            'products',
-            'categories',
-            'priceRange',
-            'search',
-            'category',
-            'minPrice',
-            'maxPrice',
-            'sort',
-            'status'
-        ));
-    }
-
-    /**
-     * Display the specified product details.
-     */
-    public function show($slug)
-    {
-        $product = Product::with(['category', 'brand', 'reviews.user'])
-            ->where('slug', $slug)
-            ->where('status', 'active')
-            ->firstOrFail();
-
-        // Related products (same category)
-        $relatedProducts = Product::where('category_id', $product->category_id)
-            ->where('id', '!=', $product->id)
-            ->where('status', 'active')
-            ->limit(4)
-            ->get();
-
-        // Recently viewed (store in session)
-        $recentlyViewed = session()->get('recently_viewed', []);
-        array_unshift($recentlyViewed, $product->id);
-        $recentlyViewed = array_slice(array_unique($recentlyViewed), 0, 4);
-        session()->put('recently_viewed', $recentlyViewed);
-
-        return view('frontend.products.show', compact('product', 'relatedProducts'));
     }
 }

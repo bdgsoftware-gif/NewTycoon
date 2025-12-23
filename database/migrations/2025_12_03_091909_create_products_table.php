@@ -32,7 +32,7 @@ return new class extends Migration
             $table->json('specifications')->nullable();
 
             // Media
-            $table->string('featured_image')->nullable();
+            $table->json('featured_images')->nullable();
             $table->json('gallery_images')->nullable();
 
             // Attributes

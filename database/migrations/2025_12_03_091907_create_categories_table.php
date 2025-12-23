@@ -13,21 +13,35 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
+
             $table->string('name');
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->string('image')->nullable();
+
             $table->unsignedBigInteger('parent_id')->nullable();
+
+            // Navigation-specific
+            $table->boolean('show_in_nav')->default(false);
+            $table->integer('nav_order')->default(0);
+
+            // General ordering
             $table->integer('order')->default(0);
+
+            // Marketing / Homepage
             $table->boolean('is_featured')->default(false);
+
+            // System
             $table->boolean('is_active')->default(true);
+
+            // SEO
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
             $table->string('meta_keywords')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
 
-            // Foreign key for hierarchical categories
             $table->foreign('parent_id')
                 ->references('id')
                 ->on('categories')

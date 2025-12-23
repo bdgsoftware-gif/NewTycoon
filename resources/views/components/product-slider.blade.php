@@ -9,6 +9,7 @@
             <p>{{ $index + 1 }}. {{ $product['name'] }} - Slug: {{ $product['slug'] }}</p>
         @endforeach
     </div>
+  
 
     <!-- Section Header -->
     <div class="flex items-center justify-between mb-8">

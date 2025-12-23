@@ -3,6 +3,12 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Models\Product;
+use App\Observers\ProductObserver;
+use App\Services\Product\ProductService;
+use App\Services\Product\ProductStockService;
+use App\Services\Product\ProductPricingService;
+use App\Services\Product\ProductImageService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,7 +17,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(ProductService::class, function ($app) {
+            return new ProductService(
+                $app->make(ProductStockService::class),
+                $app->make(ProductPricingService::class),
+                $app->make(ProductImageService::class)
+            );
+        });
+
+        $this->app->singleton(ProductStockService::class);
+        $this->app->singleton(ProductPricingService::class);
+        $this->app->singleton(ProductImageService::class);
     }
 
     /**
@@ -19,6 +35,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Product::observe(ProductObserver::class);
     }
 }
