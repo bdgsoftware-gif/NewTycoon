@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Frontend;
 
-use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\SearchTerm;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductCardViewResource;
 
 class SearchController extends Controller
 {
@@ -19,6 +22,16 @@ class SearchController extends Controller
                 return response()->json([]);
             }
 
+            if ($query) {
+                SearchTerm::updateOrCreate(
+                    ['term' => $query],
+                    [
+                        'search_count' => DB::raw('search_count + 1'),
+                        'last_searched_at' => now(),
+                    ]
+                );
+            }
+
             // Search products
             $products = Product::active()
                 ->where(function ($q) use ($query) {
@@ -27,7 +40,7 @@ class SearchController extends Controller
                         ->orWhere('short_description', 'LIKE', "%{$query}%");
                 })
                 ->limit(8)
-                ->get(['id', 'name', 'slug', 'price', 'featured_image', 'stock_status', 'is_new', 'discount_percentage']);
+                ->get(['id', 'name', 'slug', 'price', 'featured_images', 'stock_status', 'is_new', 'discount_percentage']);
 
             // Search categories
             $categories = Category::active()
@@ -45,7 +58,7 @@ class SearchController extends Controller
                     'name' => $product->name,
                     'url' => route('product.show', $product->slug),
                     'price' => number_format($product->price, 2),
-                    'image' => $this->getImageUrl($product->featured_image),
+                    'image' => $this->getImageUrl($product->featured_images[0]),
                     'in_stock' => $product->stock_status === 'in_stock',
                     'is_new' => $product->is_new,
                     'discount_percentage' => $product->discount_percentage,
@@ -66,7 +79,7 @@ class SearchController extends Controller
 
             return response()->json($suggestions);
         } catch (\Exception $e) {
-            flash('Search suggestion error', 'success');
+            flash('Search suggestion error', 'error');
             Log::error('Search suggestion error', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
@@ -88,8 +101,22 @@ class SearchController extends Controller
         $maxPrice = $request->input('max_price');
         $status = $request->input('status', 'all');
 
+        if ($search) {
+            SearchTerm::updateOrCreate(
+                ['term' => $search],
+                [
+                    'search_count' => DB::raw('search_count + 1'),
+                    'last_searched_at' => now(),
+                ]
+            );
+        }
         // Base query for products
-        $query = Product::query()->where('status', 'active');
+        $query = Product::query()->active();
+
+        // dd(
+        //     $query->toSql(),
+        //     $query->getBindings()
+        // );
 
         // Apply search
         if (!empty($search)) {
@@ -120,6 +147,9 @@ class SearchController extends Controller
         switch ($status) {
             case 'in_stock':
                 $query->where('stock_status', 'in_stock');
+                break;
+            case 'out_of_stock':
+                $query->where('stock_status', 'out_of_stock');
                 break;
             case 'new':
                 $query->where('is_new', true);
@@ -159,34 +189,22 @@ class SearchController extends Controller
         }
 
         // Get products with pagination
-        $products = $query->paginate(12)->withQueryString();
+        $products = ProductCardViewResource::collection($query->paginate(12)->withQueryString());
 
         // Get categories for filter sidebar
-        $categories = Category::where('is_active', true)
-            ->whereNull('parent_id')
+        $categories = Category::active()->root()
             ->withCount(['products' => function ($query) {
                 $query->where('status', 'active');
             }])
             ->orderBy('order')
             ->get();
 
+        dd($products, $categories);
         // Get price range
         $priceRange = [
             'min' => Product::min('price') ?? 0,
             'max' => Product::max('price') ?? 10000
         ];
-
-        // Prepare search results data
-        $products->getCollection()->transform(function ($product) {
-            $product->discounted_price = $product->discount_percentage > 0
-                ? $product->price - ($product->price * $product->discount_percentage / 100)
-                : $product->price;
-
-            $product->original_price = $product->price;
-            $product->in_stock = $product->stock_status === 'in_stock';
-
-            return $product;
-        });
 
         return view('frontend.search.results', compact(
             'products',

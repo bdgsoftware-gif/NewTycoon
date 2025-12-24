@@ -7,7 +7,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ProductResource;
+use App\Http\Resources\ProductDetailsResource;
 use App\Services\Product\ProductService;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\Admin\UpdateProductRequest;
@@ -50,7 +50,7 @@ class ProductController extends Controller
 
         $products = $query->paginate($perPage);
 
-        return ProductResource::collection($products);
+        return ProductDetailsResource::collection($products);
     }
 
     /**
@@ -62,7 +62,7 @@ class ProductController extends Controller
 
         return response()->json([
             'message' => 'Product created successfully',
-            'data' => new ProductResource($product)
+            'data' => new ProductDetailsResource($product)
         ], Response::HTTP_CREATED);
     }
 
@@ -73,7 +73,7 @@ class ProductController extends Controller
     {
         $product->load(['category', 'vendor', 'reviews.user']);
 
-        return new ProductResource($product);
+        return new ProductDetailsResource($product);
     }
 
     /**
@@ -85,7 +85,7 @@ class ProductController extends Controller
 
         return response()->json([
             'message' => 'Product updated successfully',
-            'data' => new ProductResource($product)
+            'data' => new ProductDetailsResource($product)
         ]);
     }
 
@@ -128,7 +128,7 @@ class ProductController extends Controller
 
         $products = $this->productService->search($search, $filters, $perPage);
 
-        return ProductResource::collection($products);
+        return ProductDetailsResource::collection($products);
     }
 
     /**
@@ -142,7 +142,7 @@ class ProductController extends Controller
 
         $products = $this->productService->getProductsByCategory($category, $filters, $perPage);
 
-        return ProductResource::collection($products);
+        return ProductDetailsResource::collection($products);
     }
 
     /**

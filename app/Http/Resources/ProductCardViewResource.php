@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class FeaturedProductViewResource extends JsonResource
+class ProductCardViewResource extends JsonResource
 {
     public function toArray($request): array
     {
@@ -20,8 +20,9 @@ class FeaturedProductViewResource extends JsonResource
 
             'is_new' => (bool) $this->is_new,
             'in_stock' => $this->stock_status === 'in_stock',
+            'is_featured' => (bool) $this->is_featured,
 
-            'image' => $this->featured_images[0] ?? null,
+            'image' => data_get($this->featured_images, '0'),
         ];
     }
 }
