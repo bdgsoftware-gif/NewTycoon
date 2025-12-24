@@ -46,7 +46,7 @@ class ProductResource extends JsonResource
             ],
             'flags' => [
                 'is_featured' => $this->is_featured,
-                'is_bestseller' => $this->is_bestseller,
+                'is_bestsells' => $this->is_bestsells,
                 'is_new' => $this->is_new,
             ],
             'status' => $this->status,

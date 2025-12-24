@@ -44,7 +44,7 @@
         @endif
     </div>
 
-    <div class="absolute right-4 top-1/4 2xl:-right-10 2xl:bottom-[4.5rem]">
+    <div class="absolute right-4 top-1/4 xl:top-auto 2xl:-right-10 2xl:bottom-[4.5rem]">
         <a href="{{ route('categories.index') }}"
             class="inline-block transform 2xl:rotate-90 px-3 py-1.5 2xl:px-2.5 2xl:py-1 bg-primary hover:bg-accent text-white text-sm 2xl:text-xs font-inter font-normal tracking-wide rounded-md">
             View All

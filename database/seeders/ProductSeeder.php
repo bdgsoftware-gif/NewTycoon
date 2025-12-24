@@ -137,7 +137,7 @@ class ProductSeeder extends Seeder
                 'meta_description' => $productData['short_description'],
                 'meta_keywords' => $this->generateKeywords($productData['name']),
                 'is_featured' => $productData['is_featured'],
-                'is_bestseller' => $productData['is_bestseller'],
+                'is_bestsells' => $productData['is_bestsells'],
                 'is_new' => $productData['is_new'],
                 'status' => $productData['status'],
                 'stock_status' => $productData['stock_status'],
@@ -145,7 +145,7 @@ class ProductSeeder extends Seeder
                 'rating_count' => rand(10, 200),
                 'total_sold' => rand(5, 150),
                 'total_revenue' => $productData['price'] * rand(5, 150),
-                'category_id' => $category->id,               
+                'category_id' => $category->id,
             ]);
         }
 
@@ -182,7 +182,7 @@ class ProductSeeder extends Seeder
                 'meta_description' => 'Currently out of stock. Will be available soon.',
                 'meta_keywords' => $this->generateKeywords($productData['name']) . ', out of stock',
                 'is_featured' => false,
-                'is_bestseller' => false,
+                'is_bestsells' => false,
                 'is_new' => false,
                 'status' => 'active',
                 'stock_status' => 'out_of_stock',
@@ -201,7 +201,7 @@ class ProductSeeder extends Seeder
         $this->command->info('In-stock products: ' . Product::where('stock_status', 'in_stock')->count());
         $this->command->info('Out-of-stock products: ' . Product::where('stock_status', 'out_of_stock')->count());
         $this->command->info('Featured products: ' . Product::where('is_featured', true)->count());
-        $this->command->info('Best sellers: ' . Product::where('is_bestseller', true)->count());
+        $this->command->info('Best sellers: ' . Product::where('is_bestsells', true)->count());
         $this->command->info('New products: ' . Product::where('is_new', true)->count());
     }
 
@@ -442,7 +442,7 @@ class ProductSeeder extends Seeder
                 'height' => rand($template['dimensions']['height'][0], $template['dimensions']['height'][1]) / 10,
             ],
             'is_featured' => $isFeatured,
-            'is_bestseller' => $isBestseller,
+            'is_bestsells' => $isBestseller,
             'is_new' => $isNew,
             'status' => $status,
             'stock_status' => $stockStatus,

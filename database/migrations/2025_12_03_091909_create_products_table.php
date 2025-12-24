@@ -48,7 +48,7 @@ return new class extends Migration
 
             // Status flags
             $table->boolean('is_featured')->default(false);
-            $table->boolean('is_bestseller')->default(false);
+            $table->boolean('is_bestsells')->default(false);
             $table->boolean('is_new')->default(true);
             $table->enum('status', ['draft', 'active', 'inactive', 'archived'])->default('draft');
             $table->enum('stock_status', ['in_stock', 'out_of_stock', 'backorder'])->default('in_stock');

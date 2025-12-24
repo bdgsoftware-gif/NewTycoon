@@ -406,7 +406,7 @@
                         $metrics = [
                             [
                                 'title' => 'Bestsellers',
-                                'count' => \App\Models\Product::where('is_bestseller', true)->count(),
+                                'count' => \App\Models\Product::where('is_bestsells', true)->count(),
                                 'icon' => 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6',
                                 'color' => 'text-green-500',
                                 'bg' => 'bg-green-50',

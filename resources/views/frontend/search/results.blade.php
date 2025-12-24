@@ -36,8 +36,8 @@
                                     placeholder="Search products..."
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-inter">
                                 <button type="submit" class="absolute right-3 top-2.5">
-                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 text-gray-400 hover:text-primary" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                     </svg>
@@ -50,19 +50,56 @@
                     @if ($categories->count() > 0)
                         <div class="mb-6">
                             <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Categories</h3>
-                            <div
-                                class="space-y-2 max-h-96 overflow-y-auto no-scrollbar border-b border-gray-200 shadow-sm pb-2">
+                            <div class="space-y-2 max-h-96 overflow-y-auto border-b border-gray-200 shadow-sm pb-2">
                                 <a href="{{ route('search', array_merge(request()->except('category'), ['category' => null])) }}"
-                                    class="block px-3 py-2 rounded-lg {{ !request('category') ? 'bg-primary-light text-primary border border-primary' : 'hover:bg-gray-50 border border-gray-200' }} font-inter transition-colors">
-                                    All Categories
+                                    class="flex items-center justify-between px-3 py-2 rounded-lg {{ !request('category') ? 'bg-primary-light text-primary border border-primary' : 'hover:bg-gray-50 border border-gray-200' }} font-inter transition-colors">
+                                    <span class="font-medium">All Categories</span>
+                                    <span class="text-xs bg-gray-100 px-2 py-1 rounded">
+                                        {{ $allProductsCount }}
+                                    </span>
                                 </a>
-                                @foreach ($categories as $cat)
-                                    <a href="{{ route('search', array_merge(request()->except('category'), ['category' => $cat->id])) }}"
-                                        class="flex items-center justify-between px-3 py-2 rounded-lg {{ request('category') == $cat->id ? 'bg-primary-light text-primary border border-primary' : 'hover:bg-gray-50 border border-gray-200' }} font-inter transition-colors">
-                                        <span>{{ $cat->name }}</span>
-                                        <span
-                                            class="text-xs bg-gray-100 px-2 py-1 rounded">{{ $cat->products_count }}</span>
-                                    </a>
+
+                                @foreach ($categories as $category)
+                                    @php
+                                        $categoryProductCount = $category->getProductsCountForSearch($search);
+                                    @endphp
+
+                                    @if ($categoryProductCount > 0)
+                                        <div class="category-item">
+                                            <a href="{{ route('search', array_merge(request()->except('category'), ['category' => $category->id])) }}"
+                                                class="flex items-center justify-between px-3 py-2 rounded-lg {{ request('category') == $category->id ? 'bg-primary-light text-primary border border-primary' : 'hover:bg-gray-50 border border-gray-200' }} font-inter transition-colors">
+                                                <div class="flex items-center flex-1">
+                                                    <span class="truncate">{{ $category->name }}</span>
+                                                </div>
+                                                <span
+                                                    class="text-xs bg-gray-100 px-2 py-1 rounded min-w-[2rem] text-center">
+                                                    {{ $categoryProductCount }}
+                                                </span>
+                                            </a>
+
+                                            @if ($category->children->count() > 0)
+                                                <div class="ml-4 mt-1 space-y-1">
+                                                    @foreach ($category->children as $child)
+                                                        @php
+                                                            $childProductCount = $child->getProductsCountForSearch(
+                                                                $search,
+                                                            );
+                                                        @endphp
+
+                                                        @if ($childProductCount > 0)
+                                                            <a href="{{ route('search', array_merge(request()->except('category'), ['category' => $child->id])) }}"
+                                                                class="flex items-center justify-between px-3 py-2 rounded-lg {{ request('category') == $child->id ? 'bg-primary-light text-primary border border-primary' : 'hover:bg-gray-50 border border-gray-200' }} font-inter transition-colors">
+                                                                <span class="truncate">{{ $child->name }}</span>
+                                                                <span class="text-xs bg-gray-100 px-2 py-1 rounded">
+                                                                    {{ $childProductCount }}
+                                                                </span>
+                                                            </a>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @endif
                                 @endforeach
                             </div>
                         </div>
@@ -73,10 +110,12 @@
                         <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Price Range</h3>
                         <div class="space-y-4">
                             <div class="flex items-center justify-between">
-                                <span
-                                    class="text-sm font-medium text-gray-700 font-inter">TK{{ number_format(request('min_price', $priceRange['min'])) }}</span>
-                                <span
-                                    class="text-sm font-medium text-gray-700 font-inter">TK{{ number_format(request('max_price', $priceRange['max'])) }}</span>
+                                <span class="text-sm font-medium text-gray-700 font-inter">
+                                    TK{{ number_format(request('min_price', $priceRange['min'])) }}
+                                </span>
+                                <span class="text-sm font-medium text-gray-700 font-inter">
+                                    TK{{ number_format(request('max_price', $priceRange['max'])) }}
+                                </span>
                             </div>
                             <div class="px-2">
                                 <input type="range" name="min_price" min="{{ $priceRange['min'] }}"
@@ -129,8 +168,8 @@
                     </div>
 
                     <!-- Clear Filters Button -->
-                    @if (request()->hasAny(['q', 'category', 'min_price', 'max_price', 'status', 'sort']))
-                        <a href="{{ route('search') }}"
+                    @if (request()->hasAny(['category', 'min_price', 'max_price', 'status', 'sort']))
+                        <a href="{{ route('search', ['q' => $search]) }}"
                             class="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg font-medium text-center font-inter transition-colors duration-200">
                             Clear All Filters
                         </a>
@@ -140,7 +179,7 @@
 
             <!-- Products Grid -->
             <div class="lg:w-3/4">
-                <!-- Sort Options -->
+                <!-- Results Summary -->
                 <div
                     class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 bg-white p-4 rounded-xl border border-gray-200">
                     <p class="text-gray-600 font-inter">
@@ -149,26 +188,23 @@
                         of <span class="font-semibold">{{ $products->total() }}</span> results
                     </p>
 
-                    <div class="flex items-center gap-2">
-                        <span class="text-gray-700 font-inter text-sm">Sort by:</span>
-                        <select name="sort" id="sortSelect"
-                            class="px-3 py-2 border border-gray-300 rounded-lg text-sm font-inter focus:ring-2 focus:ring-primary focus:border-transparent">
-                            <option value="latest" {{ request('sort', 'latest') == 'latest' ? 'selected' : '' }}>Latest
-                            </option>
-                            <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to
-                                High</option>
-                            <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High
-                                to Low</option>
-                            <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Name: A to Z
-                            </option>
-                            <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Name: Z to A
-                            </option>
-                            <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Most Popular
-                            </option>
-                            <option value="rating" {{ request('sort') == 'rating' ? 'selected' : '' }}>Highest Rated
-                            </option>
-                        </select>
-                    </div>
+                    <select name="sort" id="sortSelect"
+                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm font-inter focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="latest" {{ request('sort', 'latest') == 'latest' ? 'selected' : '' }}>Latest
+                        </option>
+                        <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to
+                            High</option>
+                        <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High
+                            to Low</option>
+                        <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Name: A to Z
+                        </option>
+                        <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Name: Z to A
+                        </option>
+                        <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Most Popular
+                        </option>
+                        <option value="rating" {{ request('sort') == 'rating' ? 'selected' : '' }}>Highest Rated
+                        </option>
+                    </select>
                 </div>
 
                 <!-- Products Grid -->
@@ -211,7 +247,6 @@
                                             @endif
                                         </div>
 
-
                                         <!-- Discount Badge -->
                                         @if ($product->discount_percentage > 0)
                                             <div class="absolute top-3 right-3 z-10">
@@ -226,7 +261,6 @@
 
                                 <!-- Product Info -->
                                 <div class="p-4 border-t border-gray-100 flex-grow flex flex-col">
-
                                     <a href="{{ route('product.show', $product->slug) }}" title="{{ $product->name }}"
                                         class="font-medium font-quantico text-gray-900 text-sm mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-200 flex-grow">
                                         {{ $product->name }}
@@ -328,9 +362,10 @@
                             </div>
                         @endforeach
                     </div>
+
                     <!-- Pagination -->
                     @if ($products->hasPages())
-                        <div class="px-6 py-4 border-t border-gray-200 mt-6">
+                        <div class="mt-8">
                             {{ $products->withQueryString()->links() }}
                         </div>
                     @endif

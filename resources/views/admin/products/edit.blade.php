@@ -552,8 +552,8 @@
                                     </label>
 
                                     <label class="flex items-center">
-                                        <input type="checkbox" name="is_bestseller" value="1"
-                                            {{ old('is_bestseller', $product->is_bestseller) ? 'checked' : '' }}
+                                        <input type="checkbox" name="is_bestsells" value="1"
+                                            {{ old('is_bestsells', $product->is_bestsells) ? 'checked' : '' }}
                                             class="h-4 w-4 text-primary rounded border-gray-300 focus:ring-primary">
                                         <span class="ml-2 text-sm text-gray-700">Bestseller</span>
                                     </label>

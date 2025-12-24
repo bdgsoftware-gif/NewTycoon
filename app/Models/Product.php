@@ -39,7 +39,7 @@ class Product extends Model
         'meta_description',
         'meta_keywords',
         'is_featured',
-        'is_bestseller',
+        'is_bestsells',
         'is_new',
         'status',
         'stock_status',
@@ -69,7 +69,7 @@ class Product extends Model
         'width' => 'decimal:2',
         'height' => 'decimal:2',
         'is_featured' => 'boolean',
-        'is_bestseller' => 'boolean',
+        'is_bestsells' => 'boolean',
         'is_new' => 'boolean',
         'average_rating' => 'decimal:2',
         'rating_count' => 'integer',
@@ -164,7 +164,7 @@ class Product extends Model
      */
     public function scopeBestsell($query)
     {
-        return $query->where('is_bestseller', true);
+        return $query->where('is_bestsells', true);
     }
 
     /**
@@ -216,5 +216,33 @@ class Product extends Model
     public function scopeByCategory($query, $categoryId)
     {
         return $query->where('category_id', $categoryId);
+    }
+
+    public function scopeWithActiveCategory($query)
+    {
+        return $query->whereHas('category', fn($q) => $q->active());
+    }
+
+    /**
+     * Scope a query to search products with category matching
+     */
+    public function scopeSearchWithCategories($query, $search)
+    {
+        if (empty($search)) {
+            return $query;
+        }
+
+        return $query->where(function ($q) use ($search) {
+            // Products matching search
+            $q->search($search)
+                // OR products in categories that match the search
+                ->orWhereHas('category', function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")
+                        // Include parent categories that match
+                        ->orWhereHas('parent', function ($q) use ($search) {
+                            $q->where('name', 'LIKE', "%{$search}%");
+                        });
+                });
+        });
     }
 }

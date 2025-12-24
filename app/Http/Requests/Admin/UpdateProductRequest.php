@@ -68,7 +68,7 @@ class UpdateProductRequest extends FormRequest
 
             // Status flags
             'is_featured' => 'boolean',
-            'is_bestseller' => 'boolean',
+            'is_bestsells' => 'boolean',
             'is_new' => 'boolean',
             'status' => 'required|in:draft,active,inactive,archived',
             'stock_status' => 'required|in:in_stock,out_of_stock,backorder',
@@ -117,7 +117,7 @@ class UpdateProductRequest extends FormRequest
             'track_quantity' => $this->boolean('track_quantity'),
             'allow_backorder' => $this->boolean('allow_backorder'),
             'is_featured' => $this->boolean('is_featured'),
-            'is_bestseller' => $this->boolean('is_bestseller'),
+            'is_bestsells' => $this->boolean('is_bestsells'),
             'is_new' => $this->boolean('is_new'),
         ]);
 

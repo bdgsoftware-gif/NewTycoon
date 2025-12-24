@@ -10,33 +10,42 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Services\Product\ProductService;
+use App\Services\Product\ActiveProductService;
 use App\Http\Resources\FeaturedProductViewResource;
 
 class HomeController extends Controller
 {
     public function __construct(
-        protected ProductService $productService
+        protected ProductService $productService,
+        protected ActiveProductService $activeProductService,
     ) {}
 
     public function index()
     {
         $heroSlides = $this->heroSlides();
+
+        // Get active categories with active parents
         $categories = Category::active()->root()->featured()->limit(12)->get();
-        // $products = $this->products();
-        $featuredProducts = FeaturedProductViewResource::collection(
-            $this->productService->getFeaturedProducts()
-        )->resolve();
-        $products = $this->productService->getHomepageProducts();
-        // dd($featuredProducts);
-        // dd($featuredProducts->resolve());
 
-        // dd($products);
+        $products = $this->activeProductService->getHomepageActiveProducts();
+        // Get active featured products
+        $featuredProducts = $this->activeProductService->getActiveFeaturedProducts(8);
+
+        $featuredProducts = FeaturedProductViewResource::collection($featuredProducts);
+
+        // Get new Arrivals products
+        $newArrivals = $this->activeProductService->getActiveNewArrivals();
+        $newArrivals = FeaturedProductViewResource::collection($newArrivals);
+
+        // Get Best Sells products
+        $bestsells = $this->activeProductService->getActiveBestSells();
+        $bestsells = FeaturedProductViewResource::collection($bestsells);
+
+        // Get Recommended Products products
+        $recommendedProducts = $this->activeProductService->getActiveRecommendedProducts();
+        $recommendedProducts = FeaturedProductViewResource::collection($recommendedProducts);
+
         $smartSections = $this->smartSections();
-
-        $recommendedProducts = $this->getRecommendedProducts();
-        $newArrivals = $this->newArrivals();
-        $bestsellers = $this->saleProducts();
-
         $adsBanners = $this->getAdsBanners();
         $adsAnotherBanners = $this->getAnotherAdsBanners();
 
@@ -47,17 +56,15 @@ class HomeController extends Controller
 
         $userStories = $this->getUserStories();
 
-        // flash('Welcome Home', 'success');
-
         return view('frontend.home', compact(
             'heroSlides',
             'categories',
-            'products',
-            'smartSections',
-            'recommendedProducts',
             'featuredProducts',
-            'bestsellers',
+            'products',
             'newArrivals',
+            'bestsells',
+            'recommendedProducts',
+            'smartSections',
             'adsBanners',
             'userStories',
             'adsAnotherBanners',
@@ -65,6 +72,7 @@ class HomeController extends Controller
             'offerProducts'
         ));
     }
+
 
     public function getNavigation()
     {

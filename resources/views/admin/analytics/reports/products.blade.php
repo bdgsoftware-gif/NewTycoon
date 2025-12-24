@@ -205,7 +205,7 @@
                                                 Featured
                                             </span>
                                         @endif
-                                        @if ($product->is_bestseller)
+                                        @if ($product->is_bestsells)
                                             <span
                                                 class="ml-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
                                                 Bestseller

@@ -14,7 +14,7 @@ class StoreProductRequest extends FormRequest
     {
         return true; // You should implement your authorization logic here
     }
- 
+
     /**
      * Get the validation rules that apply to the request.
      */
@@ -62,7 +62,7 @@ class StoreProductRequest extends FormRequest
             'meta_description' => 'nullable|string',
             'meta_keywords' => 'nullable|string',
             'is_featured' => 'boolean',
-            'is_bestseller' => 'boolean',
+            'is_bestsells' => 'boolean',
             'is_new' => 'boolean',
             'status' => 'required|in:draft,active,inactive,archived',
             'category_id' => 'nullable|exists:categories,id',
@@ -96,7 +96,7 @@ class StoreProductRequest extends FormRequest
             'track_quantity' => filter_var($this->track_quantity, FILTER_VALIDATE_BOOLEAN),
             'allow_backorder' => filter_var($this->allow_backorder, FILTER_VALIDATE_BOOLEAN),
             'is_featured' => filter_var($this->is_featured, FILTER_VALIDATE_BOOLEAN),
-            'is_bestseller' => filter_var($this->is_bestseller, FILTER_VALIDATE_BOOLEAN),
+            'is_bestsells' => filter_var($this->is_bestsells, FILTER_VALIDATE_BOOLEAN),
             'is_new' => filter_var($this->is_new, FILTER_VALIDATE_BOOLEAN),
         ]);
 
