@@ -163,7 +163,7 @@ class Category extends Model
     }
 
     /**
-     * Get all category IDs (including self and all descendants)
+     * Get all category IDs including descendants
      */
     public function getAllCategoryIds(): array
     {
@@ -171,17 +171,45 @@ class Category extends Model
     }
 
     /**
-     * Get products query for this category (including descendants)
+     * Get products query for category with search
      */
-  
+    public function getProductsQuery(?string $search = null)
+    {
+        $categoryIds = $this->getAllCategoryIds();
+
+        return Product::active()
+            ->whereIn('category_id', $categoryIds)
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->search($search)
+                        ->orWhereHas('category', function ($q) use ($search) {
+                            $q->where('name', 'LIKE', "%{$search}%");
+                        });
+                });
+            });
+    }
 
     /**
-     * Get product count for search
+     * Get product count for category with search
      */
-   
+    public function getProductsCount(?string $search = null): int
+    {
+        return $this->getProductsQuery($search)->count();
+    }
 
     /**
-     * Get all categories that should be shown for a search
+     * Get parent categories
      */
-   
+    public function getParentCategories()
+    {
+        $parents = collect();
+        $parent = $this->parent;
+
+        while ($parent) {
+            $parents->prepend($parent);
+            $parent = $parent->parent;
+        }
+
+        return $parents;
+    }
 }

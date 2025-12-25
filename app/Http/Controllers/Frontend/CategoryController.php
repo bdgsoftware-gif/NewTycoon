@@ -5,10 +5,19 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Http\Resources\ProductCardViewResource;
+use App\Services\Category\CategoryProductsService;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
+    protected $categoryProductsService;
+
+    public function __construct(CategoryProductsService $categoryProductsService)
+    {
+        $this->categoryProductsService = $categoryProductsService;
+    }
+
     /**
      * Display all categories.
      */
@@ -34,176 +43,52 @@ class CategoryController extends Controller
     }
 
     /**
-     * Display a single category and its products.
+     * Display a specific category with products.
      */
     public function show(Request $request, Category $category)
     {
-        // Get filter parameters
-        $search = $request->query('search');
-        $minPrice = $request->query('min_price');
-        $maxPrice = $request->query('max_price');
-        $sort = $request->query('sort', 'latest');
-        $status = $request->query('status', 'all');
+        $search = trim($request->input('q', ''));
+        $sort = $request->input('sort', 'latest');
+        $minPrice = $request->input('min_price');
+        $maxPrice = $request->input('max_price');
+        $status = $request->input('status', 'all');
 
-        // Get all category IDs including descendants
-        $categoryIds = $this->getAllCategoryIds($category);
-
-        // Start query
-        $query = Product::active()
-            ->whereIn('category_id', $categoryIds);
-
-        // Apply search filter
-        if ($search) {
-            $query->search($search);
-        }
-
-        // Apply price range filter
-        if ($minPrice) {
-            $query->where('price', '>=', $minPrice);
-        }
-        if ($maxPrice) {
-            $query->where('price', '<=', $maxPrice);
-        }
-
-        // Apply status filter
-        if ($status !== 'all') {
-            switch ($status) {
-                case 'in_stock':
-                    $query->inStock();
-                    break;
-                case 'new':
-                    $query->new();
-                    break;
-                case 'featured':
-                    $query->featured();
-                    break;
-                case 'bestseller':
-                    $query->bestseller();
-                    break;
-                case 'discounted':
-                    $query->where('compare_price', '>', 0)
-                        ->whereColumn('compare_price', '>', 'price');
-                    break;
-            }
-        }
-
-        // Apply sorting
-        switch ($sort) {
-            case 'price_low':
-                $query->orderBy('price', 'asc');
-                break;
-            case 'price_high':
-                $query->orderBy('price', 'desc');
-                break;
-            case 'name_asc':
-                $query->orderBy('name', 'asc');
-                break;
-            case 'name_desc':
-                $query->orderBy('name', 'desc');
-                break;
-            case 'popular':
-                $query->orderBy('total_sold', 'desc');
-                break;
-            case 'rating':
-                $query->orderBy('average_rating', 'desc');
-                break;
-            case 'latest':
-            default:
-                $query->orderBy('created_at', 'desc');
-                break;
-        }
+        // Get products for this category
+        $productQuery = $this->categoryProductsService->getCategoryProducts(
+            $category,
+            $search,
+            $sort,
+            $minPrice,
+            $maxPrice,
+            $status
+        );
 
         // Get paginated products
-        $products = $query->paginate(12);
+        $products = ProductCardViewResource::collection(
+            $productQuery->paginate(12)->withQueryString()
+        );
 
-        // Transform products for frontend
-        $products->getCollection()->transform(function ($product) {
-            return [
-                'id' => $product->id,
-                'slug' => $product->slug,
-                'name' => $product->name,
-                'original_price' => (float) $product->price,
-                'discounted_price' => $product->compare_price > $product->price
-                    ? (float) $product->price
-                    : (float) $product->price,
-                'discount_percentage' => $product->compare_price > $product->price
-                    ? round((($product->compare_price - $product->price) / $product->compare_price) * 100)
-                    : 0,
-                'images' => $product->gallery_images_urls,
-                'in_stock' => $product->in_stock,
-                'is_new' => $product->is_new,
-                'rating' => (float) $product->average_rating,
-                'review_count' => $product->rating_count,
-                'stock_status' => $product->stock_status,
-                'short_description' => $product->short_description,
-            ];
-        });
+        // Get related categories for filter sidebar
+        $categories = $this->categoryProductsService->getRelatedCategoriesForSearch($category, $search);
 
-        // Get subcategories
-        $subcategories = Category::active()
-            ->where('parent_id', $category->id)
-            ->orderBy('order')
-            ->get();
+        // Get price range
+        $priceRange = $this->categoryProductsService->getPriceRange($category, $search);
 
         // Get breadcrumb
-        $breadcrumb = $this->getBreadcrumb($category);
-        // Get price range for the category
-        $priceRange = [
-            'min' => Product::whereIn('category_id', $categoryIds)->min('price') ?? 0,
-            'max' => Product::whereIn('category_id', $categoryIds)->max('price') ?? 10000
-        ];
+        $breadcrumb = $category->getParentCategories();
 
-        return view('frontend.categories.show', compact(
-            'category',
-            'products',
-            'subcategories',
-            'breadcrumb',
-            'search',
-            'minPrice',
-            'maxPrice',
-            'priceRange',
-            'sort',
-            'status'
-        ));
-    }
-
-    /**
-     * Get all category IDs including descendants.
-     */
-    private function getAllCategoryIds(Category $category)
-    {
-        $ids = [$category->id];
-
-        // Get all children recursively
-        $this->getDescendantIds($category, $ids);
-
-        return $ids;
-    }
-
-    /**
-     * Recursively get descendant category IDs.
-     */
-    private function getDescendantIds(Category $category, &$ids)
-    {
-        foreach ($category->children as $child) {
-            $ids[] = $child->id;
-            $this->getDescendantIds($child, $ids);
-        }
-    }
-
-    /**
-     * Get breadcrumb for category.
-     */
-    private function getBreadcrumb(Category $category)
-    {
-        $breadcrumb = collect([$category]);
-        $parent = $category->parent;
-
-        while ($parent) {
-            $breadcrumb->prepend($parent);
-            $parent = $parent->parent;
-        }
-
-        return $breadcrumb;
+        return view('frontend.categories.show', [
+            'category' => $category,
+            'products' => $products,
+            'categories' => $categories,
+            'priceRange' => $priceRange,
+            'breadcrumb' => $breadcrumb,
+            'search' => $search,
+            'sort' => $sort,
+            'minPrice' => $minPrice,
+            'maxPrice' => $maxPrice,
+            'status' => $status,
+            'totalProductsCount' => $category->getProductsCount($search),
+        ]);
     }
 }

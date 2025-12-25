@@ -11,77 +11,38 @@
                 <li>
                     <a href="{{ route('home') }}" class="text-gray-500 hover:text-primary">Home</a>
                 </li>
-                @foreach ($breadcrumb as $crumb)
+                @foreach ($breadcrumb as $parent)
                     <li class="flex items-center">
-                        <svg class="w-4 h-4 mx-1 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                clip-rule="evenodd" />
+                        <svg class="w-4 h-4 text-gray-400 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
-                        @if ($loop->last)
-                            <span class="text-gray-900 font-medium">{{ $crumb->name }}</span>
-                        @else
-                            <a href="{{ route('categories.show', $crumb->slug) }}"
-                                class="text-gray-500 hover:text-primary">{{ $crumb->name }}</a>
-                        @endif
+                        <a href="{{ $parent->url }}" class="text-gray-500 hover:text-primary">{{ $parent->name }}</a>
                     </li>
                 @endforeach
+                <li class="flex items-center">
+                    <svg class="w-4 h-4 text-gray-400 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                    <span class="text-primary font-medium">{{ $category->name }}</span>
+                </li>
             </ol>
         </nav>
 
         <!-- Category Header -->
         <div class="mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2 font-quantico">{{ $category->name }}</h1>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2 font-quantico">
+                {{ $category->name }}
+            </h1>
             @if ($category->description)
-                <p class="text-gray-600 font-inter max-w-3xl">{{ $category->description }}</p>
+                <p class="text-gray-600 font-inter mb-4">{{ $category->description }}</p>
             @endif
-        </div>
-
-        <!-- Subcategories (if any) -->
-        @if ($subcategories->count() > 0)
-            <div class="mb-8">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold text-gray-900 font-quantico">Subcategories</h2>
-                    <span class="text-sm text-gray-500 font-inter">{{ $subcategories->count() }} subcategories</span>
-                </div>
-                <!-- Horizontal Scrolling Option (for many subcategories) -->
-                <div class="flex space-x-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
-                    @foreach ($subcategories as $subcategory)
-                        <a href="{{ route('categories.show', $subcategory->slug) }}"
-                            class="group bg-white border border-gray-200 hover:border-primary rounded-lg p-3 flex items-center space-x-3 min-w-[200px] flex-shrink-0 transition-all duration-300 hover:shadow-md">
-                            <div class="flex-shrink-0">
-                                @if ($subcategory->image)
-                                    <div class="w-10 h-10 rounded-md overflow-hidden bg-gray-100">
-                                        <img src="{{ asset('storage/' . $subcategory->image) }}"
-                                            alt="{{ $subcategory->name }}"
-                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
-                                    </div>
-                                @else
-                                    <div
-                                        class="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center group-hover:bg-primary/10">
-                                        <svg class="w-5 h-5 text-gray-400 group-hover:text-primary" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                        </svg>
-                                    </div>
-                                @endif
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <h3
-                                    class="text-sm font-medium text-gray-900 group-hover:text-primary font-quantico truncate">
-                                    {{ $subcategory->name }}
-                                </h3>
-                                <p class="text-xs text-gray-500 font-inter">
-                                    {{ $subcategory->products_count ?? 0 }} items
-                                </p>
-                            </div>
-                        </a>
-                    @endforeach
-                </div>
-
+            <div class="flex items-center text-gray-600 font-inter">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+                <p>Found <span class="font-semibold">{{ $totalProductsCount }}</span> products</p>
             </div>
-        @endif
+        </div>
 
         <div class="flex flex-col lg:flex-row gap-8">
             <!-- Filters Sidebar -->
@@ -89,15 +50,15 @@
                 <div class="bg-white rounded-xl p-6 mb-6 border border-gray-200 sticky top-6">
                     <!-- Search Filter -->
                     <div class="mb-6">
-                        <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Search in {{ $category->name }}</h3>
-                        <form method="GET" action="{{ route('categories.show', $category->slug) }}" id="searchForm">
+                        <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Search</h3>
+                        <form method="GET" action="{{ $category->url }}" id="searchForm">
                             <div class="relative">
-                                <input type="text" name="search" value="{{ $search }}"
-                                    placeholder="Search products..."
+                                <input type="text" name="q" value="{{ $search }}"
+                                    placeholder="Search in {{ $category->name }}..."
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent font-inter">
                                 <button type="submit" class="absolute right-3 top-2.5">
-                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 text-gray-400 hover:text-primary" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                     </svg>
@@ -106,28 +67,37 @@
                         </form>
                     </div>
 
-                    <!-- Price Range Filter -->
-                    @php
-                        $priceRange = [
-                            'min' =>
-                                \App\Models\Product::whereIn('category_id', $categoryIds ?? [$category->id])->min(
-                                    'price',
-                                ) ?? 0,
-                            'max' =>
-                                \App\Models\Product::whereIn('category_id', $categoryIds ?? [$category->id])->max(
-                                    'price',
-                                ) ?? 10000,
-                        ];
-                    @endphp
+                    <!-- Related Categories -->
+                    @if ($categories->count() > 0)
+                        <div class="mb-6">
+                            <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Related Categories</h3>
+                            <div class="space-y-2 max-h-96 overflow-y-auto border-b border-gray-200 shadow-sm pb-2">
+                                @foreach ($categories as $relatedCategory)
+                                    <a href="{{ $relatedCategory->url }}"
+                                        class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-50 border border-gray-200 font-inter transition-colors">
+                                        <span class="truncate">{{ $relatedCategory->name }}</span>
+                                        @if ($relatedCategory->products_count > 0)
+                                            <span class="text-xs bg-gray-100 px-2 py-1 rounded">
+                                                {{ $relatedCategory->products_count }}
+                                            </span>
+                                        @endif
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
 
+                    <!-- Price Range Filter -->
                     <div class="mb-6">
                         <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Price Range</h3>
                         <div class="space-y-4">
                             <div class="flex items-center justify-between">
-                                <span
-                                    class="text-sm font-medium text-gray-700 font-inter">TK{{ number_format(request('min_price', $priceRange['min'])) }}</span>
-                                <span
-                                    class="text-sm font-medium text-gray-700 font-inter">TK{{ number_format(request('max_price', $priceRange['max'])) }}</span>
+                                <span class="text-sm font-medium text-gray-700 font-inter">
+                                    TK{{ number_format(request('min_price', $priceRange['min'])) }}
+                                </span>
+                                <span class="text-sm font-medium text-gray-700 font-inter">
+                                    TK{{ number_format(request('max_price', $priceRange['max'])) }}
+                                </span>
                             </div>
                             <div class="px-2">
                                 <input type="range" name="min_price" min="{{ $priceRange['min'] }}"
@@ -156,36 +126,32 @@
                     <div class="mb-6">
                         <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Status</h3>
                         <div class="grid grid-cols-2 gap-2">
-                            <a href="{{ route('categories.show', array_merge([$category->slug], request()->except('status'), ['status' => 'all'])) }}"
-                                class="px-3 py-2 text-center rounded-lg border {{ request('status', 'all') == 'all' ? 'bg-primary-light text-primary border-primary' : 'border-gray-200 hover:bg-gray-50' }} text-sm font-inter transition-colors">
+                            <a href="{{ $category->url }}"
+                                class="px-3 py-2 text-center rounded-lg border {{ !request('status') || request('status') == 'all' ? 'bg-primary-light text-primary border-primary' : 'border-gray-200 hover:bg-gray-50' }} text-sm font-inter transition-colors">
                                 All
                             </a>
-                            <a href="{{ route('categories.show', array_merge([$category->slug], request()->except('status'), ['status' => 'in_stock'])) }}"
+                            <a href="{{ $category->url }}?status=in_stock"
                                 class="px-3 py-2 text-center rounded-lg border {{ request('status') == 'in_stock' ? 'bg-primary-light text-primary border-primary' : 'border-gray-200 hover:bg-gray-50' }} text-sm font-inter transition-colors">
                                 In Stock
                             </a>
-                            <a href="{{ route('categories.show', array_merge([$category->slug], request()->except('status'), ['status' => 'new'])) }}"
+                            <a href="{{ $category->url }}?status=new"
                                 class="px-3 py-2 text-center rounded-lg border {{ request('status') == 'new' ? 'bg-primary-light text-primary border-primary' : 'border-gray-200 hover:bg-gray-50' }} text-sm font-inter transition-colors">
                                 New
                             </a>
-                            <a href="{{ route('categories.show', array_merge([$category->slug], request()->except('status'), ['status' => 'featured'])) }}"
-                                class="px-3 py-2 text-center rounded-lg border {{ request('status') == 'featured' ? 'bg-primary-light text-primary border-primary' : 'border-gray-200 hover:bg-gray-50' }} text-sm font-inter transition-colors">
-                                Featured
-                            </a>
-                            <a href="{{ route('categories.show', array_merge([$category->slug], request()->except('status'), ['status' => 'bestseller'])) }}"
-                                class="px-3 py-2 text-center rounded-lg border {{ request('status') == 'bestseller' ? 'bg-primary-light text-primary border-primary' : 'border-gray-200 hover:bg-gray-50' }} text-sm font-inter transition-colors">
-                                Bestseller
-                            </a>
-                            <a href="{{ route('categories.show', array_merge([$category->slug], request()->except('status'), ['status' => 'discounted'])) }}"
+                            <a href="{{ $category->url }}?status=discounted"
                                 class="px-3 py-2 text-center rounded-lg border {{ request('status') == 'discounted' ? 'bg-primary-light text-primary border-primary' : 'border-gray-200 hover:bg-gray-50' }} text-sm font-inter transition-colors">
                                 On Sale
+                            </a>
+                            <a href="{{ $category->url }}?status=featured"
+                                class="px-3 py-2 text-center rounded-lg border {{ request('status') == 'featured' ? 'bg-primary-light text-primary border-primary' : 'border-gray-200 hover:bg-gray-50' }} text-sm font-inter transition-colors">
+                                Featured
                             </a>
                         </div>
                     </div>
 
                     <!-- Clear Filters Button -->
-                    @if (request()->hasAny(['search', 'min_price', 'max_price', 'status', 'sort']))
-                        <a href="{{ route('categories.show', $category->slug) }}"
+                    @if (request()->hasAny(['q', 'min_price', 'max_price', 'status', 'sort']))
+                        <a href="{{ $category->url }}"
                             class="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg font-medium text-center font-inter transition-colors duration-200">
                             Clear All Filters
                         </a>
@@ -195,13 +161,13 @@
 
             <!-- Products Grid -->
             <div class="lg:w-3/4">
-                <!-- Sort Options -->
+                <!-- Results Summary -->
                 <div
                     class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 bg-white p-4 rounded-xl border border-gray-200">
                     <p class="text-gray-600 font-inter">
                         Showing <span class="font-semibold">{{ $products->firstItem() ?? 0 }}</span>
                         to <span class="font-semibold">{{ $products->lastItem() ?? 0 }}</span>
-                        of <span class="font-semibold">{{ $products->total() }}</span> products in {{ $category->name }}
+                        of <span class="font-semibold">{{ $products->total() }}</span> products
                     </p>
 
                     <div class="flex items-center gap-2">
@@ -234,41 +200,44 @@
                             <div
                                 class="group relative h-full bg-white border border-gray-200 hover:border-primary rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl flex flex-col">
                                 <!-- Image Section -->
-                                <a href="{{ route('product.show', $product['slug']) }}">
+                                <a href="{{ route('product.show', $product->slug) }}">
                                     <div
                                         class="relative w-full aspect-square bg-gradient-to-br from-gray-50 to-white overflow-hidden">
                                         <!-- Primary Image -->
-                                        <img src="{{ $product['images'][0] ?? asset('images/products/fr-06.jpg') }}"
-                                            alt="{{ $product['name'] }}"
+                                        <img src="{{ $product->featured_images[0] }}" alt="{{ $product->name }}"
                                             class="absolute inset-0 w-full h-full object-contain transition-opacity duration-500 group-hover:opacity-0">
 
-                                        <!-- Secondary Image on Hover -->
-                                        <img src="{{ $product['images'][1] ?? ($product['images'][0] ?? asset('images/products/fr-06.jpg')) }}"
-                                            alt="{{ $product['name'] }}"
-                                            class="absolute inset-0 w-full h-full object-contain opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+                                        <!-- Secondary Image on Hover (if available) -->
+                                        @if ($product->gallery_images && count($product->gallery_images) > 0)
+                                            <img src="{{ $product->gallery_images[0] }}" alt="{{ $product->name }}"
+                                                class="absolute inset-0 w-full h-full object-contain opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+                                        @else
+                                            <img src="{{ $product->featured_image_url }}" alt="{{ $product->name }}"
+                                                class="absolute inset-0 w-full h-full object-contain opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+                                        @endif
 
                                         <!-- Badges -->
-                                        <div class="absolute top-3 left-3 flex flex-col space-y-1 z-10">
-                                            @if ($product['is_new'])
+                                        <div class="absolute top-3 left-3 flex flex-col space-y-1 z-10 items-start">
+                                            @if ($product->is_new)
                                                 <span
-                                                    class="bg-gradient-to-r from-primary to-primary-dark text-white text-xs font-bold px-3 py-1.5 font-quantico rounded">
+                                                    class="inline-block bg-gradient-to-r from-primary to-primary-dark text-white text-xs font-bold px-2 py-1 font-quantico rounded">
                                                     NEW
                                                 </span>
                                             @endif
-                                            @if ($product['stock_status'] !== 'in_stock')
+                                            @if ($product->stock_status !== 'in_stock')
                                                 <span
-                                                    class="bg-gray-700/90 text-white text-xs font-bold px-3 py-1.5 font-quantico rounded">
-                                                    {{ strtoupper(str_replace('_', ' ', $product['stock_status'])) }}
+                                                    class="inline-block bg-gray-700/90 text-white text-xs font-bold px-2 py-1 font-quantico rounded">
+                                                    {{ strtoupper(str_replace('_', ' ', $product->stock_status)) }}
                                                 </span>
                                             @endif
                                         </div>
 
                                         <!-- Discount Badge -->
-                                        @if ($product['discount_percentage'] > 0)
+                                        @if ($product->discount_percentage > 0)
                                             <div class="absolute top-3 right-3 z-10">
                                                 <span
                                                     class="bg-gradient-to-r from-accent to-orange-500 text-white text-xs font-bold px-3 py-1.5 font-quantico rounded">
-                                                    -{{ $product['discount_percentage'] }}% OFF
+                                                    -{{ $product->discount_percentage }}% OFF
                                                 </span>
                                             </div>
                                         @endif
@@ -277,40 +246,36 @@
 
                                 <!-- Product Info -->
                                 <div class="p-4 border-t border-gray-100 flex-grow flex flex-col">
-                                    <a href="{{ route('product.show', $product['slug']) }}"
-                                        title="{{ $product['name'] }}"
+                                    <a href="{{ route('product.show', $product->slug) }}" title="{{ $product->name }}"
                                         class="font-medium font-quantico text-gray-900 text-sm mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-200 flex-grow">
-                                        {{ $product['name'] }}
-                                    </a>                                    
+                                        {{ $product->name }}
+                                    </a>
 
                                     <!-- Price + Wishlist -->
                                     <div class="mt-auto">
                                         <div class="flex items-center justify-between">
                                             <span class="text-lg font-bold font-quantico text-gray-900">
-                                                TK{{ number_format($product['discounted_price'], 2) }}
+                                                TK{{ number_format($product->price, 2) }}
                                             </span>
 
-                                            @if ($product['in_stock'])
-                                                <button
-                                                    class="wishlist-btn p-1 hover:text-red-500 transition-colors duration-200"
-                                                    title="Add to Wishlist">
-                                                    <svg class="w-5 h-5 text-gray-400 hover:text-red-500" fill="none"
-                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                                    </svg>
-                                                </button>
-                                            @endif
+                                            <button
+                                                class="wishlist-btn p-1 hover:text-red-500 transition-colors duration-200"
+                                                title="Add to Wishlist">
+                                                <svg class="w-5 h-5 text-gray-400 hover:text-red-500" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                </svg>
+                                            </button>
                                         </div>
 
-                                        @if ($product['discount_percentage'] > 0)
+                                        @if ($product->discount_percentage > 0)
                                             <div class="flex items-center space-x-2 mt-2 font-inter">
                                                 <span class="text-xs bg-accent/10 text-accent font-semibold px-2 py-1">
-                                                    Save {{ $product['discount_percentage'] }}%
+                                                    Save {{ $product->discount_percentage }}%
                                                 </span>
                                                 <span class="text-xs text-gray-500 line-through">
-                                                    TK{{ number_format($product['original_price'], 2) }}
+                                                    TK{{ number_format($product->compare_price, 2) }}
                                                 </span>
                                             </div>
                                         @endif
@@ -318,13 +283,13 @@
                                 </div>
 
                                 <!-- Quick Actions Overlay -->
-                                @if ($product['in_stock'])
+                                @if ($product->stock_status === 'in_stock')
                                     <div
                                         class="absolute bottom-0 left-0 right-0 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20 opacity-0 group-hover:opacity-100">
                                         <div
                                             class="bg-gradient-to-t from-black/90 via-black/70 to-transparent pt-6 pb-4 px-4">
                                             <div class="flex space-x-2">
-                                                <a href="{{ route('checkout.process', $product['id']) }}"
+                                                <a href="{{ route('checkout.process', $product->id) }}"
                                                     class="flex-1 bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-quantico rounded-lg">
                                                     <span class="flex items-center justify-center">
                                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
@@ -337,7 +302,7 @@
                                                     </span>
                                                 </a>
 
-                                                <form action="{{ route('cart.add', $product['id']) }}" method="POST"
+                                                <form action="{{ route('cart.add', $product->id) }}" method="POST"
                                                     class="inline-block">
                                                     @csrf
                                                     <button type="submit"
@@ -356,13 +321,36 @@
                                             </div>
                                         </div>
                                     </div>
+                                @else
+                                    <div
+                                        class="absolute bottom-0 left-0 right-0 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20 opacity-0 group-hover:opacity-100">
+                                        <div
+                                            class="bg-gradient-to-t from-black/90 via-black/70 to-transparent pt-6 pb-4 px-4">
+                                            <div class="flex space-x-2">
+                                                <a href="{{ route('contact') }}" title="+8801714XXXXXX"
+                                                    class="flex-1 bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-quantico rounded-lg">
+                                                    <span class="flex items-center justify-center">
+                                                        <!-- Contact/Phone Icon -->
+                                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                                        </svg>
+                                                        Contact Us
+                                                    </span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
                                 @endif
                             </div>
                         @endforeach
                     </div>
+
                     <!-- Pagination -->
                     @if ($products->hasPages())
-                        <div class="px-6 py-4 border-t border-gray-200 mt-6">
+                        <div class="mt-8">
                             {{ $products->withQueryString()->links() }}
                         </div>
                     @endif
@@ -382,18 +370,20 @@
                                 No products found for "<span class="font-semibold">{{ $search }}</span>" in
                                 {{ $category->name }}
                             @else
-                                No products available in {{ $category->name }} right now
+                                No products found in {{ $category->name }}
                             @endif
                         </p>
                         <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                            <a href="{{ route('products.index') }}"
+                            <a href="{{ route('categories.index') }}"
                                 class="px-6 py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition-colors duration-200 font-quantico">
-                                Browse All Products
+                                Browse All Categories
                             </a>
-                            <a href="{{ route('categories.show', $category->slug) }}"
-                                class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-lg transition-colors duration-200 font-quantico">
-                                Clear Filters
-                            </a>
+                            @if ($search)
+                                <a href="{{ $category->url }}"
+                                    class="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold rounded-lg transition-colors duration-200 font-quantico">
+                                    Clear Search
+                                </a>
+                            @endif
                         </div>
                     </div>
                 @endif
@@ -476,7 +466,7 @@
             }
 
             // Search form submission with debounce
-            const searchInput = document.querySelector('input[name="search"]');
+            const searchInput = document.querySelector('input[name="q"]');
             if (searchInput) {
                 searchInput.addEventListener('keyup', debounce(function(e) {
                     if (e.key === 'Enter') {
