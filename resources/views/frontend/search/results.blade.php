@@ -61,8 +61,9 @@
 
                                 @foreach ($categories as $category)
                                     @php
-                                        $categoryProductCount = $category->getProductsCountForSearch($search);
+                                        $categoryProductCount = $category->products_count;
                                     @endphp
+
 
                                     @if ($categoryProductCount > 0)
                                         <div class="category-item">
@@ -81,9 +82,7 @@
                                                 <div class="ml-4 mt-1 space-y-1">
                                                     @foreach ($category->children as $child)
                                                         @php
-                                                            $childProductCount = $child->getProductsCountForSearch(
-                                                                $search,
-                                                            );
+                                                            $childProductCount = $child->products_count ?? 0;
                                                         @endphp
 
                                                         @if ($childProductCount > 0)
@@ -187,24 +186,26 @@
                         to <span class="font-semibold">{{ $products->lastItem() ?? 0 }}</span>
                         of <span class="font-semibold">{{ $products->total() }}</span> results
                     </p>
-
-                    <select name="sort" id="sortSelect"
-                        class="px-3 py-2 border border-gray-300 rounded-lg text-sm font-inter focus:ring-2 focus:ring-primary focus:border-transparent">
-                        <option value="latest" {{ request('sort', 'latest') == 'latest' ? 'selected' : '' }}>Latest
-                        </option>
-                        <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to
-                            High</option>
-                        <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High
-                            to Low</option>
-                        <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Name: A to Z
-                        </option>
-                        <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Name: Z to A
-                        </option>
-                        <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Most Popular
-                        </option>
-                        <option value="rating" {{ request('sort') == 'rating' ? 'selected' : '' }}>Highest Rated
-                        </option>
-                    </select>
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-700 font-inter text-sm">Sort by:</span>
+                        <select name="sort" id="sortSelect"
+                            class="px-3 py-2 border border-gray-300 rounded-lg text-sm font-inter focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <option value="latest" {{ request('sort', 'latest') == 'latest' ? 'selected' : '' }}>Latest
+                            </option>
+                            <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to
+                                High</option>
+                            <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High
+                                to Low</option>
+                            <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Name: A to Z
+                            </option>
+                            <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Name: Z to A
+                            </option>
+                            <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Most Popular
+                            </option>
+                            <option value="rating" {{ request('sort') == 'rating' ? 'selected' : '' }}>Highest Rated
+                            </option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Products Grid -->

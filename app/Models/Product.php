@@ -195,12 +195,10 @@ class Product extends Model
             $q->where('name', 'LIKE', "%{$search}%")
                 ->orWhere('sku', 'LIKE', "%{$search}%")
                 ->orWhere('model_number', 'LIKE', "%{$search}%")
-                ->orWhere('short_description', 'LIKE', "%{$search}%")
-                ->orWhereHas('category', function ($q) use ($search) {
-                    $q->where('name', 'LIKE', "%{$search}%");
-                });
+                ->orWhere('short_description', 'LIKE', "%{$search}%");
         });
     }
+
 
     /**
      * Scope a query to filter by price range.
@@ -221,28 +219,5 @@ class Product extends Model
     public function scopeWithActiveCategory($query)
     {
         return $query->whereHas('category', fn($q) => $q->active());
-    }
-
-    /**
-     * Scope a query to search products with category matching
-     */
-    public function scopeSearchWithCategories($query, $search)
-    {
-        if (empty($search)) {
-            return $query;
-        }
-
-        return $query->where(function ($q) use ($search) {
-            // Products matching search
-            $q->search($search)
-                // OR products in categories that match the search
-                ->orWhereHas('category', function ($q) use ($search) {
-                    $q->where('name', 'LIKE', "%{$search}%")
-                        // Include parent categories that match
-                        ->orWhereHas('parent', function ($q) use ($search) {
-                            $q->where('name', 'LIKE', "%{$search}%");
-                        });
-                });
-        });
     }
 }

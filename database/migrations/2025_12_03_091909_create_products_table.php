@@ -70,6 +70,10 @@ return new class extends Migration
             $table->softDeletes();
 
             // Indexes for performance
+            $table->index('name');
+            $table->index('is_active');
+            $table->index('parent_id');
+            $table->index(['is_active', 'parent_id']);
             $table->index('category_id');
             $table->index('vendor_id');
             $table->index('status');

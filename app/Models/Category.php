@@ -121,24 +121,6 @@ class Category extends Model
         });
     }
 
-    //   Scope a query to include categories with products matching search.
-
-    public function scopeWithProductsMatchingSearch($query, $search)
-    {
-        if (empty($search)) {
-            return $query->withActiveProducts();
-        }
-
-        return $query->where(function ($q) use ($search) {
-            $q->where('name', 'LIKE', "%{$search}%")
-                ->orWhereHas('products', function ($q) use ($search) {
-                    $q->active()->search($search);
-                })
-                ->orWhereHas('children.products', function ($q) use ($search) {
-                    $q->active()->search($search);
-                });
-        });
-    }
     /* ---------------------------------
      | Accessors
      |---------------------------------*/
@@ -180,41 +162,6 @@ class Category extends Model
         return $ids;
     }
 
-    public function getAllProducts()
-    {
-        $categoryIds = array_merge([$this->id], $this->getAllDescendantIds());
-
-        return Product::whereIn('category_id', $categoryIds);
-    }
-
-
-    // Get products count including all descendants.
-
-    public function getTotalProductsCountAttribute()
-    {
-        if (!$this->relationLoaded('descendantsProductsCount')) {
-            $categoryIds = array_merge([$this->id], $this->getAllDescendantIds());
-
-            // Get the search term from the request
-            $search = request('q', '');
-
-            $query = Product::active()->whereIn('category_id', $categoryIds);
-
-            if ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->search($search)
-                        ->orWhereHas('category', function ($q) use ($search) {
-                            $q->where('name', 'LIKE', "%{$search}%");
-                        });
-                });
-            }
-
-            return $query->count();
-        }
-
-        return $this->descendantsProductsCount;
-    }
-
     /**
      * Get all category IDs (including self and all descendants)
      */
@@ -226,94 +173,15 @@ class Category extends Model
     /**
      * Get products query for this category (including descendants)
      */
-    public function productsQuery($search = null)
-    {
-        $categoryIds = $this->getAllCategoryIds();
-
-        $query = Product::active()->whereIn('category_id', $categoryIds);
-
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->search($search);
-            });
-        }
-
-        return $query;
-    }
+  
 
     /**
      * Get product count for search
      */
-    public function getProductsCountForSearch($search = null): int
-    {
-        return $this->productsQuery($search)->count();
-    }
+   
 
     /**
      * Get all categories that should be shown for a search
      */
-    public static function getCategoriesForSearch($search = null)
-    {
-        if (empty($search)) {
-            return self::active()
-                ->withActiveProducts()
-                ->with(['children' => function ($query) {
-                    $query->active()
-                        ->withActiveProducts()
-                        ->orderBy('order');
-                }])
-                ->whereNull('parent_id')
-                ->orderBy('order')
-                ->get();
-        }
-
-        // Get category IDs that match the search
-        $matchingCategoryIds = self::active()
-            ->where('name', 'LIKE', "%{$search}%")
-            ->pluck('id')
-            ->toArray();
-
-        // Get category IDs that have products matching the search
-        $productMatchingCategoryIds = Product::active()
-            ->search($search)
-            ->pluck('category_id')
-            ->toArray();
-
-        // Get parent category IDs for all matching categories
-        $allMatchingIds = array_merge($matchingCategoryIds, $productMatchingCategoryIds);
-        $allCategoryIds = [];
-
-        foreach ($allMatchingIds as $categoryId) {
-            $category = self::find($categoryId);
-            if ($category) {
-                $allCategoryIds = array_merge($allCategoryIds, $category->getAllCategoryIds());
-            }
-        }
-
-        // Remove duplicates
-        $allCategoryIds = array_unique($allCategoryIds);
-
-        // Get all unique parent category IDs from the matching categories
-        $parentCategoryIds = self::whereIn('id', $allCategoryIds)
-            ->pluck('parent_id')
-            ->filter()
-            ->unique()
-            ->toArray();
-
-        // Combine all category IDs
-        $finalCategoryIds = array_merge($allCategoryIds, $parentCategoryIds);
-        $finalCategoryIds = array_unique($finalCategoryIds);
-
-        // Get the categories and build hierarchy
-        return self::active()
-            ->whereIn('id', $finalCategoryIds)
-            ->with(['children' => function ($query) use ($finalCategoryIds) {
-                $query->active()
-                    ->whereIn('id', $finalCategoryIds)
-                    ->orderBy('order');
-            }])
-            ->whereNull('parent_id')
-            ->orderBy('order')
-            ->get();
-    }
+   
 }
