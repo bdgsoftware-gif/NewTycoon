@@ -220,4 +220,9 @@ class Product extends Model
     {
         return $query->whereHas('category', fn($q) => $q->active());
     }
+
+    public function getInStockAttribute(): bool
+    {
+        return $this->stock_status === 'in_stock';
+    }
 }

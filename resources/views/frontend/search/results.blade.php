@@ -319,10 +319,12 @@
                                                 </a>
 
                                                 <form action="{{ route('cart.add', $product->id) }}" method="POST"
-                                                    class="inline-block">
+                                                    class="add-to-cart-form inline-block">
                                                     @csrf
-                                                    <button type="submit"
-                                                        class="bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg rounded-lg">
+                                                    <button type="submit" title="Add to Cart"
+                                                        class="add-to-cart-btn bg-primary hover:bg-primary-dark text-white
+                                                        font-semibold py-2.5 px-4 transition-colors duration-200 text-sm
+                                                        shadow-lg rounded-lg">
                                                         <span class="flex items-center">
                                                             <svg class="w-4 h-4 mr-1" fill="none"
                                                                 stroke="currentColor" viewBox="0 0 24 24">

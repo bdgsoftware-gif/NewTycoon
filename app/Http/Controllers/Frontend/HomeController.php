@@ -30,8 +30,8 @@ class HomeController extends Controller
         $products = $this->activeProductService->getHomepageActiveProducts();
         // Get active featured products
         $featuredProducts = $this->activeProductService->getActiveFeaturedProducts(8);
-
-        $featuredProducts = FeaturedProductViewResource::collection($featuredProducts);
+        // $featuredProducts = FeaturedProductViewResource::collection($featuredProducts);
+        // dd($featuredProducts);
 
         // Get new Arrivals products
         $newArrivals = $this->activeProductService->getActiveNewArrivals();
@@ -55,6 +55,7 @@ class HomeController extends Controller
         $offerProducts = $offerAllData['offerProducts'] ?? [];
 
         $userStories = $this->getUserStories();
+        flash('Welcome Home', 'success');
 
         return view('frontend.home', compact(
             'heroSlides',

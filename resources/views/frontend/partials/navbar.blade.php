@@ -177,26 +177,21 @@
                 <!-- Cart Icon Button -->
                 <a href="{{ route('cart.index') }}"
                     class="text-gray-600 hover:text-primary p-2 transition-all duration-300 relative">
-                    <svg class="w-6 h-6" id="Layer_1" enable-background="new 0 0 32 32" viewBox="0 0 32 32"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <g id="_01">
-                            <g>
-                                <path
-                                    d="m23.8 30h-15.6c-3.3 0-6-2.7-6-6v-.2l.6-16c.1-3.3 2.8-5.8 6-5.8h14.4c3.2 0 5.9 2.5 6 5.8l.6 16c.1 1.6-.5 3.1-1.6 4.3s-2.6 1.9-4.2 1.9c0 0-.1 0-.2 0zm-15-26c-2.2 0-3.9 1.7-4 3.8l-.6 16.2c0 2.2 1.8 4 4 4h15.8c1.1 0 2.1-.5 2.8-1.3s1.1-1.8 1.1-2.9l-.6-16c-.1-2.2-1.8-3.8-4-3.8z" />
-                            </g>
-                            <g>
-                                <path
-                                    d="m16 14c-3.9 0-7-3.1-7-7 0-.6.4-1 1-1s1 .4 1 1c0 2.8 2.2 5 5 5s5-2.2 5-5c0-.6.4-1 1-1s1 .4 1 1c0 3.9-3.1 7-7 7z" />
-                            </g>
-                        </g>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                     @if ($cartCount > 0)
-                        <span
-                            class="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                        <span id="cart-count"
+                            class="cart-count absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                             {{ $cartCount }}
                         </span>
+                    @else
+                        <span id="cart-count"
+                            class="cart-count absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">
+                            0
+                        </span>
                     @endif
-
                 </a>
 
                 <!-- Mobile menu button -->

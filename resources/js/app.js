@@ -11,11 +11,6 @@ Alpine.start();
 
 // Initialize when DOM is ready
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("App initialized with Flash System");
-
-    // You can add any additional initialization here
-    // For example, attach flash events to buttons with data attributes
-
     // Auto-attach flash to buttons with data-flash attribute
     document.querySelectorAll("[data-flash]").forEach((button) => {
         button.addEventListener("click", function (e) {
@@ -43,9 +38,6 @@ window.flash = function (
     if (window.flashSystem && window.flashSystem.add) {
         return window.flashSystem.add({ message, type, duration, description });
     } else {
-        // Fallback if flash system not loaded
-        console.warn("Flash system not loaded yet, queuing message");
-
         // Store for when system loads
         if (!window.queuedFlashMessages) {
             window.queuedFlashMessages = [];

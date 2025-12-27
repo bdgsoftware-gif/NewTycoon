@@ -56,10 +56,11 @@
                         </span>
                     </a>
 
-                    <form action="{{ route('cart.add', $productId) }}" method="POST" class="inline-block">
+                    <form action="{{ route('cart.add', $productId) }}" method="POST"
+                        class="add-to-cart-form inline-block">
                         @csrf
-                        <button type="submit"
-                            class="bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg">
+                        <button type="submit" title="Add to Cart"
+                            class="add-to-cart-btn bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg">
                             <span class="flex items-center">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -19,7 +19,7 @@ class FeaturedProductViewResource extends JsonResource
             'discount_percentage' => (int) $this->discount_percentage,
 
             'is_new' => (bool) $this->is_new,
-            'in_stock' => $this->stock_status === 'in_stock',
+            'in_stock' => (bool) $this->stock_status === 'in_stock',
 
             'image' => $this->featured_images[0] ?? null,
         ];

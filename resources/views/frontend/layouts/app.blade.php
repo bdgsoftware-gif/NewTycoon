@@ -1,4 +1,3 @@
-<!-- view/frontend/layouts/app.blade.php -->
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="no-scrollbar">
 
@@ -38,8 +37,6 @@
     <div class="min-h-screen mx-auto max-w-full">
         <!-- Flash Messages Container -->
         <x-flash-container />
-        <!-- Server Flash Messages (fallback) -->
-        <x-server-flash />
 
         @include('frontend.partials.navbar')
 
@@ -56,23 +53,38 @@
     <!-- Additional Scripts -->
     @stack('scripts')
 
-    <!-- Flash System Initialization -->
-    <script>
-        // Handle any queued flash messages
-        document.addEventListener('DOMContentLoaded', function() {
-            if (window.queuedFlashMessages && window.queuedFlashMessages.length > 0) {
-                setTimeout(() => {
-                    if (window.flashSystem && window.flashSystem.add) {
-                        window.queuedFlashMessages.forEach(msg => {
-                            window.flashSystem.add(msg);
-                        });
-                        window.queuedFlashMessages = [];
-                    }
-                }, 500);
-            }
-        });
-    </script>
+    <script src="{{ asset('js/cart.js') }}"></script>
 
+    <!-- Debug script -->
+    <script>
+        // Debug functions
+        window.debugAll = function() {
+            console.log('=== DEBUG ALL ===');
+
+            // Test flash
+            if (typeof window.flash === 'function') {
+                window.flash('Debug test notification', 'info', 3000, 'Testing flash system');
+                console.log('✅ Flash function works');
+            } else {
+                console.error('❌ Flash function missing');
+            }
+
+            // Test cart
+            if (window.cartManager) {
+                console.log('✅ CartManager ready');
+                console.log('Cart count elements:', document.querySelectorAll('.cart-count').length);
+            } else {
+                console.error('❌ CartManager not ready');
+            }
+        };
+
+        // Auto-debug on load with parameter
+        if (window.location.search.includes('debug')) {
+            setTimeout(() => {
+                debugAll();
+            }, 1500);
+        }
+    </script>
 </body>
 
 </html>

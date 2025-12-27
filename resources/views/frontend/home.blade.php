@@ -31,5 +31,5 @@
     <!--  -->
 
     <!-- User Video Stories Section -->
-    @include('frontend.partials.user-stories')
+    {{-- @include('frontend.partials.user-stories') --}}
 @endsection

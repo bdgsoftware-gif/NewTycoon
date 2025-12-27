@@ -30,7 +30,6 @@ class FlashMessageSystem {
             this.add({ message, type, duration, description });
         };
 
-        console.log("Flash message system initialized");
     }
 
     add({ message, type = "success", duration = 5000, description = "" }) {

@@ -31,6 +31,22 @@
                                     </svg>
                                 </button>
                             </div>
+                            <!-- Hidden fields to preserve other filters -->
+                            @if (request('category'))
+                                <input type="hidden" name="category" value="{{ request('category') }}">
+                            @endif
+                            @if (request('min_price'))
+                                <input type="hidden" name="min_price" value="{{ request('min_price') }}">
+                            @endif
+                            @if (request('max_price'))
+                                <input type="hidden" name="max_price" value="{{ request('max_price') }}">
+                            @endif
+                            @if (request('status'))
+                                <input type="hidden" name="status" value="{{ request('status') }}">
+                            @endif
+                            @if (request('sort'))
+                                <input type="hidden" name="sort" value="{{ request('sort') }}">
+                            @endif
                         </form>
                     </div>
 
@@ -66,25 +82,29 @@
                                     class="text-sm font-medium text-gray-700 font-inter">TK{{ number_format(request('max_price', $priceRange['max'])) }}</span>
                             </div>
                             <div class="px-2">
-                                <input type="range" name="min_price" min="{{ $priceRange['min'] }}"
+                                <input type="range" id="min_price_slider" min="{{ $priceRange['min'] }}"
                                     max="{{ $priceRange['max'] }}" value="{{ request('min_price', $priceRange['min']) }}"
                                     class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary">
-                                <input type="range" name="max_price" min="{{ $priceRange['min'] }}"
+                                <input type="range" id="max_price_slider" min="{{ $priceRange['min'] }}"
                                     max="{{ $priceRange['max'] }}" value="{{ request('max_price', $priceRange['max']) }}"
                                     class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary">
                             </div>
                             <div class="flex gap-2">
-                                <input type="number" name="min_price_input"
+                                <input type="number" id="min_price_input"
                                     value="{{ request('min_price', $priceRange['min']) }}" min="{{ $priceRange['min'] }}"
                                     max="{{ $priceRange['max'] }}"
                                     class="w-1/2 px-3 py-2 border border-gray-300 rounded text-sm font-inter"
                                     placeholder="Min">
-                                <input type="number" name="max_price_input"
+                                <input type="number" id="max_price_input"
                                     value="{{ request('max_price', $priceRange['max']) }}" min="{{ $priceRange['min'] }}"
                                     max="{{ $priceRange['max'] }}"
                                     class="w-1/2 px-3 py-2 border border-gray-300 rounded text-sm font-inter"
                                     placeholder="Max">
                             </div>
+                            <button type="button" id="apply_price_filter"
+                                class="w-full px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-medium text-center font-inter transition-colors duration-200">
+                                Apply Price Filter
+                            </button>
                         </div>
                     </div>
 
@@ -93,7 +113,7 @@
                         <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Status</h3>
                         <div class="grid grid-cols-2 gap-2">
                             <a href="{{ route('products.index', array_merge(request()->except('status'), ['status' => 'all'])) }}"
-                                class="px-3 py-2 text-center rounded-lg border {{ request('status', 'all') == 'all' ? 'bg-primary-light text-primary border-primary' : 'border-gray-200 hover:bg-gray-50' }} text-sm font-inter transition-colors">
+                                class="px-3 py-2 text-center rounded-lg border {{ !request('status') || request('status') == 'all' ? 'bg-primary-light text-primary border-primary' : 'border-gray-200 hover:bg-gray-50' }} text-sm font-inter transition-colors">
                                 All
                             </a>
                             <a href="{{ route('products.index', array_merge(request()->except('status'), ['status' => 'in_stock'])) }}"
@@ -159,18 +179,37 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         @foreach ($products as $product)
                             @php
-                                $productSlug = $product['slug'] ?? '#';
-                                $productId = $product['id'] ?? '#';
-                                $productName = $product['name'] ?? 'Product Name';
-                                $primaryImage = $product['images'][0] ?? 'images/placeholder.jpg';
-                                $secondaryImage = $product['images'][1] ?? $primaryImage;
-                                $discountedPrice = $product['discounted_price'] ?? ($product['original_price'] ?? 0);
-                                $originalPrice = $product['original_price'] ?? 0;
-                                $discountPercentage = $product['discount_percentage'] ?? 0;
-                                $inStock = $product['in_stock'] ?? true;
-                                $isNew = $product['is_new'] ?? false;
-                                $rating = $product['rating'] ?? 0;
-                                $reviewCount = $product['review_count'] ?? 0;
+                                $productSlug = $product->slug;
+                                $productId = $product->id;
+                                $productName = $product->name;
+
+                                // Handle images - check if featured_images is an array
+                                $featuredImages = is_array($product->featured_images) ? $product->featured_images : [];
+                                $galleryImages = is_array($product->gallery_images) ? $product->gallery_images : [];
+
+                                $primaryImage = !empty($featuredImages)
+                                    ? $featuredImages[0]
+                                    : (!empty($galleryImages)
+                                        ? $galleryImages[0]
+                                        : 'images/placeholder.jpg');
+                                $secondaryImage = !empty($featuredImages)
+                                    ? $featuredImages[1] ?? $featuredImages[0]
+                                    : (!empty($galleryImages)
+                                        ? $galleryImages[1] ?? $galleryImages[0]
+                                        : $primaryImage);
+
+                                // Handle pricing
+                                $discountedPrice =
+                                    $product->discount_percentage > 0
+                                        ? $product->price * (1 - $product->discount_percentage / 100)
+                                        : $product->price;
+                                $originalPrice = $product->price;
+                                $discountPercentage = $product->discount_percentage;
+
+                                $inStock = $product->in_stock;
+                                $isNew = $product->is_new ?? false;
+                                $rating = $product->average_rating ?? 0;
+                                $reviewCount = $product->rating_count ?? 0;
                             @endphp
 
                             <!-- Product Card -->
@@ -181,12 +220,12 @@
                                     <div
                                         class="relative w-full aspect-square bg-gradient-to-br from-gray-50 to-white overflow-hidden">
                                         <!-- Primary Image -->
-                                        <img src="{{ asset($primaryImage) }}" alt="{{ $productName }}"
-                                            class="absolute inset-0 w-full h-full object-contain transition-opacity duration-500 group-hover:opacity-0">
+                                        <img src="{{ asset('storage/' . $primaryImage) }}" alt="{{ $productName }}"
+                                            class="absolute inset-0 w-full h-full object-contain transition-opacity duration-500 group-hover:opacity-0 p-4">
 
                                         <!-- Secondary Image on Hover -->
-                                        <img src="{{ asset($secondaryImage) }}" alt="{{ $productName }}"
-                                            class="absolute inset-0 w-full h-full object-contain opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+                                        <img src="{{ asset('storage/' . $secondaryImage) }}" alt="{{ $productName }}"
+                                            class="absolute inset-0 w-full h-full object-contain opacity-0 transition-opacity duration-500 group-hover:opacity-100 p-4">
 
                                         <!-- Badges -->
                                         <div class="absolute top-3 left-3 flex flex-col space-y-1 z-10">
@@ -231,7 +270,7 @@
                                                 TK{{ number_format($discountedPrice, 2) }}
                                             </span>
 
-                                            @if (!$inStock)
+                                            @if ($inStock)
                                                 <button
                                                     class="wishlist-btn p-1 hover:text-red-500 transition-colors duration-200"
                                                     title="Add to Wishlist">
@@ -278,11 +317,11 @@
                                                     </span>
                                                 </a>
 
-                                                <form action="{{ route('cart.add', $productId) }}" method="POST"
-                                                    class="inline-block">
+                                                <form action="{{ route('cart.add', $product->id) }}" method="POST"
+                                                    class="add-to-cart-form inline-block">
                                                     @csrf
-                                                    <button type="submit"
-                                                        class="bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg rounded-lg">
+                                                    <button type="submit" title="Add to Cart"
+                                                        class="add-to-cart-btn bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg rounded-lg">
                                                         <span class="flex items-center">
                                                             <svg class="w-4 h-4 mr-1" fill="none"
                                                                 stroke="currentColor" viewBox="0 0 24 24">
@@ -301,10 +340,11 @@
                             </div>
                         @endforeach
                     </div>
+
                     <!-- Pagination -->
                     @if ($products->hasPages())
                         <div class="px-6 py-4 border-t border-gray-200 mt-6">
-                            {{ $products->withQueryString()->links() }}
+                            {{ $products->appends(request()->query())->links() }}
                         </div>
                     @endif
                 @else
@@ -337,80 +377,85 @@
             const sortSelect = document.getElementById('sortSelect');
             if (sortSelect) {
                 sortSelect.addEventListener('change', function() {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('sort', this.value);
-                    window.location.href = url.toString();
+                    updateUrlParameter('sort', this.value);
                 });
             }
 
-            // Price range slider handlers
-            const minPriceSlider = document.querySelector('input[name="min_price"]');
-            const maxPriceSlider = document.querySelector('input[name="max_price"]');
-            const minPriceInput = document.querySelector('input[name="min_price_input"]');
-            const maxPriceInput = document.querySelector('input[name="max_price_input"]');
+            // Price range elements
+            const minPriceSlider = document.getElementById('min_price_slider');
+            const maxPriceSlider = document.getElementById('max_price_slider');
+            const minPriceInput = document.getElementById('min_price_input');
+            const maxPriceInput = document.getElementById('max_price_input');
+            const applyPriceFilterBtn = document.getElementById('apply_price_filter');
 
-            function updatePriceFilters() {
+            // Sync sliders with inputs
+            if (minPriceSlider && minPriceInput) {
+                minPriceSlider.addEventListener('input', function() {
+                    minPriceInput.value = this.value;
+                });
+                minPriceInput.addEventListener('input', function() {
+                    minPriceSlider.value = this.value;
+                });
+            }
+
+            if (maxPriceSlider && maxPriceInput) {
+                maxPriceSlider.addEventListener('input', function() {
+                    maxPriceInput.value = this.value;
+                });
+                maxPriceInput.addEventListener('input', function() {
+                    maxPriceSlider.value = this.value;
+                });
+            }
+
+            // Apply price filter button
+            if (applyPriceFilterBtn) {
+                applyPriceFilterBtn.addEventListener('click', function() {
+                    const minPrice = minPriceInput.value;
+                    const maxPrice = maxPriceInput.value;
+
+                    // Validate price range
+                    if (parseInt(minPrice) > parseInt(maxPrice)) {
+                        alert('Minimum price cannot be greater than maximum price');
+                        return;
+                    }
+
+                    updateUrlParameter('min_price', minPrice);
+                    updateUrlParameter('max_price', maxPrice);
+                });
+            }
+
+            // Search form with debounce
+            const searchInput = document.querySelector('input[name="search"]');
+            if (searchInput) {
+                let searchTimeout;
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        updateUrlParameter('search', this.value);
+                    }, 500);
+                });
+            }
+
+            // Helper function to update URL parameters
+            function updateUrlParameter(key, value) {
                 const url = new URL(window.location.href);
 
-                // Get values from inputs if they exist
-                const minValue = minPriceInput ? minPriceInput.value : minPriceSlider.value;
-                const maxValue = maxPriceInput ? maxPriceInput.value : maxPriceSlider.value;
-
-                url.searchParams.set('min_price', minValue);
-                url.searchParams.set('max_price', maxValue);
-
-                // Remove price params if they're at defaults
-                if (minValue === '{{ $priceRange['min'] }}') {
-                    url.searchParams.delete('min_price');
+                if (value) {
+                    url.searchParams.set(key, value);
+                } else {
+                    url.searchParams.delete(key);
                 }
-                if (maxValue === '{{ $priceRange['max'] }}') {
-                    url.searchParams.delete('max_price');
-                }
+
+                // Remove page parameter when changing filters
+                url.searchParams.delete('page');
 
                 window.location.href = url.toString();
             }
 
-            // Add debounce function to prevent too many requests
-            function debounce(func, wait) {
-                let timeout;
-                return function executedFunction(...args) {
-                    const later = () => {
-                        clearTimeout(timeout);
-                        func(...args);
-                    };
-                    clearTimeout(timeout);
-                    timeout = setTimeout(later, wait);
-                };
-            }
-
-            const debouncedUpdate = debounce(updatePriceFilters, 800);
-
-            // Attach event listeners
-            if (minPriceSlider && maxPriceSlider) {
-                minPriceSlider.addEventListener('input', function() {
-                    if (minPriceInput) minPriceInput.value = this.value;
-                    debouncedUpdate();
-                });
-
-                maxPriceSlider.addEventListener('input', function() {
-                    if (maxPriceInput) maxPriceInput.value = this.value;
-                    debouncedUpdate();
-                });
-            }
-
-            if (minPriceInput && maxPriceInput) {
-                minPriceInput.addEventListener('change', debouncedUpdate);
-                maxPriceInput.addEventListener('change', debouncedUpdate);
-            }
-
-            // Search form submission with debounce
-            const searchInput = document.querySelector('input[name="search"]');
-            if (searchInput) {
-                searchInput.addEventListener('keyup', debounce(function(e) {
-                    if (e.key === 'Enter') {
-                        document.getElementById('searchForm').submit();
-                    }
-                }, 500));
+            // Helper function to get URL parameters
+            function getUrlParameter(name) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(name);
             }
         });
     </script>

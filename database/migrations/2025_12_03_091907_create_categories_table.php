@@ -46,6 +46,10 @@ return new class extends Migration
                 ->references('id')
                 ->on('categories')
                 ->onDelete('cascade');
+
+            $table->index('is_active');
+            $table->index('parent_id');
+            $table->index(['is_active', 'parent_id']);
         });
     }
 

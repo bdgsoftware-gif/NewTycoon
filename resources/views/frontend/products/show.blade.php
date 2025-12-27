@@ -162,10 +162,15 @@
                             </div>
 
                             <!-- Add to Cart -->
-                            <button type="submit"
-                                class="flex-1 bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors font-inter">
-                                Add to Cart
-                            </button>
+                            <form action="{{ route('cart.add', $product->id) }}" method="POST"
+                                class="add-to-cart-form inline-block">
+                                @csrf
+                                <button type="submit" title="Add to Cart"
+                                    class="add-to-cart-btn flex-1 bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors font-inter {{ !$product->in_stock ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                    {{ !$product->in_stock ? 'disabled' : '' }}>
+                                    Add to Cart
+                                </button>
+                            </form>
 
                             <!-- Buy Now -->
                             <a href="{{ route('checkout.process', $product->id) }}"

@@ -234,10 +234,10 @@ if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
                                                     </a>
 
                                                     <form action="{{ route('cart.add', $productId) }}" method="POST"
-                                                        class="inline-block">
+                                                        class="add-to-cart-form inline-block">
                                                         @csrf
-                                                        <button type="submit"
-                                                            class="bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg">
+                                                        <button type="submit" title="Add to Cart"
+                                                            class="add-to-cart-btn bg-primary hover:bg-primary-dark text-white font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg">
                                                             <span class="flex items-center">
                                                                 <svg class="w-4 h-4 mr-1" fill="none"
                                                                     stroke="currentColor" viewBox="0 0 24 24">
@@ -253,7 +253,7 @@ if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
                                             </div>
                                         </div>
                                     @endif
-                                    
+
                                     @if (!$inStock)
                                         <div
                                             class="absolute bottom-0 left-0 right-0 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
