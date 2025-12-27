@@ -21,7 +21,6 @@ class Cart extends Model
         $sessionId = Session::getId();
 
         if (Auth::check()) {
-            // If user is logged in, get or create cart for user
             $cart = self::firstOrCreate([
                 'user_id' => Auth::id(),
             ]);

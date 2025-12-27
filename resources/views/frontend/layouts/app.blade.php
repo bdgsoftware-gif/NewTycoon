@@ -51,40 +51,9 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
 
     <!-- Additional Scripts -->
+    <script src="{{ asset('js/cart.js') }}"></script>
     @stack('scripts')
 
-    <script src="{{ asset('js/cart.js') }}"></script>
-
-    <!-- Debug script -->
-    <script>
-        // Debug functions
-        window.debugAll = function() {
-            console.log('=== DEBUG ALL ===');
-
-            // Test flash
-            if (typeof window.flash === 'function') {
-                window.flash('Debug test notification', 'info', 3000, 'Testing flash system');
-                console.log('✅ Flash function works');
-            } else {
-                console.error('❌ Flash function missing');
-            }
-
-            // Test cart
-            if (window.cartManager) {
-                console.log('✅ CartManager ready');
-                console.log('Cart count elements:', document.querySelectorAll('.cart-count').length);
-            } else {
-                console.error('❌ CartManager not ready');
-            }
-        };
-
-        // Auto-debug on load with parameter
-        if (window.location.search.includes('debug')) {
-            setTimeout(() => {
-                debugAll();
-            }, 1500);
-        }
-    </script>
 </body>
 
 </html>

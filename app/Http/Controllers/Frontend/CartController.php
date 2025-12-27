@@ -37,54 +37,62 @@ class CartController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Product is out of stock',
-                    'type' => 'error'
+                    'type' => 'error',
+                    'cart_count' => Cart::getCurrentCart()->total_items ?? 0
                 ], 400);
             }
 
-            flash('Product is out of stock', 'error');
+            flash('Product is out of stock', 'error', 3000, 'Please try another product');
             return redirect()->back();
         }
 
         try {
-            // Get current cart (for user or guest)
+            // Get current cart
             $cart = Cart::getCurrentCart();
 
             // Add item to cart
             $cart->addItem($product->id, $quantity);
 
-            // Clear cart cache for fresh data
+            // Clear cart cache
             Cache::forget("cart_" . (auth()->id() ?? session()->getId()));
 
-            // Get updated cart count
+            // Refresh cart to get updated data
+            $cart->refresh();
             $cartCount = $cart->total_items;
 
-            // Prepare success message
-            $message = "{$product->name} added to cart";
+            // Prepare response
+            $response = [
+                'success' => true,
+                'message' => "{$product->name} added to cart",
+                'type' => 'success',
+                'cart_count' => $cartCount,
+                'product_name' => $product->name,
+                'cart_total' => format_currency($cart->subtotal),
+                'cart_subtotal' => format_currency($cart->subtotal)
+            ];
 
             // AJAX response
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => $message,
-                    'type' => 'success',
-                    'cart_count' => $cartCount,
-                    'product_name' => $product->name
-                ]);
+                return response()->json($response);
             }
-            // Non-AJAX response (regular form submission)
-            flash($message, 'success');
+
+            // Non-AJAX response
+            flash($response['message'], $response['type'], 3000, "Item successfully added to your shopping cart");
             return redirect()->back();
         } catch (\Exception $e) {
             // Error handling
+            $errorResponse = [
+                'success' => false,
+                'message' => 'Failed to add to cart: ' . $e->getMessage(),
+                'type' => 'error',
+                'cart_count' => Cart::getCurrentCart()->total_items ?? 0
+            ];
+
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Failed to add to cart',
-                    'type' => 'error'
-                ], 500);
+                return response()->json($errorResponse, 500);
             }
 
-            flash('Failed to add to cart', 'error');
+            flash($errorResponse['message'], $errorResponse['type'], 3000, 'Please try again');
             return redirect()->back();
         }
     }
@@ -99,49 +107,67 @@ class CartController extends Controller
         ]);
 
         $cart = Cart::getCurrentCart();
+        $quantity = $request->quantity;
 
         try {
             // Check stock if increasing quantity
-            if ($request->quantity > 0) {
+            if ($quantity > 0) {
                 $cartItem = $cart->items()->where('product_id', $product->id)->first();
-                if ($cartItem && $request->quantity > $cartItem->quantity) {
-                    $increaseAmount = $request->quantity - $cartItem->quantity;
+                if ($cartItem && $quantity > $cartItem->quantity) {
+                    $increaseAmount = $quantity - $cartItem->quantity;
                     if ($product->track_quantity && $product->quantity < $increaseAmount && !$product->allow_backorder) {
-                        return response()->json([
+                        $response = [
                             'success' => false,
                             'message' => 'Not enough stock available',
-                            'type' => 'warning'
-                        ], 400);
+                            'type' => 'warning',
+                            'cart_count' => $cart->total_items
+                        ];
+
+                        if ($request->ajax()) {
+                            return response()->json($response, 400);
+                        }
+
+                        flash($response['message'], $response['type'], 3000, 'Only ' . $product->quantity . ' items available');
+                        return redirect()->back();
                     }
                 }
             }
 
-            $cart->updateItem($product->id, $request->quantity);
-
+            $cart->updateItem($product->id, $quantity);
             Cache::forget("cart_" . (auth()->id() ?? session()->getId()));
 
+            // Refresh cart data
+            $cart->refresh();
+
+            $response = [
+                'success' => true,
+                'message' => $quantity == 0 ? 'Item removed from cart' : 'Cart updated successfully',
+                'type' => 'success',
+                'cart_count' => $cart->total_items,
+                'cart_total' => format_currency($cart->subtotal),
+                'cart_subtotal' => format_currency($cart->subtotal),
+                'item_total' => $quantity > 0 ? format_currency($quantity * ($cart->items()->where('product_id', $product->id)->first()->price ?? 0)) : '0.00'
+            ];
+
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => $request->quantity == 0 ? 'Item removed from cart' : 'Cart updated',
-                    'type' => 'success',
-                    'cart_count' => $cart->total_items,
-                    'cart_total' => format_currency($cart->subtotal)
-                ]);
+                return response()->json($response);
             }
 
-            flash('Cart updated', 'success');
+            flash($response['message'], $response['type'], 3000, 'Your cart has been updated');
             return redirect()->route('cart.index');
         } catch (\Exception $e) {
+            $errorResponse = [
+                'success' => false,
+                'message' => 'Failed to update cart: ' . $e->getMessage(),
+                'type' => 'error',
+                'cart_count' => $cart->total_items ?? 0
+            ];
+
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Failed to update cart',
-                    'type' => 'error'
-                ], 500);
+                return response()->json($errorResponse, 500);
             }
 
-            flash('Failed to update cart', 'error');
+            flash($errorResponse['message'], $errorResponse['type'], 3000, 'Please try again');
             return redirect()->back();
         }
     }
@@ -157,28 +183,38 @@ class CartController extends Controller
 
             Cache::forget("cart_" . (auth()->id() ?? session()->getId()));
 
+            // Refresh cart data
+            $cart->refresh();
+
+            $response = [
+                'success' => true,
+                'message' => 'Product removed from cart',
+                'type' => 'success',
+                'cart_count' => $cart->total_items,
+                'cart_total' => format_currency($cart->subtotal),
+                'cart_subtotal' => format_currency($cart->subtotal),
+                'product_name' => $product->name
+            ];
+
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Product removed from cart',
-                    'type' => 'success',
-                    'cart_count' => $cart->total_items,
-                    'cart_total' => format_currency($cart->subtotal)
-                ]);
+                return response()->json($response);
             }
 
-            flash('Product removed from cart', 'success');
+            flash($response['message'], $response['type'], 3000, $product->name . ' has been removed from your cart');
             return redirect()->route('cart.index');
         } catch (\Exception $e) {
+            $errorResponse = [
+                'success' => false,
+                'message' => 'Failed to remove item: ' . $e->getMessage(),
+                'type' => 'error',
+                'cart_count' => Cart::getCurrentCart()->total_items ?? 0
+            ];
+
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Failed to remove item',
-                    'type' => 'error'
-                ], 500);
+                return response()->json($errorResponse, 500);
             }
 
-            flash('Failed to remove item', 'error');
+            flash($errorResponse['message'], $errorResponse['type'], 3000, 'Please try again');
             return redirect()->back();
         }
     }
@@ -194,28 +230,34 @@ class CartController extends Controller
 
             Cache::forget("cart_" . (auth()->id() ?? session()->getId()));
 
+            $response = [
+                'success' => true,
+                'message' => 'Cart cleared successfully',
+                'type' => 'success',
+                'cart_count' => 0,
+                'cart_total' => format_currency(0),
+                'cart_subtotal' => format_currency(0)
+            ];
+
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Cart cleared',
-                    'type' => 'success',
-                    'cart_count' => 0,
-                    'cart_total' => format_currency(0)
-                ]);
+                return response()->json($response);
             }
 
-            flash('Cart cleared', 'success');
+            flash($response['message'], $response['type'], 3000, 'All items have been removed from your cart');
             return redirect()->route('cart.index');
         } catch (\Exception $e) {
+            $errorResponse = [
+                'success' => false,
+                'message' => 'Failed to clear cart: ' . $e->getMessage(),
+                'type' => 'error',
+                'cart_count' => Cart::getCurrentCart()->total_items ?? 0
+            ];
+
             if ($request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Failed to clear cart',
-                    'type' => 'error'
-                ], 500);
+                return response()->json($errorResponse, 500);
             }
 
-            flash('Failed to clear cart', 'error');
+            flash($errorResponse['message'], $errorResponse['type'], 3000, 'Please try again');
             return redirect()->back();
         }
     }
@@ -228,13 +270,16 @@ class CartController extends Controller
         $cart = Cart::getCurrentCart();
 
         return response()->json([
+            'success' => true,
             'count' => $cart->total_items,
-            'total' => format_currency($cart->subtotal)
+            'total' => format_currency($cart->subtotal),
+            'cart_count' => $cart->total_items,
+            'cart_total' => format_currency($cart->subtotal)
         ]);
     }
 
     /**
-     * Get current cart count (AJAX only)
+     * Get cart count (AJAX only)
      */
     public function count(Request $request)
     {

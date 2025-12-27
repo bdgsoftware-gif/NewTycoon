@@ -43,7 +43,8 @@
                                     $inStock = $product->in_stock;
                                 @endphp
 
-                                <div class="grid grid-cols-12 gap-4 p-6 items-center">
+                                <div class="cart-item grid grid-cols-12 gap-4 p-6 items-center"
+                                    data-product-id="{{ $product->id }}">
                                     <!-- Product Info -->
                                     <div class="col-span-6">
                                         <div class="flex items-center space-x-4">
@@ -78,8 +79,9 @@
                                                 @endif
 
                                                 <!-- Remove Button -->
-                                                <button onclick="removeFromCart({{ $product->id }})"
-                                                    class="mt-2 text-sm text-red-600 hover:text-red-800 font-inter transition-colors duration-200">
+                                                <button
+                                                    class="cart-remove-item mt-2 text-sm text-red-600 hover:text-red-800 font-inter transition-colors duration-200"
+                                                    data-url="{{ route('cart.remove', $product->id) }}">
                                                     Remove
                                                 </button>
                                             </div>
@@ -96,40 +98,45 @@
                                     <!-- Quantity -->
                                     <div class="col-span-2">
                                         <div class="flex items-center justify-center">
-                                            <div class="flex items-center border border-gray-300 rounded-lg">
-                                                <button
-                                                    onclick="updateQuantity({{ $product->id }}, {{ $item->quantity - 1 }})"
-                                                    class="px-3 py-2 text-gray-600 hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                                                    {{ $item->quantity <= 1 ? 'disabled' : '' }}>
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M20 12H4" />
-                                                    </svg>
-                                                </button>
+                                            <form action="{{ route('cart.update', $product->id) }}" method="POST"
+                                                class="cart-item-form">
+                                                @csrf
+                                                <div class="flex items-center border border-gray-300 rounded-lg">
+                                                    <button type="button"
+                                                        class="cart-update-quantity px-3 py-2 text-gray-600 hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                                        data-quantity="{{ $item->quantity - 1 }}"
+                                                        {{ $item->quantity <= 1 ? 'disabled' : '' }}>
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M20 12H4" />
+                                                        </svg>
+                                                    </button>
 
-                                                <input type="number" value="{{ $item->quantity }}" min="1"
-                                                    max="{{ $product->track_quantity ? $product->quantity : 999 }}"
-                                                    class="w-16 text-center border-0 focus:ring-0 focus:outline-none font-inter [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                                                    onchange="updateQuantity({{ $product->id }}, this.value)">
+                                                    <input type="number" name="quantity" value="{{ $item->quantity }}"
+                                                        min="1"
+                                                        max="{{ $product->track_quantity ? $product->quantity : 999 }}"
+                                                        class="quantity-input w-16 text-center border-0 focus:ring-0 focus:outline-none font-inter [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                                        data-product-id="{{ $product->id }}">
 
-                                                <button
-                                                    onclick="updateQuantity({{ $product->id }}, {{ $item->quantity + 1 }})"
-                                                    class="px-3 py-2 text-gray-600 hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                                                    {{ !$inStock && $product->track_quantity ? 'disabled' : '' }}>
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M12 4v16m8-8H4" />
-                                                    </svg>
-                                                </button>
-                                            </div>
+                                                    <button type="button"
+                                                        class="cart-update-quantity px-3 py-2 text-gray-600 hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                                        data-quantity="{{ $item->quantity + 1 }}"
+                                                        {{ !$inStock && $product->track_quantity ? 'disabled' : '' }}>
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M12 4v16m8-8H4" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </form>
                                         </div>
                                     </div>
 
                                     <!-- Total -->
                                     <div class="col-span-2 text-center">
-                                        <span class="text-lg font-bold text-gray-900 font-quantico">
+                                        <span class="item-total text-lg font-bold text-gray-900 font-quantico">
                                             TK{{ number_format($itemTotal, 2) }}
                                         </span>
                                     </div>
@@ -148,7 +155,8 @@
                                 $inStock = $product->in_stock;
                             @endphp
 
-                            <div class="bg-white rounded-xl border border-gray-200 p-4">
+                            <div class="cart-item bg-white rounded-xl border border-gray-200 p-4"
+                                data-product-id="{{ $product->id }}">
                                 <div class="flex items-start space-x-4">
                                     <!-- Product Image -->
                                     <a href="{{ route('product.show', $product->slug) }}" class="flex-shrink-0">
@@ -175,8 +183,8 @@
                                             </div>
 
                                             <!-- Remove Button -->
-                                            <button onclick="removeFromCart({{ $product->id }})"
-                                                class="text-red-600 hover:text-red-800">
+                                            <button class="cart-remove-item text-red-600 hover:text-red-800"
+                                                data-url="{{ route('cart.remove', $product->id) }}">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -201,39 +209,44 @@
 
                                         <!-- Quantity Controls -->
                                         <div class="mt-4 flex items-center justify-between">
-                                            <div class="flex items-center border border-gray-300 rounded-lg">
-                                                <button
-                                                    onclick="updateQuantity({{ $product->id }}, {{ $item->quantity - 1 }})"
-                                                    class="px-3 py-2 text-gray-600 hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                                                    {{ $item->quantity <= 1 ? 'disabled' : '' }}>
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M20 12H4" />
-                                                    </svg>
-                                                </button>
+                                            <form action="{{ route('cart.update', $product->id) }}" method="POST"
+                                                class="cart-item-form">
+                                                @csrf
+                                                <div class="flex items-center border border-gray-300 rounded-lg">
+                                                    <button type="button"
+                                                        class="cart-update-quantity px-3 py-2 text-gray-600 hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                                        data-quantity="{{ $item->quantity - 1 }}"
+                                                        {{ $item->quantity <= 1 ? 'disabled' : '' }}>
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M20 12H4" />
+                                                        </svg>
+                                                    </button>
 
-                                                <input type="number" value="{{ $item->quantity }}" min="1"
-                                                    max="{{ $product->track_quantity ? $product->quantity : 999 }}"
-                                                    class="w-16 text-center border-0 focus:ring-0 focus:outline-none font-inter [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                                                    onchange="updateQuantity({{ $product->id }}, this.value)">
+                                                    <input type="number" name="quantity" value="{{ $item->quantity }}"
+                                                        min="1"
+                                                        max="{{ $product->track_quantity ? $product->quantity : 999 }}"
+                                                        class="quantity-input w-16 text-center border-0 focus:ring-0 focus:outline-none font-inter [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                                        data-product-id="{{ $product->id }}">
 
-                                                <button
-                                                    onclick="updateQuantity({{ $product->id }}, {{ $item->quantity + 1 }})"
-                                                    class="px-3 py-2 text-gray-600 hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                                                    {{ !$inStock && $product->track_quantity ? 'disabled' : '' }}>
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M12 4v16m8-8H4" />
-                                                    </svg>
-                                                </button>
-                                            </div>
+                                                    <button type="button"
+                                                        class="cart-update-quantity px-3 py-2 text-gray-600 hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                                        data-quantity="{{ $item->quantity + 1 }}"
+                                                        {{ !$inStock && $product->track_quantity ? 'disabled' : '' }}>
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M12 4v16m8-8H4" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </form>
 
                                             <!-- Item Total -->
                                             <div class="text-right">
                                                 <div class="text-sm text-gray-500 font-inter">Total</div>
-                                                <div class="text-lg font-bold text-gray-900 font-quantico">
+                                                <div class="item-total text-lg font-bold text-gray-900 font-quantico">
                                                     TK{{ number_format($itemTotal, 2) }}
                                                 </div>
                                             </div>
@@ -256,7 +269,7 @@
                         </a>
 
                         <div class="flex gap-3">
-                            <button onclick="clearCart()"
+                            <button id="clear-cart-btn"
                                 class="px-6 py-3 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg font-medium font-inter transition-colors duration-200">
                                 Clear Cart
                             </button>
@@ -279,7 +292,7 @@
                             <!-- Subtotal -->
                             <div class="flex justify-between items-center">
                                 <span class="text-gray-600 font-inter">Subtotal</span>
-                                <span
+                                <span id="cart-subtotal"
                                     class="text-gray-900 font-semibold font-quantico">TK{{ number_format($cart->subtotal, 2) }}</span>
                             </div>
 
@@ -300,7 +313,7 @@
                                 <div class="flex justify-between items-center">
                                     <span class="text-lg font-bold text-gray-900 font-quantico">Total</span>
                                     <div class="text-right">
-                                        <div class="text-2xl font-bold text-gray-900 font-quantico">
+                                        <div id="cart-total" class="text-2xl font-bold text-gray-900 font-quantico">
                                             TK{{ number_format($cart->subtotal, 2) }}
                                         </div>
                                         <div class="text-sm text-gray-500 font-inter mt-1">
@@ -385,75 +398,28 @@
 
 @push('scripts')
     <script>
-        // Update quantity
-        function updateQuantity(productId, quantity) {
-            if (quantity < 1) {
-                removeFromCart(productId);
-                return;
-            }
-
-            fetch(`/cart/${productId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({
-                        quantity: parseInt(quantity)
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Reload the page to update cart totals
-                        window.location.reload();
-                    } else {
-                        alert(data.message || 'Failed to update quantity');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while updating the cart');
-                });
-        }
-
-        // Remove item from cart
-        function removeFromCart(productId) {
-            if (!confirm('Are you sure you want to remove this item from your cart?')) {
-                return;
-            }
-
-            fetch(`/cart/${productId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Reload the page to update cart
-                        window.location.reload();
-                    } else {
-                        alert('Failed to remove item from cart');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while removing the item');
-                });
-        }
-
-        // Clear entire cart
-        function clearCart() {
+        // Clear cart function
+        document.getElementById('clear-cart-btn')?.addEventListener('click', function() {
             if (!confirm('Are you sure you want to clear your entire cart?')) {
                 return;
             }
 
-            fetch(`/cart/clear`, {
+            const button = this;
+            const originalText = button.innerHTML;
+
+            // Show loading state
+            button.disabled = true;
+            button.innerHTML = `
+                <span class="flex items-center">
+                    <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Clearing...
+                </span>
+            `;
+
+            fetch('{{ route('cart.clear') }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -461,77 +427,310 @@
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                .then(response => {
-                    if (response.redirected) {
-                        window.location.href = response.url;
-                    } else {
-                        return response.json();
-                    }
-                })
+                .then(response => response.json())
                 .then(data => {
-                    if (data && data.success) {
-                        window.location.reload();
+                    if (data.success) {
+                        // Show success message
+                        if (window.flash) {
+                            window.flash(data.message || 'Cart cleared successfully', 'success');
+                        }
+
+                        // Reload page after a delay to show the empty cart message
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        throw new Error(data.message || 'Failed to clear cart');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('An error occurred while clearing the cart');
-                });
-        }
-
-        // Update cart counter in navbar (if you have one)
-        function updateCartCounter() {
-            fetch('/cart/summary')
-                .then(response => response.json())
-                .then(data => {
-                    // Update cart counter element in navbar
-                    const cartCounter = document.querySelector('.cart-counter');
-                    if (cartCounter) {
-                        cartCounter.textContent = data.count;
+                    if (window.flash) {
+                        window.flash(error.message || 'An error occurred while clearing the cart', 'error');
                     }
-                })
-                .catch(error => console.error('Error:', error));
+
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                });
+        });
+
+        // Handle +/- button clicks for quantity updates
+        document.querySelectorAll('.cart-update-quantity').forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.preventDefault();
+
+                const newQuantity = parseInt(this.dataset.quantity);
+                const form = this.closest('.cart-item-form');
+                const productId = form.querySelector('.quantity-input').dataset.productId;
+                const inputElement = form.querySelector('.quantity-input');
+
+                // Validate min/max
+                const min = parseInt(inputElement.min) || 1;
+                const max = parseInt(inputElement.max) || 999;
+
+                if (newQuantity < min) {
+                    newQuantity = min;
+                }
+
+                if (newQuantity > max) {
+                    if (window.flash) {
+                        window.flash('Maximum quantity reached', 'warning');
+                    }
+                    newQuantity = max;
+                }
+
+                // Update input value
+                inputElement.value = newQuantity;
+
+                // Trigger update
+                await updateQuantity(productId, newQuantity, inputElement);
+            });
+        });
+
+        // Quantity input handler
+        document.querySelectorAll('.quantity-input').forEach(input => {
+            let debounceTimer;
+
+            input.addEventListener('change', function() {
+                clearTimeout(debounceTimer);
+
+                const quantity = parseInt(this.value);
+                const productId = this.dataset.productId;
+                const max = parseInt(this.max) || 999;
+                const min = parseInt(this.min) || 1;
+
+                // Validate input
+                if (isNaN(quantity) || quantity < min) {
+                    this.value = min;
+                    return;
+                }
+
+                if (quantity > max) {
+                    this.value = max;
+                    if (window.flash) {
+                        window.flash('Maximum quantity reached', 'warning');
+                    }
+                    return;
+                }
+
+                // Debounce the update
+                debounceTimer = setTimeout(() => {
+                    updateQuantity(productId, quantity, this);
+                }, 500);
+            });
+
+            // Prevent form submission on Enter
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.blur(); // Trigger change event
+                }
+            });
+        });
+
+        // Update quantity function
+        async function updateQuantity(productId, quantity, inputElement) {
+            try {
+                // Show loading state on input
+                const originalValue = inputElement.value;
+                inputElement.disabled = true;
+                inputElement.classList.add('opacity-50', 'cursor-not-allowed');
+
+                const response = await fetch(`/cart/update/${productId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        quantity: quantity
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update UI if CartManager is available
+                    if (window.cartManager) {
+                        window.cartManager.updateCartCount(data.cart_count || 0);
+                        window.cartManager.updateCartTotals(data);
+                    }
+
+                    // Update individual item total
+                    const itemElement = inputElement.closest('.cart-item');
+                    if (itemElement) {
+                        const itemTotalElement = itemElement.querySelector('.item-total');
+                        if (itemTotalElement && data.item_total) {
+                            itemTotalElement.textContent = `TK${parseFloat(data.item_total).toFixed(2)}`;
+                            itemTotalElement.classList.add('animate-pulse');
+                            setTimeout(() => itemTotalElement.classList.remove('animate-pulse'), 1000);
+                        }
+                    }
+
+                    // Update cart totals in summary
+                    const cartTotalElement = document.getElementById('cart-total');
+                    const cartSubtotalElement = document.getElementById('cart-subtotal');
+
+                    if (cartTotalElement && data.cart_total) {
+                        cartTotalElement.textContent = data.cart_total;
+                        cartTotalElement.classList.add('animate-pulse');
+                        setTimeout(() => cartTotalElement.classList.remove('animate-pulse'), 1000);
+                    }
+
+                    if (cartSubtotalElement && data.cart_subtotal) {
+                        cartSubtotalElement.textContent = data.cart_subtotal;
+                        cartSubtotalElement.classList.add('animate-pulse');
+                        setTimeout(() => cartSubtotalElement.classList.remove('animate-pulse'), 1000);
+                    }
+
+                    // Show success message
+                    if (window.flash) {
+                        window.flash(data.message || 'Quantity updated', 'success', 2000);
+                    }
+                } else {
+                    throw new Error(data.message || 'Failed to update quantity');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+
+                // Show error message
+                if (window.flash) {
+                    window.flash(error.message || 'An error occurred while updating the quantity', 'error');
+                }
+
+                // Reset input to original value
+                if (inputElement) {
+                    inputElement.value = originalValue;
+                }
+            } finally {
+                // Re-enable input
+                inputElement.disabled = false;
+                inputElement.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
         }
 
-        // Initialize on page load
+        // Remove item functionality
+        document.querySelectorAll('.cart-remove-item').forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.preventDefault();
+
+                if (!confirm('Are you sure you want to remove this item from your cart?')) {
+                    return;
+                }
+
+                const url = this.dataset.url;
+                const itemElement = this.closest('.cart-item');
+                const productName = itemElement.querySelector('a.font-medium')?.textContent.trim() ||
+                    'Item';
+
+                // Show loading state
+                const originalText = this.innerHTML;
+                this.disabled = true;
+                this.classList.add('opacity-50', 'cursor-not-allowed');
+                this.innerHTML = `
+                    <span class="flex items-center">
+                        <svg class="animate-spin h-3 w-3 mr-1" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Removing...
+                    </span>
+                `;
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Update cart count
+                        if (window.cartManager) {
+                            window.cartManager.updateCartCount(data.cart_count || 0);
+                            window.cartManager.updateCartTotals(data);
+                        }
+
+                        // Update cart totals in summary
+                        const cartTotalElement = document.getElementById('cart-total');
+                        const cartSubtotalElement = document.getElementById('cart-subtotal');
+
+                        if (cartTotalElement && data.cart_total) {
+                            cartTotalElement.textContent = data.cart_total;
+                            cartTotalElement.classList.add('animate-pulse');
+                            setTimeout(() => cartTotalElement.classList.remove('animate-pulse'), 1000);
+                        }
+
+                        if (cartSubtotalElement && data.cart_subtotal) {
+                            cartSubtotalElement.textContent = data.cart_subtotal;
+                            cartSubtotalElement.classList.add('animate-pulse');
+                            setTimeout(() => cartSubtotalElement.classList.remove('animate-pulse'),
+                                1000);
+                        }
+
+                        // Animate removal
+                        itemElement.style.opacity = '0.5';
+                        itemElement.style.transform = 'translateX(-100%)';
+                        setTimeout(() => {
+                            itemElement.remove();
+
+                            // Check if cart is empty
+                            const remainingItems = document.querySelectorAll('.cart-item')
+                                .length;
+                            if (remainingItems === 0) {
+                                // Redirect to empty cart view
+                                window.location.reload();
+                            }
+                        }, 300);
+
+                        // Show success message
+                        if (window.flash) {
+                            window.flash(data.message || `${productName} removed from cart`, 'success',
+                                3000);
+                        }
+                    } else {
+                        throw new Error(data.message || 'Failed to remove item');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+
+                    // Show error message
+                    if (window.flash) {
+                        window.flash(error.message || 'Failed to remove item', 'error');
+                    }
+
+                    // Reset button
+                    this.disabled = false;
+                    this.classList.remove('opacity-50', 'cursor-not-allowed');
+                    this.innerHTML = originalText;
+                }
+            });
+        });
+
+        // Store original quantities on page load
         document.addEventListener('DOMContentLoaded', function() {
-            // Prevent form submission on enter in quantity inputs
-            document.querySelectorAll('input[type="number"]').forEach(input => {
-                input.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                    }
-                });
+            document.querySelectorAll('.quantity-input').forEach(input => {
+                input.setAttribute('data-original-quantity', input.value);
             });
 
-            // Debounce function for quantity updates
-            const debounce = (func, wait) => {
-                let timeout;
-                return function executedFunction(...args) {
-                    const later = () => {
-                        clearTimeout(timeout);
-                        func(...args);
-                    };
-                    clearTimeout(timeout);
-                    timeout = setTimeout(later, wait);
-                };
-            };
+            // Initialize CartManager if available
+            if (window.cartManager) {
+                window.cartManager.initCartUpdates();
+            }
 
-            // Apply debounce to quantity inputs
-            const debouncedUpdate = debounce((productId, quantity) => {
-                updateQuantity(productId, quantity);
-            }, 500);
-
-            // Add event listeners for quantity inputs
-            document.querySelectorAll('input[type="number"]').forEach(input => {
-                input.addEventListener('change', function() {
-                    const productId = this.getAttribute('data-product-id') ||
-                        this.closest('[data-product-id]')?.getAttribute('data-product-id');
-                    if (productId) {
-                        debouncedUpdate(productId, this.value);
-                    }
-                });
-            });
+            // Test flash system
+            if (window.location.search.includes('test=flash') && window.flash) {
+                setTimeout(() => {
+                    window.flash('Flash system is working!', 'success', 3000,
+                        'Cart page loaded successfully');
+                }, 1000);
+            }
         });
     </script>
 @endpush
