@@ -27,7 +27,7 @@
         <div class="relative w-full aspect-square bg-gradient-to-br from-gray-50 to-white overflow-hidden">
             <!-- Image with gradient overlay -->
             <div class="absolute inset-0 flex items-center justify-center p-4">
-                <img src="{{ asset($primaryImage) }}" alt="{{ $productName }}"
+                <img src="{{ $product->featured_image_url }}" alt="{{ $productName }}"
                     class="max-h-full max-w-full object-contain transition-transform duration-700 group-hover:scale-110">
             </div>
 

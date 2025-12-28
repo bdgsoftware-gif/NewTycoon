@@ -26,6 +26,10 @@ export default {
                 inter: ["Inter", ...defaultTheme.fontFamily.sans],
                 cambay: ["Cambay", ...defaultTheme.fontFamily.sans],
                 quantico: ["Quantico", ...defaultTheme.fontFamily.sans],
+                bengali: [
+                    '"Noto Sans Bengali"',
+                    ...defaultTheme.fontFamily.sans,
+                ],
             },
             colors: {
                 primary: "#ea2f30",

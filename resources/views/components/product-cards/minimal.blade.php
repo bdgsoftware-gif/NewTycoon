@@ -19,7 +19,7 @@
     <!-- Image Section -->
     <a href="{{ route('product.show', $productSlug) }}">
         <div class="w-full aspect-square bg-white overflow-hidden relative">
-            <img src="{{ asset($primaryImage) }}"
+            <img src="{{ $product->featured_image_url }}"
                 class="absolute inset-0 w-full h-full object-contain transition-opacity duration-300 group-hover:opacity-0">
             <img src="{{ asset($secondaryImage ?? $primaryImage) }}"
                 class="absolute inset-0 w-full h-full object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100 {{ !$secondaryImage ? 'group-hover:scale-105' : '' }}">

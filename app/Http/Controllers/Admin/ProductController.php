@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Brand;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -52,90 +52,110 @@ class ProductController extends Controller
             ->orderBy('name')
             ->get();
 
-        $brands = Brand::where('is_active', true)
-            ->orderBy('name')
-            ->get();
-
         return view('admin.products.create', [
             'categories' => $categories,
-            'brands' => $brands,
         ]);
     }
 
     public function store(StoreProductRequest $request)
     {
+        DB::beginTransaction();
+
         try {
-            // Handle featured images upload
             $featuredImages = [];
+
             if ($request->hasFile('featured_images')) {
                 foreach ($request->file('featured_images') as $image) {
-                    $path = $image->store('products/featured', 'public');
-                    $featuredImages[] = $path;
+                    $featuredImages[] = $image->store('products', 'public');
                 }
 
-                // Ensure exactly 2 images (duplicate if only 1 uploaded)
+                // Ensure exactly 2 images
                 if (count($featuredImages) === 1) {
                     $featuredImages[] = $featuredImages[0];
                 }
             } else {
-                // Use default placeholder
-                $featuredImages = ['products/featured/default.jpg'];
+                $featuredImages = ['products/default.jpg'];
             }
 
-            // Handle gallery images upload
             $galleryImages = [];
+
             if ($request->hasFile('gallery_images')) {
                 foreach ($request->file('gallery_images') as $image) {
-                    $path = $image->store('products/gallery', 'public');
-                    $galleryImages[] = $path;
+                    $galleryImages[] = $image->store('products/gallery', 'public');
+                }
+
+                $galleryImages = array_slice($galleryImages, 0, 5);
+            }
+
+            $vendorId = Auth::id() ?? 1;
+
+            $product = Product::create([
+                'name' => $request->validated('name'),
+                'short_description' => $request->validated('short_description'),
+                'description' => $request->validated('description'),
+
+                'price' => $request->validated('price'),
+                'compare_price' => $request->validated('compare_price'),
+                'cost_price' => $request->validated('cost_price'),
+
+                'quantity' => $request->validated('quantity'),
+                'alert_quantity' => $request->validated('alert_quantity') ?? 5,
+                'track_quantity' => $request->validated('track_quantity') ?? true,
+                'allow_backorder' => $request->validated('allow_backorder') ?? false,
+
+                'model_number' => $request->validated('model_number'),
+                'warranty_period' => $request->validated('warranty_period'),
+                'warranty_type' => $request->validated('warranty_type'),
+
+                'specifications' => $request->validated('specifications'),
+
+                'featured_images' => $featuredImages,
+                'gallery_images' => $galleryImages,
+
+                'weight' => $request->validated('weight'),
+                'length' => $request->validated('length'),
+                'width' => $request->validated('width'),
+                'height' => $request->validated('height'),
+
+                'meta_title' => $request->validated('meta_title'),
+                'meta_description' => $request->validated('meta_description'),
+                'meta_keywords' => $request->validated('meta_keywords'),
+
+                'is_featured' => $request->validated('is_featured') ?? false,
+                'is_bestsells' => $request->validated('is_bestsells') ?? false,
+                'is_new' => $request->validated('is_new') ?? true,
+
+                'status' => $request->validated('status'),
+                'stock_status' => $request->validated('stock_status'),
+
+                'category_id' => $request->validated('category_id'),
+                'vendor_id' => $vendorId,
+
+                'discount_percentage' => $request->validated('discount_percentage') ?? 0,
+
+            ]);
+
+            DB::commit();
+
+            flash('Product created successfully!', 'success', 3000);
+            return redirect()->route('admin.products.index');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            if (!empty($featuredImages)) {
+                foreach ($featuredImages as $img) {
+                    Storage::disk('public')->delete($img);
                 }
             }
 
-            // Get vendor ID (in-house vendor - first user or authenticated user)
-            $vendorId = Auth::id() ?? 1;
+            if (!empty($galleryImages)) {
+                foreach ($galleryImages as $img) {
+                    Storage::disk('public')->delete($img);
+                }
+            }
 
-            // Create the product
-            $product = Product::create([
-                'name' => $request->name,
-                'sku' => $request->sku,
-                'short_description' => $request->short_description,
-                'description' => $request->description,
-                'price' => $request->price,
-                'compare_price' => $request->compare_price,
-                'cost_price' => $request->cost_price,
-                'quantity' => $request->quantity,
-                'alert_quantity' => $request->alert_quantity ?? 5,
-                'track_quantity' => $request->track_quantity ?? true,
-                'allow_backorder' => $request->allow_backorder ?? false,
-                'model_number' => $request->model_number,
-                'warranty_period' => $request->warranty_period,
-                'warranty_type' => $request->warranty_type,
-                'specifications' => $request->specifications,
-                'featured_images' => $featuredImages,
-                'gallery_images' => $galleryImages,
-                'weight' => $request->weight,
-                'length' => $request->length,
-                'width' => $request->width,
-                'height' => $request->height,
-                'meta_title' => $request->meta_title,
-                'meta_description' => $request->meta_description,
-                'meta_keywords' => $request->meta_keywords,
-                'is_featured' => $request->is_featured ?? false,
-                'is_bestsells' => $request->is_bestsells ?? false,
-                'is_new' => $request->is_new ?? true,
-                'status' => $request->status,
-                'stock_status' => $request->stock_status,
-                'category_id' => $request->category_id,
-                'brand_id' => $request->brand_id,
-                'vendor_id' => $vendorId,
-            ]);
-
-            return redirect()->route('admin.products.index')
-                ->with('success', 'Product created successfully!');
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Failed to create product. Error: ' . $e->getMessage());
+            flash('Failed to create product', 'error', 3000, $e->getMessage());
+            return back()->withInput();
         }
     }
 
@@ -145,20 +165,12 @@ class ProductController extends Controller
             ->orderBy('name')
             ->get();
 
-        $brands = Brand::where('is_active', true)
-            ->orderBy('name')
-            ->get();
-
         return view('admin.products.edit', [
             'product' => $product,
             'categories' => $categories,
-            'brands' => $brands,
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateProductRequest $request, Product $product)
     {
         try {
@@ -216,39 +228,40 @@ class ProductController extends Controller
                 $galleryImages = array_slice($galleryImages, 0, 5);
             }
 
-            // Update the product
+            // Update the product with validated data
             $product->update([
-                'name' => $request->name,
-                'sku' => $request->sku,
-                'short_description' => $request->short_description,
-                'description' => $request->description,
-                'price' => $request->price,
-                'compare_price' => $request->compare_price,
-                'cost_price' => $request->cost_price,
-                'quantity' => $request->quantity,
-                'alert_quantity' => $request->alert_quantity ?? 5,
-                'track_quantity' => $request->track_quantity ?? true,
-                'allow_backorder' => $request->allow_backorder ?? false,
-                'model_number' => $request->model_number,
-                'warranty_period' => $request->warranty_period,
-                'warranty_type' => $request->warranty_type,
-                'specifications' => $request->specifications,
+                'name' => $request->validated('name'),
+                'sku' => $request->validated('sku'),
+                'slug' => $request->validated('slug'),
+                'short_description' => $request->validated('short_description'),
+                'description' => $request->validated('description'),
+                'price' => $request->validated('price'),
+                'compare_price' => $request->validated('compare_price'),
+                'cost_price' => $request->validated('cost_price'),
+                'quantity' => $request->validated('quantity'),
+                'alert_quantity' => $request->validated('alert_quantity') ?? 5,
+                'track_quantity' => $request->validated('track_quantity') ?? true,
+                'allow_backorder' => $request->validated('allow_backorder') ?? false,
+                'model_number' => $request->validated('model_number'),
+                'warranty_period' => $request->validated('warranty_period'),
+                'warranty_type' => $request->validated('warranty_type'),
+                'specifications' => $request->validated('specifications'),
                 'featured_images' => $featuredImages,
                 'gallery_images' => $galleryImages,
-                'weight' => $request->weight,
-                'length' => $request->length,
-                'width' => $request->width,
-                'height' => $request->height,
-                'meta_title' => $request->meta_title,
-                'meta_description' => $request->meta_description,
-                'meta_keywords' => $request->meta_keywords,
-                'is_featured' => $request->is_featured ?? false,
-                'is_bestsells' => $request->is_bestsells ?? false,
-                'is_new' => $request->is_new ?? true,
-                'status' => $request->status,
-                'stock_status' => $request->stock_status,
-                'category_id' => $request->category_id,
-                'brand_id' => $request->brand_id,
+                'weight' => $request->validated('weight'),
+                'length' => $request->validated('length'),
+                'width' => $request->validated('width'),
+                'height' => $request->validated('height'),
+                'meta_title' => $request->validated('meta_title'),
+                'meta_description' => $request->validated('meta_description'),
+                'meta_keywords' => $request->validated('meta_keywords'),
+                'is_featured' => $request->validated('is_featured') ?? false,
+                'is_bestsells' => $request->validated('is_bestsells') ?? false,
+                'is_new' => $request->validated('is_new') ?? true,
+                'status' => $request->validated('status'),
+                'stock_status' => $request->validated('stock_status'),
+                'category_id' => $request->validated('category_id'),
+                'discount_percentage' => $request->validated('discount_percentage') ?? 0,
             ]);
 
             return redirect()->route('admin.products.index')
@@ -259,6 +272,7 @@ class ProductController extends Controller
                 ->with('error', 'Failed to update product. Error: ' . $e->getMessage());
         }
     }
+
 
     /**
      * Remove the specified resource from storage.

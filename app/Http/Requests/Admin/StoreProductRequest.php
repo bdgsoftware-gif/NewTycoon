@@ -3,7 +3,9 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Str;
 
 class StoreProductRequest extends FormRequest
 {
@@ -12,67 +14,62 @@ class StoreProductRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // Changed to true, adjust authorization as needed
+        return true;
     }
 
     /**
      * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
+        $productId = $this->route('product') ? $this->route('product')->id : null;
+
         return [
-            'name' => 'required|string|max:255',
-            'sku' => 'required|string|max:100|unique:products,sku',
+            'name' => 'required|string|max:255|unique:products,name' . ($productId ? ',' . $productId : ''),
+            'category_id' => 'required|exists:categories,id',
             'short_description' => 'nullable|string|max:500',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'compare_price' => 'nullable|numeric|min:0|gt:price',
-            'cost_price' => 'nullable|numeric|min:0',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0|max:999999.99',
+            'compare_price' => 'nullable|numeric|min:0|max:999999.99|gt:price',
+            'cost_price' => 'nullable|numeric|min:0|max:999999.99',
             'quantity' => 'required|integer|min:0',
-            'alert_quantity' => 'integer|min:0',
+            'alert_quantity' => 'nullable|integer|min:0',
             'track_quantity' => 'boolean',
             'allow_backorder' => 'boolean',
             'model_number' => 'nullable|string|max:100',
-            'warranty_period' => 'nullable|string|max:50',
-            'warranty_type' => 'nullable|in:replacement,service,parts',
-
-            // Specifications as array
+            'warranty_period' => 'nullable|integer|min:0',
+            'warranty_type' => 'nullable|string|in:days,months,years',
             'specifications' => 'nullable|array',
-            'specifications.*' => 'string|max:255',
+            'specifications.*.key' => 'required|string|max:100',
+            'specifications.*.value' => 'required|string|max:255',
 
-            // Featured images (max 2)
-            'featured_images' => 'nullable|array|max:2',
-            'featured_images.*' => 'image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            // Featured Images: max 2, at least 1
+            'featured_images' => 'required|array|min:1|max:2',
+            'featured_images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120|dimensions:min_width=300,min_height=300',
 
-            // Gallery images (max 5)
+            // Gallery Images: max 5
             'gallery_images' => 'nullable|array|max:5',
-            'gallery_images.*' => 'image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'gallery_images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120|dimensions:min_width=300,min_height=300',
 
-            // Physical dimensions
-            'weight' => 'nullable|numeric|min:0',
-            'length' => 'nullable|numeric|min:0',
-            'width' => 'nullable|numeric|min:0',
-            'height' => 'nullable|numeric|min:0',
+            'weight' => 'nullable|numeric|min:0|max:999.99',
+            'length' => 'nullable|numeric|min:0|max:999.99',
+            'width' => 'nullable|numeric|min:0|max:999.99',
+            'height' => 'nullable|numeric|min:0|max:999.99',
 
-            // SEO
-            'meta_title' => 'nullable|string|max:255',
-            'meta_description' => 'nullable|string|max:500',
-            'meta_keywords' => 'nullable|string|max:500',
+            'meta_title' => 'nullable|string|max:70',
+            'meta_description' => 'nullable|string|max:160',
+            'meta_keywords' => 'nullable|string|max:255',
 
-            // Status flags
             'is_featured' => 'boolean',
             'is_bestsells' => 'boolean',
             'is_new' => 'boolean',
+
             'status' => 'required|in:draft,active,inactive,archived',
             'stock_status' => 'required|in:in_stock,out_of_stock,backorder',
 
-            // Relationships
-            'category_id' => 'required|exists:categories,id',
-            'brand_id' => 'nullable|exists:brands,id',
-
-            // For existing featured/gallery images (when updating)
-            'existing_featured_images' => 'nullable|array',
-            'existing_gallery_images' => 'nullable|array',
+            'discount_percentage' => 'nullable|numeric|min:0|max:100',
         ];
     }
 
@@ -82,61 +79,119 @@ class StoreProductRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'The product name is required.',
-            'name.max' => 'The product name may not be greater than 255 characters.',
-            'sku.required' => 'The SKU is required.',
-            'sku.unique' => 'This SKU has already been taken. Please use a different SKU.',
-            'price.required' => 'The price is required.',
-            'price.min' => 'The price must be at least 0.',
-            'compare_price.gt' => 'The compare price must be greater than the selling price.',
-            'quantity.required' => 'The quantity is required.',
-            'quantity.min' => 'The quantity must be at least 0.',
-            'featured_images.max' => 'You can upload maximum 2 featured images.',
-            'featured_images.*.image' => 'Each featured image must be an image file.',
-            'featured_images.*.max' => 'Each featured image may not be greater than 2MB.',
-            'gallery_images.max' => 'You can upload maximum 5 gallery images.',
-            'gallery_images.*.image' => 'Each gallery image must be an image file.',
-            'gallery_images.*.max' => 'Each gallery image may not be greater than 2MB.',
-            'category_id.required' => 'Please select a category.',
-            'category_id.exists' => 'The selected category is invalid.',
-            'brand_id.exists' => 'The selected brand is invalid.',
-            'status.required' => 'Please select a status.',
-            'stock_status.required' => 'Please select a stock status.',
-            'specifications.*.string' => 'Each specification must be a text value.',
-            'specifications.*.max' => 'Each specification may not be greater than 255 characters.',
+            'name.required' => 'Product name is required',
+            'name.unique' => 'This product name already exists',
+            'category_id.required' => 'Please select a category',
+            'description.required' => 'Product description is required',
+            'price.required' => 'Price is required',
+            'price.min' => 'Price must be at least 0',
+            'compare_price.gt' => 'Compare price must be greater than regular price',
+            'quantity.required' => 'Quantity is required',
+            'featured_images.required' => 'At least one featured image is required',
+            'featured_images.max' => 'Maximum 2 featured images allowed',
+            'featured_images.*.image' => 'Featured images must be valid image files',
+            'featured_images.*.max' => 'Featured image size must not exceed 5MB',
+            'gallery_images.max' => 'Maximum 5 gallery images allowed',
+            'gallery_images.*.image' => 'Gallery images must be valid image files',
+            'gallery_images.*.max' => 'Gallery image size must not exceed 5MB',
+            'status.required' => 'Please select a status',
+            'stock_status.required' => 'Please select stock status',
         ];
+    }
+
+    /**
+     * Get custom attributes for validator errors.
+     */
+    public function attributes(): array
+    {
+        return [
+            'featured_images' => 'featured images',
+            'gallery_images' => 'gallery images',
+            'featured_images.*' => 'featured image',
+            'gallery_images.*' => 'gallery image',
+        ];
+    }
+
+    /**
+     * Handle a failed validation attempt.
+     */
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            redirect()->back()
+                ->withInput()
+                ->withErrors($validator)
+                ->with('error', 'Please fix the errors below.')
+        );
     }
 
     /**
      * Prepare the data for validation.
      */
-    protected function prepareForValidation(): void
+    protected function prepareForValidation()
     {
-        // Handle specifications array
-        if ($this->has('specifications') && is_string($this->specifications)) {
+        // Auto-generate slug from name
+        if ($this->has('name')) {
+            $slug = Str::slug($this->name);
+            $originalSlug = $slug;
+            $counter = 1;
+
+            // Check if slug exists (excluding current product)
+            $productId = $this->route('product') ? $this->route('product')->id : null;
+            $query = \App\Models\Product::where('slug', $slug);
+            if ($productId) {
+                $query->where('id', '!=', $productId);
+            }
+
+            // Make slug unique
+            while ($query->exists()) {
+                $slug = $originalSlug . '-' . $counter;
+                $counter++;
+                $query = \App\Models\Product::where('slug', $slug);
+                if ($productId) {
+                    $query->where('id', '!=', $productId);
+                }
+            }
+
             $this->merge([
-                'specifications' => array_filter(
-                    array_map('trim', explode("\n", $this->specifications))
-                ),
+                'slug' => $slug,
             ]);
         }
 
-        // Convert boolean fields
-        $this->merge([
-            'track_quantity' => $this->boolean('track_quantity'),
-            'allow_backorder' => $this->boolean('allow_backorder'),
-            'is_featured' => $this->boolean('is_featured'),
-            'is_bestsells' => $this->boolean('is_bestsells'),
-            'is_new' => $this->boolean('is_new'),
-        ]);
-
-        // Handle empty arrays for existing images
-        if (!$this->has('existing_featured_images')) {
-            $this->merge(['existing_featured_images' => []]);
+        // Auto-generate SKU if not provided
+        if (!$this->has('sku') || empty($this->sku)) {
+            $sku = 'SKU-' . strtoupper(Str::random(3)) . '-' . date('Ymd') . '-' . rand(100, 999);
+            $this->merge([
+                'sku' => $sku,
+            ]);
         }
 
-        if (!$this->has('existing_gallery_images')) {
-            $this->merge(['existing_gallery_images' => []]);
+        // Ensure SKU is unique
+        if ($this->has('sku')) {
+            $sku = $this->sku;
+            $productId = $this->route('product') ? $this->route('product')->id : null;
+            $query = \App\Models\Product::where('sku', $sku);
+            if ($productId) {
+                $query->where('id', '!=', $productId);
+            }
+
+            if ($query->exists()) {
+                $counter = 1;
+                $originalSku = $sku;
+
+                while ($query->exists()) {
+                    $sku = $originalSku . '-' . $counter;
+                    $counter++;
+                    $query = \App\Models\Product::where('sku', $sku);
+                    if ($productId) {
+                        $query->where('id', '!=', $productId);
+                    }
+                }
+
+                $this->merge([
+                    'sku' => $sku,
+                ]);
+            }
         }
     }
 }

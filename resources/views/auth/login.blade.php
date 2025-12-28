@@ -31,7 +31,7 @@
         <div class="flex items-center justify-between mb-6">
             <label for="remember_me" class="flex items-center">
                 <input id="remember_me" type="checkbox" name="remember"
-                    class="rounded border-gray-300 text-primary shadow-sm focus:ring-primary">
+                    class="rounded border-gray-300 text-primary shadow-sm focus:ring-0">
                 <span class="ml-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
             </label>
 
@@ -71,16 +71,20 @@
         </div>
 
         <div class="mt-6 grid grid-cols-2 gap-3">
-            <a href="{{ route('login.google') }}"
-                class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200">
-                <i class="fab fa-google text-red-500 mr-2"></i>
+            <!-- Google Button (Disabled State) -->
+            <a href="{{ route('login.google') }}" aria-disabled="true"
+                class="pointer-events-none opacity-50 cursor-not-allowed w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700">
+                <i class="fab fa-google text-red-500 mr-2" aria-hidden="true"></i>
                 Google
             </a>
-            <a href="{{ route('login.facebook') }}"
-                class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200">
-                <i class="fab fa-facebook text-blue-600 mr-2"></i>
+
+            <!-- Facebook Button (Disabled State) -->
+            <a href="{{ route('login.facebook') }}" aria-disabled="true"
+                class="pointer-events-none opacity-50 cursor-not-allowed w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700">
+                <i class="fab fa-facebook text-blue-600 mr-2" aria-hidden="true"></i>
                 Facebook
             </a>
         </div>
+
     </div>
 @endsection

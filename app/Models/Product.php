@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Product extends Model
 {
@@ -95,6 +96,54 @@ class Product extends Model
         'specifications_array',
     ];
 
+    protected static function booted()
+    {
+        static::creating(function (Product $product) {
+            // Generate slug once (if missing)
+            if (blank($product->slug)) {
+                $product->slug = $product->generateUniqueSlug();
+            }
+
+            // Generate SKU (if missing)
+            if (blank($product->sku)) {
+                $product->sku = $product->generateUniqueSku();
+            }
+        });
+    }
+
+    /**
+     * Generate unique slug
+     */
+    public function generateUniqueSlug(?int $excludeId = null): string
+    {
+        $baseSlug = Str::slug($this->name);
+        $slug = $baseSlug;
+        $counter = 1;
+
+        while (
+            static::where('slug', $slug)
+            ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))
+            ->exists()
+        ) {
+            $slug = "{$baseSlug}-{$counter}";
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    /**
+     * Generate unique SKU
+     */
+    public function generateUniqueSku(): string
+    {
+        do {
+            $sku = 'SKU-' . now()->format('YmdHis') . '-' . strtoupper(Str::random(4));
+        } while (static::where('sku', $sku)->exists());
+
+        return $sku;
+    }
+
     /**
      * Get the category that owns the product.
      */
@@ -103,21 +152,6 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
-    /**
-     * Get the brand that owns the product.
-     */
-    // public function brand(): BelongsTo
-    // {
-    //     return $this->belongsTo(Brand::class);
-    // }
-
-    /**
-     * Get the vendor that owns the product.
-     */
-    // public function vendor(): BelongsTo
-    // {
-    //     return $this->belongsTo(User::class, 'vendor_id');
-    // }
 
     /**
      * Get the product's reviews.

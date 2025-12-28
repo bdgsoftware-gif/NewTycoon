@@ -48,7 +48,7 @@
             <button type="submit"
                 class="bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-lg font-medium transition-colors duration-200 shadow-sm hover:shadow flex items-center">
                 <i class="fas fa-paper-plane mr-2"></i>
-                {{ __('Email Password Reset Link') }}
+                {{ __('Reset Password') }}
             </button>
         </div>
     </form>

@@ -139,6 +139,10 @@ class CartController extends Controller
             // Refresh cart data
             $cart->refresh();
 
+            // Get updated item
+            $updatedItem = $cart->items()->where('product_id', $product->id)->first();
+            $itemTotal = $updatedItem ? $updatedItem->quantity * $updatedItem->price : 0;
+
             $response = [
                 'success' => true,
                 'message' => $quantity == 0 ? 'Item removed from cart' : 'Cart updated successfully',
@@ -146,7 +150,7 @@ class CartController extends Controller
                 'cart_count' => $cart->total_items,
                 'cart_total' => format_currency($cart->subtotal),
                 'cart_subtotal' => format_currency($cart->subtotal),
-                'item_total' => $quantity > 0 ? format_currency($quantity * ($cart->items()->where('product_id', $product->id)->first()->price ?? 0)) : '0.00'
+                'item_total' => format_currency($itemTotal) // Make sure this is included
             ];
 
             if ($request->expectsJson()) {
