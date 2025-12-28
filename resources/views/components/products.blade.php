@@ -14,7 +14,7 @@
                     <!-- Product Image with Overlay -->
                     <a href="{{ route('product.show', $product->slug) }}" class="block relative">
                         <div class="relative w-full aspect-square bg-gray-100 overflow-hidden">
-                            <img src="{{ asset($product['featured_images'][0]) }}"
+                            <img src="{{ $product->featured_image_url }}"
                                 class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105">
 
                             <!-- Product Badges -->

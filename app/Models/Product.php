@@ -225,4 +225,20 @@ class Product extends Model
     {
         return $this->stock_status === 'in_stock';
     }
+    // Single Image fetching
+    public function getFeaturedImageUrlAttribute(): string
+    {
+        $image = $this->featured_images[0] ?? null;
+
+        return $image
+            ? asset('storage/' . $image)
+            : asset('images/no-image.jpg');
+    }
+    // Multiple Images fetching
+    public function getFeaturedImagesUrlsAttribute(): array
+    {
+        return collect($this->featured_images ?? [])
+            ->map(fn($img) => asset('storage/' . $img))
+            ->toArray();
+    }
 }

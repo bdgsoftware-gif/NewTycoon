@@ -55,7 +55,7 @@ class HomeController extends Controller
         $offerProducts = $offerAllData['offerProducts'] ?? [];
 
         $userStories = $this->getUserStories();
-        flash('Welcome Home', 'success');
+        
 
         return view('frontend.home', compact(
             'heroSlides',

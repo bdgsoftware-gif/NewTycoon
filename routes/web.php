@@ -38,14 +38,13 @@ Route::get('/brands', [ProductController::class, 'brands'])->name('brands.index'
 Route::get('/search/suggest', [SearchController::class, 'suggest'])->name('search.suggest');
 Route::get('/search', [SearchController::class, 'search'])->name('search');
 
-// Cart Routes (available for guests)
+// Cart Routes (available for guests and user)
 Route::prefix('cart')->name('cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
     Route::post('/add/{product}', [CartController::class, 'add'])->name('add');
     Route::post('/update/{product}', [CartController::class, 'update'])->name('update');
     Route::post('/remove/{product}', [CartController::class, 'remove'])->name('remove');
     Route::post('/clear', [CartController::class, 'clear'])->name('clear');
-    Route::get('/count', [CartController::class, 'count'])->name('count');
 });
 
 // Wishlist (requires auth)

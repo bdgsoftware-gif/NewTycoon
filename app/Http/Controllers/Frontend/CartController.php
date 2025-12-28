@@ -26,14 +26,14 @@ class CartController extends Controller
     {
         // Validate request
         $request->validate([
-            'quantity' => 'nullable|integer|min:1',
+            'quantity' => 'required|integer|min:1|max:100'
         ]);
 
         $quantity = $request->quantity ?? 1;
 
         // Check stock availability
         if ($product->track_quantity && $product->quantity < $quantity && !$product->allow_backorder) {
-            if ($request->ajax()) {
+            if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Product is out of stock',
@@ -72,7 +72,7 @@ class CartController extends Controller
             ];
 
             // AJAX response
-            if ($request->ajax()) {
+            if ($request->expectsJson()) {
                 return response()->json($response);
             }
 
@@ -88,7 +88,7 @@ class CartController extends Controller
                 'cart_count' => Cart::getCurrentCart()->total_items ?? 0
             ];
 
-            if ($request->ajax()) {
+            if ($request->expectsJson()) {
                 return response()->json($errorResponse, 500);
             }
 
@@ -123,7 +123,7 @@ class CartController extends Controller
                             'cart_count' => $cart->total_items
                         ];
 
-                        if ($request->ajax()) {
+                        if ($request->expectsJson()) {
                             return response()->json($response, 400);
                         }
 
@@ -149,7 +149,7 @@ class CartController extends Controller
                 'item_total' => $quantity > 0 ? format_currency($quantity * ($cart->items()->where('product_id', $product->id)->first()->price ?? 0)) : '0.00'
             ];
 
-            if ($request->ajax()) {
+            if ($request->expectsJson()) {
                 return response()->json($response);
             }
 
@@ -163,7 +163,7 @@ class CartController extends Controller
                 'cart_count' => $cart->total_items ?? 0
             ];
 
-            if ($request->ajax()) {
+            if ($request->expectsJson()) {
                 return response()->json($errorResponse, 500);
             }
 
@@ -196,7 +196,7 @@ class CartController extends Controller
                 'product_name' => $product->name
             ];
 
-            if ($request->ajax()) {
+            if ($request->expectsJson()) {
                 return response()->json($response);
             }
 
@@ -210,7 +210,7 @@ class CartController extends Controller
                 'cart_count' => Cart::getCurrentCart()->total_items ?? 0
             ];
 
-            if ($request->ajax()) {
+            if ($request->expectsJson()) {
                 return response()->json($errorResponse, 500);
             }
 
@@ -239,7 +239,7 @@ class CartController extends Controller
                 'cart_subtotal' => format_currency(0)
             ];
 
-            if ($request->ajax()) {
+            if ($request->expectsJson()) {
                 return response()->json($response);
             }
 
@@ -253,7 +253,7 @@ class CartController extends Controller
                 'cart_count' => Cart::getCurrentCart()->total_items ?? 0
             ];
 
-            if ($request->ajax()) {
+            if ($request->expectsJson()) {
                 return response()->json($errorResponse, 500);
             }
 
@@ -283,7 +283,7 @@ class CartController extends Controller
      */
     public function count(Request $request)
     {
-        if (!$request->ajax()) {
+        if (!$request->expectsJson()) {
             abort(404);
         }
 

@@ -1,51 +1,42 @@
 class CartManager {
     constructor() {
-        this.isProcessing = false;
         this.init();
     }
 
     init() {
         this.initAddToCartForms();
         this.initCartUpdates();
-        this.initCartCountPolling();
+        // this.initCartCountPolling();
     }
 
     initAddToCartForms() {
         // Event delegation for dynamic content
-        document.addEventListener("click", (e) => {
-            const button =
-                e.target.closest(".add-to-cart-btn") ||
-                (e.target.closest("button") &&
-                    e.target.closest(".add-to-cart-form"));
+        document.addEventListener("submit", (e) => {
+            const form = e.target.closest(".add-to-cart-form");
+            if (!form) return;
 
-            if (button && !button.disabled && !this.isProcessing) {
-                e.preventDefault();
-                e.stopPropagation();
+            e.preventDefault();
+            const button = form.querySelector(".add-to-cart-btn");
+            if (!button || button.disabled) return;
 
-                const form = button.closest(".add-to-cart-form");
-                if (form) {
-                    this.handleAddToCart(form, button);
-                }
-            }
+            this.handleAddToCart(form, button);
         });
 
         // Direct form listeners
-        document.querySelectorAll(".add-to-cart-form").forEach((form) => {
-            form.addEventListener("submit", async (e) => {
-                e.preventDefault();
-                const button = form.querySelector(".add-to-cart-btn");
-                if (button && !button.disabled) {
-                    await this.handleAddToCart(form, button);
-                }
-            });
-        });
+        // document.querySelectorAll(".add-to-cart-form").forEach((form) => {
+        //     form.addEventListener("submit", async (e) => {
+        //         e.preventDefault();
+        //         const button = form.querySelector(".add-to-cart-btn");
+        //         if (button && !button.disabled) {
+        //             await this.handleAddToCart(form, button);
+        //         }
+        //     });
+        // });
     }
 
     async handleAddToCart(form, button) {
-        if (this.isProcessing) {
-            return;
-        }
-        this.isProcessing = true;
+        if (button.dataset.loading === "true") return;
+        button.dataset.loading = "true";
         const url = form.action;
         const token =
             form.querySelector('input[name="_token"]')?.value ||
@@ -53,7 +44,7 @@ class CartManager {
 
         if (!token) {
             this.showFlash("Security error. Please refresh the page.", "error");
-            this.isProcessing = false;
+            button.dataset.loading = "false";
             return;
         }
         // Save original state
@@ -112,7 +103,7 @@ class CartManager {
                 button.innerHTML = originalHTML;
                 button.disabled = false;
                 button.className = originalClasses;
-                this.isProcessing = false;
+                button.dataset.loading = "false";
             }, 1500);
         } catch (error) {
             // Show error message
@@ -125,7 +116,7 @@ class CartManager {
             button.innerHTML = originalHTML;
             button.disabled = false;
             button.className = originalClasses;
-            this.isProcessing = false;
+            button.dataset.loading = "false";
         }
     }
 
@@ -178,39 +169,39 @@ class CartManager {
      * Show flash notification
      */
     showFlash(message, type = "success", duration = 3000, description = "") {
-        // Use window.flash if available
         if (typeof window.flash === "function") {
             window.flash(message, type, duration, description);
-            return;
+        } else {
+            console.log(`[${type}] ${message}`);
         }
     }
 
     /**
      * Fallback notification
      */
-    showFallbackNotification(message, type = "success") {
-        const notification = document.createElement("div");
-        notification.className = `fixed top-20 right-4 z-[9999] px-4 py-3 rounded-lg shadow-lg transform transition-all duration-300 ${
-            type === "success"
-                ? "bg-green-500 text-white"
-                : type === "error"
-                ? "bg-red-500 text-white"
-                : type === "warning"
-                ? "bg-yellow-500 text-black"
-                : "bg-blue-500 text-white"
-        }`;
-        notification.textContent = message;
-        notification.style.maxWidth = "300px";
+    // showFallbackNotification(message, type = "success") {
+    //     const notification = document.createElement("div");
+    //     notification.className = `fixed top-56 right-4 z-[9999] px-4 py-3 rounded-lg shadow-lg transform transition-all duration-300 ${
+    //         type === "success"
+    //             ? "bg-green-500 text-white"
+    //             : type === "error"
+    //             ? "bg-red-500 text-white"
+    //             : type === "warning"
+    //             ? "bg-yellow-500 text-black"
+    //             : "bg-blue-500 text-white"
+    //     }`;
+    //     notification.textContent = message;
+    //     notification.style.maxWidth = "300px";
 
-        document.body.appendChild(notification);
+    //     document.body.appendChild(notification);
 
-        // Auto-remove with animation
-        setTimeout(() => {
-            notification.style.opacity = "0";
-            notification.style.transform = "translateX(100%)";
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
-    }
+    //     // Auto-remove with animation
+    //     setTimeout(() => {
+    //         notification.style.opacity = "0";
+    //         notification.style.transform = "translateX(100%)";
+    //         setTimeout(() => notification.remove(), 300);
+    //     }, 3000);
+    // }
 
     /**
      * Initialize cart update/remove functionality
@@ -321,6 +312,7 @@ class CartManager {
                     "X-CSRF-TOKEN": token,
                     Accept: "application/json",
                     "Content-Type": "application/json",
+                    "X-Requested-With": "XMLHttpRequest",
                 },
             });
 
@@ -410,35 +402,35 @@ class CartManager {
     /**
      * Initialize cart count polling for real-time updates
      */
-    initCartCountPolling() {
-        // Update cart count every 30 seconds
-        setInterval(() => {
-            this.fetchCartCount();
-        }, 30000);
+    // initCartCountPolling() {
+    //     // Update cart count every 30 seconds
+    //     setInterval(() => {
+    //         this.fetchCartCount();
+    //     }, 30000);
 
-        // Also update when page gains focus
-        document.addEventListener("visibilitychange", () => {
-            if (!document.hidden) {
-                this.fetchCartCount();
-            }
-        });
-    }
+    //     // Also update when page gains focus
+    //     document.addEventListener("visibilitychange", () => {
+    //         if (!document.hidden) {
+    //             this.fetchCartCount();
+    //         }
+    //     });
+    // }
 
     /**
      * Fetch current cart count from server
      */
-    async fetchCartCount() {
-        try {
-            const response = await fetch("/cart/count");
-            const data = await response.json();
+    // async fetchCartCount() {
+    //     try {
+    //         const response = await fetch("/cart/count");
+    //         const data = await response.json();
 
-            if (data.success !== false && data.count !== undefined) {
-                this.updateCartCount(data.count);
-            }
-        } catch (error) {
-            console.error("Failed to fetch cart count:", error);
-        }
-    }
+    //         if (data.success !== false && data.count !== undefined) {
+    //             this.updateCartCount(data.count);
+    //         }
+    //     } catch (error) {
+    //         console.error("Failed to fetch cart count:", error);
+    //     }
+    // }
 }
 
 // Initialize cart manager

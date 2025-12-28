@@ -35,11 +35,9 @@
 
 <body class="font-sans antialiased bg-white">
     <div class="min-h-screen mx-auto max-w-full">
+        @include('frontend.partials.navbar')
         <!-- Flash Messages Container -->
         <x-flash-container />
-
-        @include('frontend.partials.navbar')
-
         <main class="pt-16">
             @yield('content')
         </main>

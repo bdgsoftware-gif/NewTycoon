@@ -1,3 +1,4 @@
+@import "./flash.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -105,46 +106,3 @@
     animation: gradient-x 3s ease infinite;
 }
 
-/* Flash message specific styles */
-.flash-message {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateX(100%);
-    opacity: 0;
-}
-
-.flash-message.show {
-    transform: translateX(0);
-    opacity: 1;
-}
-
-.flash-message.hide {
-    transform: translateX(100%);
-    opacity: 0;
-}
-
-/* Better progress bar */
-.flash-progress-bar {
-    transition: width 50ms linear !important;
-}
-
-/* Hover effect for flash messages */
-.flash-message:hover {
-    transform: translateX(0) scale(1.02);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
-        0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-/* Responsive adjustments */
-@media (max-width: 640px) {
-    .flash-messages-container {
-        width: calc(100% - 2rem) !important;
-        right: 1rem !important;
-        left: 1rem !important;
-        max-width: none !important;
-    }
-
-    .flash-message {
-        width: 100% !important;
-        max-width: none !important;
-    }
-}
