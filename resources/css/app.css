@@ -1,12 +1,45 @@
+/* ============= Imports ============= */
 @import "./flash.css";
+@import "./gsap.css";
+
+/* ============= Tailwind Base ============= */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ============= Global Helpers ============= */
 [x-cloak] {
     display: none !important;
 }
 
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* ============= Global Animations ============= */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(200%);
+    }
+}
+
+/* ============= Tailwind Components Layer ============= */
 @layer components {
     .suggestion-item {
         @apply p-3 rounded-lg cursor-pointer transform transition-transform transition-colors duration-200 hover:bg-gray-50;
@@ -40,47 +73,19 @@
         @apply text-xs text-gray-500 truncate;
     }
 }
-.no-scrollbar::-webkit-scrollbar {
-    display: none;
-}
 
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.animate-spin {
-    animation: spin 1s linear infinite;
-}
-/* ================================
-   Swiper + Shimmer Animations
-   ================================ */
-@keyframes shimmer {
-    0% {
-        transform: translateX(-100%);
-    }
-    100% {
-        transform: translateX(200%);
-    }
-}
-/* Custom Swiper progress bar styles */
+/* ============= Swiper Custom Styles ============= */
 .heroSwiper .swiper-progress-fill {
     will-change: transform;
     transform-origin: left center;
 }
 
-/* Optional glowing effect */
 .heroSwiper .swiper-progress-fill::after {
     content: "";
     position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     width: 4px;
+    margin-left: auto;
     background: white;
     border-radius: 2px;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
@@ -89,13 +94,13 @@
 .heroSwiper .swiper-navigation-icon {
     display: none !important;
 }
-/*  Categories Section */
+
+/* ============= Categories Section ============= */
 @keyframes gradient-x {
     0%,
     100% {
         background-position: 0% 50%;
     }
-
     50% {
         background-position: 100% 50%;
     }
@@ -105,4 +110,79 @@
     background-size: 200% 200%;
     animation: gradient-x 3s ease infinite;
 }
+
+/* ============= Attention / Shake Animation ============= */
+@keyframes attention-shake {
+    0% {
+        transform: translateX(0);
+    }
+    10% {
+        transform: translateX(-4px);
+    }
+    20% {
+        transform: translateX(4px);
+    }
+    30% {
+        transform: translateX(-4px);
+    }
+    40% {
+        transform: translateX(4px);
+    }
+    50%,
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.attention-shake {
+    animation: attention-shake 1s ease-in-out infinite;
+    animation-delay: 3s;
+}
+
+.attention-shake:hover {
+    animation: none;
+}
+
+/* ============= Button Shine Effect ============= */
+@keyframes button-shine {
+    0% {
+        transform: translateX(-120%) skewX(-20deg);
+    }
+    100% {
+        transform: translateX(220%) skewX(-20deg);
+    }
+}
+
+.btn-shine {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-shine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 50%;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255, 255, 255, 0.6),
+        transparent
+    );
+    transform: translateX(-120%) skewX(-20deg);
+    animation: button-shine 2.8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.btn-shine > * {
+    position: relative;
+    z-index: 20;
+}
+
+.btn-shine:hover::after {
+    animation: none;
+}
+
+/* ============= Text rolling Effect ============= */
 

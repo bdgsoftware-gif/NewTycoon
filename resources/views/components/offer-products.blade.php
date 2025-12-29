@@ -1,5 +1,5 @@
 <!-- Offers Section -->
-<section class="relative w-full py-12 md:py-16 overflow-hidden px-4">
+<section class="relative w-full py-12 md:py-16 px-4">
     {{-- Top Blur/Shadow Effect for smooth transition from previous section --}}
     <div class="absolute top-0 left-0 right-0 h-10 bg-gradient-to-b from-gray-50 via-cyan-400/20 to-transparent z-20">
     </div>
@@ -54,7 +54,7 @@ if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/40 to-black/20"></div>
 
     {{-- CONTENT constrained to 8xl --}}
-    <div class="relative max-w-8xl mx-auto overflow-hidden">
+    <div class="relative max-w-8xl mx-auto overflow-hidden  px-4">
         {{-- TOP BANNER AREA --}}
         <div class="w-full relative mb-4 overflow-hidden rounded-xl">
             {{-- Background Image (Full Width + Full Height) --}}
@@ -70,7 +70,7 @@ if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
             @endif
 
             {{-- Content on top of the image --}}
-            <div class="relative z-10 p-4 md:p-6">
+            <div class="relative z-10 p-4 md:p-6 offer-products-banner-content">
                 <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
 
                     {{-- Left: Title & Info --}}
@@ -163,7 +163,7 @@ if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
                 </div>
 
                 {{-- Swiper Slider --}}
-                <div class="swiper offer-products-swiper relative pb-10">
+                <div class="swiper offer-products-swiper relative z-[40] pb-10">
                     <div class="swiper-wrapper">
                         @foreach ($offerProducts as $product)
                             @php
@@ -325,23 +325,32 @@ if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
                     </div>
 
                     {{-- Swiper Navigation --}}
-                    {{-- @if (count($offerProducts) > 1)
-                        <div
-                            class="swiper-button-next !text-white !bg-black/30 backdrop-blur-sm !w-10 !h-10 md:!w-12 md:!h-12 !rounded-full after:!text-lg hover:!bg-black/50">
+                    @if (count($offerProducts) > 1)
+                        <!-- Swiper Navigation -->
+                        <div class="hidden md:flex absolute inset-y-0 left-0 items-center z-[60] pointer-events-none">
+                            <button type="button" aria-label="Previous slide"
+                                class="swiper-button-prev pointer-events-auto w-6 h-6 xl:w-8 xl:h-8 2xl:w-12 2xl:h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:border-primary/30 transition-all duration-300 flex items-center justify-center group active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">
+
+                                <svg class="w-3 h-3 2xl:w-5 2xl:h-5 text-gray-700 group-hover:text-primary transition-colors"
+                                    viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                                </svg>
+                            </button>
                         </div>
-                        <div
-                            class="swiper-button-prev !text-white !bg-black/30 backdrop-blur-sm !w-10 !h-10 md:!w-12 md:!h-12 !rounded-full after:!text-lg hover:!bg-black/50">
+
+                        <div class="hidden md:flex absolute inset-y-0 right-0 items-center z-[60] pointer-events-none">
+                            <button type="button" aria-label="Next slide"
+                                class="swiper-button-next pointer-events-auto w-6 h-6 xl:w-8 xl:h-8 2xl:w-12 2xl:h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 hover:border-primary/30 transition-all duration-300 flex items-center justify-center group active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">
+
+                                <svg class="w-3 h-3 2xl:w-5 2xl:h-5 text-gray-700 group-hover:text-primary transition-colors"
+                                    viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z" />
+                                </svg>
+                            </button>
                         </div>
-                    @endif --}}
+                    @endif
 
                 </div>
-            </div>
-        @else
-            {{-- No Products Message --}}
-            <div class="text-center py-12 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20">
-                <div class="text-5xl mb-4">😔</div>
-                <h3 class="text-white text-xl font-semibold mb-2">No Offers Available</h3>
-                <p class="text-white/80">Check back later for amazing deals!</p>
             </div>
         @endif
     </div>
@@ -448,18 +457,6 @@ if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
                     });
                 }
             }
-
-            // Wishlist button functionality
-            document.querySelectorAll('.wishlist-btn').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    // Here you can add your wishlist AJAX functionality
-                    console.log('Add to wishlist clicked');
-                    // Example: addToWishlist(productId);
-                });
-            });
         });
     </script>
 @endpush

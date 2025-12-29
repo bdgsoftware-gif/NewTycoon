@@ -4,7 +4,7 @@ class FlashMessageSystem {
         this.messages = [];
         this.container = null;
         this.init();
-        console.log("Hello I am Flash");
+        // console.log("Hello I am Flash");
     }
 
     init() {

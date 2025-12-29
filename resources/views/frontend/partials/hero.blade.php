@@ -23,32 +23,33 @@
                     @if ($slide['has_content'])
                         <div class="absolute inset-0 flex items-center">
                             <div class="max-w-8xl mx-auto px-4 md:px-16 2xl:px-4 w-full">
-                                <div
-                                    class="max-w-2xl {{ $slide['content_position'] === 'right' ? 'ml-auto text-right' : ($slide['content_position'] === 'center' ? 'mx-auto text-center' : '') }}">
+                                <div class="max-w-2xl {{ $slide['content_position'] === 'right' ? 'ml-auto text-right' : ($slide['content_position'] === 'center' ? 'mx-auto text-center' : '') }}"
+                                    data-hero-content data-content-position>
 
                                     @if (!empty($slide['badge']))
-                                        <div
-                                            class="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-6 font-inter">
+                                        <div class="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-6 font-inter"
+                                            data-hero-badge>
                                             <span class="text-sm font-semibold text-white">{{ $slide['badge'] }}</span>
                                         </div>
                                     @endif
 
                                     @if (!empty($slide['title']))
-                                        <h1
-                                            class="text-4xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight mb-4 font-quantico">
+                                        <h1 class="text-4xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight mb-4 font-quantico"
+                                            data-hero-title>
                                             {!! $slide['title'] !!}
                                         </h1>
                                     @endif
 
                                     @if (!empty($slide['subtitle']))
-                                        <p class="text-base md:text-xl text-white/90 leading-relaxed mb-8 font-inter">
+                                        <p class="text-base md:text-xl text-white/90 leading-relaxed mb-8 font-inter"
+                                            data-hero-subtitle>
                                             {{ $slide['subtitle'] }}
                                         </p>
                                     @endif
 
                                     @if ($slide['has_cta'] && !empty($slide['cta_buttons']))
-                                        <div
-                                            class="flex flex-wrap items-center gap-2 {{ $slide['content_position'] === 'center' ? 'justify-center' : ($slide['content_position'] === 'right' ? 'justify-end' : 'justify-start') }}">
+                                        <div class="flex flex-wrap items-center gap-2 {{ $slide['content_position'] === 'center' ? 'justify-center' : ($slide['content_position'] === 'right' ? 'justify-end' : 'justify-start') }}"
+                                            data-hero-cta>
 
                                             @foreach ($slide['cta_buttons'] as $button)
                                                 <a href="{{ $button['url'] }}"
@@ -194,6 +195,7 @@
                         updateSlideCounter(this);
                         updateProgressBar(this, 0);
                         setupAutoplayToggle(this);
+                        
                     },
                     slideChange: function() {
                         updateSlideCounter(this);
