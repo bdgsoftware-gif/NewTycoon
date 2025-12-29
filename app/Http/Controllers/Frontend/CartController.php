@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Frontend;
 
-use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 
 class CartController extends Controller
 {
@@ -24,207 +24,162 @@ class CartController extends Controller
      */
     public function add(Request $request, Product $product)
     {
-        // Validate request
-        $request->validate([
-            'quantity' => 'required|integer|min:1|max:100'
+        $validated = $request->validate([
+            'quantity' => 'required|integer|min:1|max:100',
         ]);
 
-        $quantity = $request->quantity ?? 1;
-
-        // Check stock availability
-        if ($product->track_quantity && $product->quantity < $quantity && !$product->allow_backorder) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Product is out of stock',
-                    'type' => 'error',
-                    'cart_count' => Cart::getCurrentCart()->total_items ?? 0
-                ], 400);
-            }
-
-            flash('Product is out of stock', 'error', 3000, 'Please try another product');
-            return redirect()->back();
-        }
+        $quantity = (int) $validated['quantity'];
 
         try {
-            // Get current cart
             $cart = Cart::getCurrentCart();
-
-            // Add item to cart
             $cart->addItem($product->id, $quantity);
-
-            // Clear cart cache
-            Cache::forget("cart_" . (auth()->id() ?? session()->getId()));
-
-            // Refresh cart to get updated data
             $cart->refresh();
-            $cartCount = $cart->total_items;
 
-            // Prepare response
             $response = [
                 'success' => true,
                 'message' => "{$product->name} added to cart",
-                'type' => 'success',
-                'cart_count' => $cartCount,
-                'product_name' => $product->name,
-                'cart_total' => format_currency($cart->subtotal),
-                'cart_subtotal' => format_currency($cart->subtotal)
+                'cart_count' => $cart->total_items,
+                'cart_subtotal' => format_currency($cart->subtotal),
             ];
 
-            // AJAX response
             if ($request->expectsJson()) {
                 return response()->json($response);
             }
 
-            // Non-AJAX response
-            flash($response['message'], $response['type'], 3000, "Item successfully added to your shopping cart");
+            flash(
+                $response['message'],
+                'success',
+                3000,
+                'Item successfully added to your shopping cart'
+            );
+
             return redirect()->back();
-        } catch (\Exception $e) {
-            // Error handling
+        } catch (\Throwable $e) {
+            Log::error('Add to cart failed', [
+                'product_id' => $product->id,
+                'quantity' => $quantity,
+                'error' => $e->getMessage(),
+            ]);
+
             $errorResponse = [
                 'success' => false,
-                'message' => 'Failed to add to cart: ' . $e->getMessage(),
-                'type' => 'error',
-                'cart_count' => Cart::getCurrentCart()->total_items ?? 0
+                'message' => 'Unable to add product to cart. Please try again.',
+                'cart_count' => Cart::getCurrentCart()->total_items ?? 0,
             ];
 
             if ($request->expectsJson()) {
-                return response()->json($errorResponse, 500);
+                return response()->json($errorResponse, 422);
             }
 
-            flash($errorResponse['message'], $errorResponse['type'], 3000, 'Please try again');
+            flash($errorResponse['message'], 'error', 3000);
             return redirect()->back();
         }
     }
 
     /**
-     * Update cart item quantity (AJAX compatible)
+     * Update cart item quantity
      */
     public function update(Request $request, Product $product)
     {
-        $request->validate([
-            'quantity' => 'required|integer|min:0'
+        $validated = $request->validate([
+            'quantity' => 'required|integer|min:0|max:100',
         ]);
 
-        $cart = Cart::getCurrentCart();
-        $quantity = $request->quantity;
+        $quantity = (int) $validated['quantity'];
 
         try {
-            // Check stock if increasing quantity
-            if ($quantity > 0) {
-                $cartItem = $cart->items()->where('product_id', $product->id)->first();
-                if ($cartItem && $quantity > $cartItem->quantity) {
-                    $increaseAmount = $quantity - $cartItem->quantity;
-                    if ($product->track_quantity && $product->quantity < $increaseAmount && !$product->allow_backorder) {
-                        $response = [
-                            'success' => false,
-                            'message' => 'Not enough stock available',
-                            'type' => 'warning',
-                            'cart_count' => $cart->total_items
-                        ];
+            $cart = Cart::getCurrentCart();
 
-                        if ($request->expectsJson()) {
-                            return response()->json($response, 400);
-                        }
-
-                        flash($response['message'], $response['type'], 3000, 'Only ' . $product->quantity . ' items available');
-                        return redirect()->back();
-                    }
-                }
+            // Quantity 0 means remove
+            if ($quantity === 0) {
+                $cart->removeItem($product->id);
+            } else {
+                $cart->updateItem($product->id, $quantity);
             }
 
-            $cart->updateItem($product->id, $quantity);
-            Cache::forget("cart_" . (auth()->id() ?? session()->getId()));
-
-            // Refresh cart data
             $cart->refresh();
-
-            // Get updated item
-            $updatedItem = $cart->items()->where('product_id', $product->id)->first();
-            $itemTotal = $updatedItem ? $updatedItem->quantity * $updatedItem->price : 0;
 
             $response = [
                 'success' => true,
-                'message' => $quantity == 0 ? 'Item removed from cart' : 'Cart updated successfully',
-                'type' => 'success',
+                'message' => 'Cart updated successfully',
                 'cart_count' => $cart->total_items,
-                'cart_total' => format_currency($cart->subtotal),
                 'cart_subtotal' => format_currency($cart->subtotal),
-                'item_total' => format_currency($itemTotal) // Make sure this is included
+                'item_quantity' => $quantity,
             ];
 
             if ($request->expectsJson()) {
                 return response()->json($response);
             }
 
-            flash($response['message'], $response['type'], 3000, 'Your cart has been updated');
+            flash($response['message'], 'success', 3000);
             return redirect()->route('cart.index');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            Log::error('Cart update failed', [
+                'product_id' => $product->id,
+                'quantity' => $quantity,
+                'error' => $e->getMessage(),
+            ]);
+
             $errorResponse = [
                 'success' => false,
-                'message' => 'Failed to update cart: ' . $e->getMessage(),
-                'type' => 'error',
-                'cart_count' => $cart->total_items ?? 0
+                'message' => 'Unable to update cart. Please try again.',
+                'cart_count' => Cart::getCurrentCart()->total_items ?? 0,
             ];
 
             if ($request->expectsJson()) {
-                return response()->json($errorResponse, 500);
+                return response()->json($errorResponse, 422);
             }
 
-            flash($errorResponse['message'], $errorResponse['type'], 3000, 'Please try again');
+            flash($errorResponse['message'], 'error', 3000);
             return redirect()->back();
         }
     }
 
     /**
-     * Remove item from cart (AJAX compatible)
+     * Remove item from cart
      */
     public function remove(Request $request, Product $product)
     {
         try {
             $cart = Cart::getCurrentCart();
             $cart->removeItem($product->id);
-
-            Cache::forget("cart_" . (auth()->id() ?? session()->getId()));
-
-            // Refresh cart data
             $cart->refresh();
 
             $response = [
                 'success' => true,
-                'message' => 'Product removed from cart',
-                'type' => 'success',
+                'message' => 'Item removed from cart',
                 'cart_count' => $cart->total_items,
-                'cart_total' => format_currency($cart->subtotal),
                 'cart_subtotal' => format_currency($cart->subtotal),
-                'product_name' => $product->name
             ];
 
             if ($request->expectsJson()) {
                 return response()->json($response);
             }
 
-            flash($response['message'], $response['type'], 3000, $product->name . ' has been removed from your cart');
+            flash($response['message'], 'success', 3000);
             return redirect()->route('cart.index');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            Log::error('Cart remove failed', [
+                'product_id' => $product->id,
+                'error' => $e->getMessage(),
+            ]);
+
             $errorResponse = [
                 'success' => false,
-                'message' => 'Failed to remove item: ' . $e->getMessage(),
-                'type' => 'error',
-                'cart_count' => Cart::getCurrentCart()->total_items ?? 0
+                'message' => 'Unable to remove item. Please try again.',
             ];
 
             if ($request->expectsJson()) {
-                return response()->json($errorResponse, 500);
+                return response()->json($errorResponse, 422);
             }
 
-            flash($errorResponse['message'], $errorResponse['type'], 3000, 'Please try again');
+            flash($errorResponse['message'], 'error', 3000);
             return redirect()->back();
         }
     }
 
     /**
-     * Clear entire cart (AJAX compatible)
+     * Clear entire cart
      */
     public function clear(Request $request)
     {
@@ -232,55 +187,38 @@ class CartController extends Controller
             $cart = Cart::getCurrentCart();
             $cart->clear();
 
-            Cache::forget("cart_" . (auth()->id() ?? session()->getId()));
-
             $response = [
                 'success' => true,
                 'message' => 'Cart cleared successfully',
-                'type' => 'success',
                 'cart_count' => 0,
-                'cart_total' => format_currency(0),
-                'cart_subtotal' => format_currency(0)
+                'cart_subtotal' => format_currency(0),
             ];
 
             if ($request->expectsJson()) {
                 return response()->json($response);
             }
 
-            flash($response['message'], $response['type'], 3000, 'All items have been removed from your cart');
+            flash($response['message'], 'success', 3000);
             return redirect()->route('cart.index');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            Log::error('Cart clear failed', [
+                'error' => $e->getMessage(),
+            ]);
+
             $errorResponse = [
                 'success' => false,
-                'message' => 'Failed to clear cart: ' . $e->getMessage(),
-                'type' => 'error',
-                'cart_count' => Cart::getCurrentCart()->total_items ?? 0
+                'message' => 'Unable to clear cart. Please try again.',
             ];
 
             if ($request->expectsJson()) {
-                return response()->json($errorResponse, 500);
+                return response()->json($errorResponse, 422);
             }
 
-            flash($errorResponse['message'], $errorResponse['type'], 3000, 'Please try again');
+            flash($errorResponse['message'], 'error', 3000);
             return redirect()->back();
         }
     }
 
-    /**
-     * Get cart summary for AJAX updates
-     */
-    public function getCartSummary()
-    {
-        $cart = Cart::getCurrentCart();
-
-        return response()->json([
-            'success' => true,
-            'count' => $cart->total_items,
-            'total' => format_currency($cart->subtotal),
-            'cart_count' => $cart->total_items,
-            'cart_total' => format_currency($cart->subtotal)
-        ]);
-    }
 
     /**
      * Get cart count (AJAX only)

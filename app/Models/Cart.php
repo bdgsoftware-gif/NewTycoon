@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Cart extends Model
 {
@@ -40,16 +41,6 @@ class Cart extends Model
 
         return $cart;
     }
-
-    /**
-     * Get the cart for the current user/session with caching
-     */
-    // public static function getCurrentCartCached()
-    // {
-    //     return cache()->remember("cart_" . (Auth::id() ?? session()->getId()), 10, function () {
-    //         return self::getCurrentCart();
-    //     });
-    // }
 
     /**
      * Merge another cart into this one
@@ -114,30 +105,33 @@ class Cart extends Model
      */
     public function addItem($productId, $quantity = 1, $options = [])
     {
-        $product = Product::findOrFail($productId);
+        return DB::transaction(function () use ($productId, $quantity, $options) {
 
-        // Check stock
-        if ($product->track_quantity && $product->quantity < $quantity && !$product->allow_backorder) {
-            throw new \Exception('Product out of stock');
-        }
+            $product = Product::lockForUpdate()->findOrFail($productId);
 
-        $item = $this->items()
-            ->where('product_id', $productId)
-            ->first();
+            // Stock check (now atomic)
+            if ($product->track_quantity && $product->quantity < $quantity && !$product->allow_backorder) {
+                throw new \Exception('Product out of stock');
+            }
 
-        if ($item) {
-            $item->quantity += $quantity;
-            $item->save();
-        } else {
-            $this->items()->create([
-                'product_id' => $productId,
-                'quantity' => $quantity,
-                'price' => $product->price,
-                'options' => $options
-            ]);
-        }
+            $item = $this->items()
+                ->where('product_id', $productId)
+                ->lockForUpdate()
+                ->first();
 
-        return $item;
+            if ($item) {
+                $item->increment('quantity', $quantity);
+            } else {
+                $item = $this->items()->create([
+                    'product_id' => $productId,
+                    'quantity' => $quantity,
+                    'price' => $product->price,
+                    'options' => $options
+                ]);
+            }
+
+            return $item;
+        });
     }
 
     /**
@@ -145,20 +139,19 @@ class Cart extends Model
      */
     public function updateItem($productId, $quantity)
     {
+        if ($quantity <= 0) {
+            return $this->removeItem($productId);
+        }
+
         $item = $this->items()
             ->where('product_id', $productId)
             ->firstOrFail();
 
-        if ($quantity <= 0) {
-            $item->delete();
-            return null;
-        }
-
-        $item->quantity = $quantity;
-        $item->save();
+        $item->update(['quantity' => $quantity]);
 
         return $item;
     }
+
 
     /**
      * Remove item from cart

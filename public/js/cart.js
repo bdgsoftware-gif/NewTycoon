@@ -38,6 +38,14 @@ class CartManager {
             button.dataset.loading = "false";
             return;
         }
+        // READ QUANTITY SAFELY
+        const quantityInput = form.querySelector('input[name="quantity"]');
+        let quantity = 1;
+
+        if (quantityInput) {
+            const parsedQty = parseInt(quantityInput.value, 10);
+            quantity = !isNaN(parsedQty) && parsedQty > 0 ? parsedQty : 1;
+        }
 
         // Save original state
         const originalHTML = button.innerHTML;
@@ -60,7 +68,7 @@ class CartManager {
                     "Content-Type": "application/json",
                     "X-Requested-With": "XMLHttpRequest",
                 },
-                body: JSON.stringify({ quantity: 1 }),
+                body: JSON.stringify({ quantity }),
             });
 
             const data = await response.json();

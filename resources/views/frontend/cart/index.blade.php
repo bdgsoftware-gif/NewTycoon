@@ -404,12 +404,6 @@
 
 @push('styles')
     <style>
-        /* Custom styles for better UX */
-        .quantity-input:focus {
-            outline: none;
-            box-shadow: none;
-        }
-
         .animate-fade-in {
             animation: fadeIn 0.5s ease-in-out;
         }
@@ -418,7 +412,6 @@
             from {
                 opacity: 0;
             }
-
             to {
                 opacity: 1;
             }

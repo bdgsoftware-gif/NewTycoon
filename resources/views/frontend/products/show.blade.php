@@ -65,7 +65,7 @@
                 @endif
             </div>
 
-            <!-- Product Info - Clean Design -->
+            <!-- Product Info -->
             <div class="space-y-6">
                 <!-- Product Header -->
                 <div class="border-b border-gray-200 pb-4">
@@ -179,16 +179,18 @@
                             <h3 class="font-semibold text-gray-900 mb-2">Quantity</h3>
                             <div class="flex items-center border border-gray-300 rounded-lg w-32">
                                 <button type="button" onclick="decrementQuantity()"
-                                    class="px-3 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-l-lg transition-colors">
+                                    class="quantity-decrement px-3 py-2 text-gray-600 hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M20 12H4" />
                                     </svg>
                                 </button>
-                                <input type="text" name="quantity" id="quantity" value="1" min="1"
-                                    max="{{ $product->quantity }}" class="w-16 text-center border-0 focus:ring-0">
+                                <input type="number" name="quantity" id="quantity" value="1" min="1"
+                                    max="{{ $product->quantity }}"
+                                    class="quantity-input w-10 p-0 text-center border-0 focus:ring-0 focus:outline-none font-inter [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                                    data-product-id="{{ $product->id }}">
                                 <button type="button" onclick="incrementQuantity()"
-                                    class="px-3 py-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-r-lg transition-colors">
+                                    class="quantity-increment px-3 py-2 text-gray-600 hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M12 4v16m8-8H4" />
@@ -199,11 +201,12 @@
 
                         <!-- Action Buttons -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <form action="{{ route('cart.add', $product->id) }}" method="POST">
+                            <form action="{{ route('cart.add', $product->id) }}" method="POST"
+                                class="add-to-cart-form">
                                 @csrf
                                 <input type="hidden" name="quantity" id="cartQuantity" value="1">
                                 <button type="submit"
-                                    class="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center">
+                                    class="add-to-cart-btn w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -226,7 +229,7 @@
                             </form>
                         </div>
 
-                        <button
+                        <button onclick="addToWishlist({{ $product->id }})"
                             class="w-full border border-gray-300 hover:border-primary text-gray-700 hover:text-primary font-semibold py-3 rounded-lg transition-colors flex items-center justify-center">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -750,6 +753,39 @@
                     navigator.clipboard.writeText(shareUrl).then(() => {
                         alert('Link copied to clipboard!');
                     });
+                }
+            }
+
+            // Add to Wishlist
+            async function addToWishlist(productId) {
+                try {
+                    const response = await fetch('/wishlist/add/' + productId, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Show success message
+                        if (typeof window.flash === 'function') {
+                            window.flash('Added to wishlist!', 'success', 3000, 'Product added to your wishlist');
+                        } else {
+                            alert('Added to wishlist!');
+                        }
+                    } else {
+                        throw new Error(data.message || 'Failed to add to wishlist');
+                    }
+                } catch (error) {
+                    if (typeof window.flash === 'function') {
+                        window.flash(error.message, 'error', 3000, 'Please try again');
+                    } else {
+                        alert(error.message);
+                    }
                 }
             }
         </script>
