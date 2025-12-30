@@ -1,5 +1,5 @@
 <!-- resources/views/components/product-slider.blade.php -->
-<section class="max-w-8xl mx-auto py-12 px-4 2xl:px-0" data-slider-section="{{ $sliderId }}">
+<section class="max-w-8xl mx-auto py-12 px-4" data-slider-section="{{ $sliderId }}">
     <!-- Debug: Check all products are being passed -->
     <div class="hidden">
         <p>Total Products: {{ count($slidingProducts) }}</p>
@@ -161,9 +161,9 @@
             'speed' => 600,
             'effect' => 'slide',
             'breakpoints' => [
-                320 => ['slidesPerView' => min(1, count($slidingProducts)), 'spaceBetween' => 12],
-                480 => ['slidesPerView' => min(2, count($slidingProducts)), 'spaceBetween' => 14],
-                768 => ['slidesPerView' => min(3, count($slidingProducts)), 'spaceBetween' => 16],
+                320 => ['slidesPerView' => min(1, count($slidingProducts)), 'spaceBetween' => 8],
+                480 => ['slidesPerView' => min(2, count($slidingProducts)), 'spaceBetween' => 10],
+                768 => ['slidesPerView' => min(3, count($slidingProducts)), 'spaceBetween' => 12],
                 1024 => [
                     'slidesPerView' => min($slidesPerView - 1, count($slidingProducts)),
                     'spaceBetween' => $spaceBetween,

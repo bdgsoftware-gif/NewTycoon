@@ -1,17 +1,17 @@
 <!-- resources/views/components/navbar.blade.php -->
-<nav class="bg-white fixed top-0 left-0 right-0 z-50 font-cambay border-b">
+<nav class="bg-white fixed top-0 left-0 right-0 z-50 font-cambay border-b gsap-navbar">
     <div class="max-w-8xl mx-auto px-4">
         <div class="flex justify-between items-center h-16">
 
             <!-- Logo on the left -->
-            <div class="flex-shrink-0">
+            <div class="flex-shrink-0 gsap-nav-logo">
                 <a href="{{ url('/') }}" aria-label="Home" class="inline-block" title="Tycoon Hi-Tech Park">
                     <img src="{{ asset('images/bk-logo.png') }}" alt="BK Logo" class="h-4 md:h-7 2xl:h-8 w-auto">
                 </a>
             </div>
 
             <!-- Centered navigation links -->
-            <div class="hidden md:flex items-center justify-start flex-1 pl-4">
+            <div class="hidden md:flex items-center justify-start flex-1 pl-4 gsap-nav-links">
                 <div class="flex md:space-x-1 2xl:space-x-3">
                     @foreach ($navigation as $item)
                         @if (isset($item['children']) && count($item['children']) > 0)
@@ -617,6 +617,48 @@
                     closeSearchModal();
                 }
             });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+            const navbar = document.querySelector('.gsap-navbar');
+            if (!navbar) return;
+
+            const logo = document.querySelector('.gsap-nav-logo');
+            const links = document.querySelectorAll('.gsap-nav-links > div > *');
+
+            // 🔒 Safety reset
+            gsap.set([logo, links], {
+                opacity: 1,
+                y: 0,
+                clearProps: 'all'
+            });
+
+            const tl = gsap.timeline({
+                defaults: {
+                    ease: 'power3.out'
+                }
+            });
+
+            tl.from(navbar, {
+                    y: -20,
+                    opacity: 0,
+                    duration: 0.6
+                })
+                .from(logo, {
+                    opacity: 0,
+                    scale: 0.95,
+                    duration: 0.4
+                }, '-=0.3')
+                .from(links, {
+                    opacity: 0,
+                    y: 10,
+                    duration: 0.4,
+                    stagger: 0.05
+                }, '-=0.25');
         });
     </script>
 @endpush

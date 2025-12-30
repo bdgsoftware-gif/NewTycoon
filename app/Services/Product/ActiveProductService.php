@@ -28,6 +28,7 @@ class ActiveProductService
     {
         return Product::with($withRelations)
             ->active()
+            ->inStock()
             ->withActiveCategory()
             ->featured()
             ->latest()

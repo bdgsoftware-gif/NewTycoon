@@ -35,10 +35,11 @@
 
                             @if ($product->discount_percentage > 0)
                                 <span
-                                    class="absolute top-3 right-3 bg-gradient-to-r from-red-600 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold font-quantico shadow-md">
+                                    class="absolute top-3 right-3 bg-gradient-to-r from-red-600 to-orange-500  text-white px-3 py-1 rounded-full text-xs font-semibold font-quantico shadow-md">
                                     -{{ $product->discount_percentage }}%
                                 </span>
                             @endif
+
 
                             <!-- Hover Overlay with Actions -->
                             <div

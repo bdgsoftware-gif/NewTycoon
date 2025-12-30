@@ -29,8 +29,6 @@
     );
     background-size: 400% 100%;
     animation: ads-skeleton-loading 1.4s ease infinite;
-    z-index: 10; /* Ensure it's above everything */
-    pointer-events: none; /* Allow clicks to pass through */
 }
 
 @keyframes ads-skeleton-loading {
@@ -40,11 +38,4 @@
     100% {
         background-position: 0 0;
     }
-}
-
-/* Class to hide skeleton with transition */
-.ads-skeleton-hidden {
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s;
 }

@@ -35,27 +35,26 @@ class HomeController extends Controller
 
         // Get new Arrivals products
         $newArrivals = $this->activeProductService->getActiveNewArrivals();
-        $newArrivals = FeaturedProductViewResource::collection($newArrivals);
+        // $newArrivals = FeaturedProductViewResource::collection($newArrivals);
 
         // Get Best Sells products
         $bestsells = $this->activeProductService->getActiveBestSells();
-        $bestsells = FeaturedProductViewResource::collection($bestsells);
+        // $bestsells = FeaturedProductViewResource::collection($bestsells);
 
         // Get Recommended Products products
         $recommendedProducts = $this->activeProductService->getActiveRecommendedProducts();
-        $recommendedProducts = FeaturedProductViewResource::collection($recommendedProducts);
+        // $recommendedProducts = FeaturedProductViewResource::collection($recommendedProducts);
 
         $smartSections = $this->smartSections();
         $adsBanners = $this->getAdsBanners();
         $adsAnotherBanners = $this->getAnotherAdsBanners();
 
         // Get offer data
-        $offerAllData = $this->getOffersSection();
-        $offerData = $offerAllData['offerHeader'] ?? [];
-        $offerProducts = $offerAllData['offerProducts'] ?? [];
-
+        $offerData = $this->offerHeadData() ?? [];
+        $offerProducts = $this->activeProductService->getActiveBestSells() ?? [];
+        // dd($offerData, $offerProducts);
         $userStories = $this->getUserStories();
-        
+
 
         return view('frontend.home', compact(
             'heroSlides',
@@ -954,36 +953,24 @@ class HomeController extends Controller
         if ($adsBanners->isEmpty()) {
             $adsBanners = collect([
                 (object)[
-                    'image_path' => 'images/ads/ads.jpg',
+                    'image_path' => 'storage/ads-banner/airad.jpg',
                     'link' => '#',
                     'target' => '_self',
-                    'title' => 'Air Conditioner',
-                    'description' => 'Stay cool with powerful and energy-efficient AC units.',
-                    'alt_text' => 'Air Conditioner Advertisement'
                 ],
                 (object)[
-                    'image_path' => 'images/ads/adss.jpg',
+                    'image_path' => 'storage/ads-banner/tvad.jpg',
                     'link' => '#',
                     'target' => '_self',
-                    'title' => 'Fan',
-                    'description' => 'Smooth airflow and modern fan designs for every room.',
-                    'alt_text' => 'Fan Advertisement'
                 ],
                 (object)[
-                    'image_path' => 'images/ads/ads.jpg',
+                    'image_path' => 'storage/ads-banner/fanad.jpg',
                     'link' => '#',
                     'target' => '_self',
-                    'title' => 'Room Comforter',
-                    'description' => 'Soft, warm, and cozy comforters for restful sleep.',
-                    'alt_text' => 'Room Comforter Banner'
                 ],
                 (object)[
-                    'image_path' => 'images/ads/adss.jpg',
+                    'image_path' => 'storage/ads-banner/kettelads.jpg',
                     'link' => '#',
                     'target' => '_self',
-                    'title' => 'Cookware',
-                    'description' => 'Durable and stylish cookware for everyday cooking.',
-                    'alt_text' => 'Cookware Advertisement'
                 ],
             ]);
         }
@@ -1000,36 +987,24 @@ class HomeController extends Controller
         if ($adsBanners->isEmpty()) {
             $adsBanners = collect([
                 (object)[
-                    'image_path' => 'images/ads/adss.jpg',
+                    'image_path' => 'storage/ads-banner/watchad.jpg',
                     'link' => '#',
                     'target' => '_self',
-                    'title' => 'Gas Burner',
-                    'description' => 'Efficient and safe gas burners for perfect cooking.',
-                    'alt_text' => 'Gas Burner Advertisement'
                 ],
                 (object)[
-                    'image_path' => 'images/ads/ads.jpg',
+                    'image_path' => 'storage/ads-banner/tvad.jpg',
                     'link' => '#',
                     'target' => '_self',
-                    'title' => 'Pressure Cooker',
-                    'description' => 'Cook faster with high-quality stainless steel pressure cookers.',
-                    'alt_text' => 'Pressure Cooker Banner'
                 ],
                 (object)[
-                    'image_path' => 'images/ads/adss.jpg',
+                    'image_path' => 'storage/ads-banner/frezze.jpg',
                     'link' => '#',
                     'target' => '_self',
-                    'title' => 'Rice Cooker',
-                    'description' => 'Perfect rice every time with smart rice cookers.',
-                    'alt_text' => 'Rice Cooker Advertisement'
                 ],
                 (object)[
-                    'image_path' => 'images/ads/ads.jpg',
+                    'image_path' => 'storage/ads-banner/fanad.jpg',
                     'link' => '#',
                     'target' => '_self',
-                    'title' => 'Electric Kettle',
-                    'description' => 'Fast-boiling, durable kettles for modern kitchens.',
-                    'alt_text' => 'Electric Kettle Banner'
                 ],
             ]);
         }
@@ -1159,12 +1134,9 @@ class HomeController extends Controller
     }
 
     // ==========================================
-    public function getOffersSection(): array
+    public function offerHeadData(): array
     {
         $offerHeadData = [
-            'background_type' => 'image', // options: image, video 
-            'background_image' => 'images/offers/offers-bg.gif',
-            'background_video' => 'videos/offers-bg.mp4',
             'title' => 'Winter Dhamaka Offer 2025',
             'subtitle' => 'Enjoy the coolest discounts of the season with up to 70% off!',
             'main_banner_image' => 'images/offers/main-banner.jpeg',
@@ -1172,36 +1144,7 @@ class HomeController extends Controller
             'timer_end_date' => now()->addDays(7)->format('Y-m-d H:i:s'), // Fixed: 7 days from now
             'view_all_link' => 'products.sale', // This will be converted to route
         ];
-        $offerProducts = collect($this->saleProducts());
-        // $offerProducts = Product::take(15)
-        //     ->get()
-        //     ->map(function ($product) {
-        //         // Ensure main_image exists
-        //         $mainImage = $product->main_image ?? 'images/products/default.png';
-        //         if (!Str::startsWith($mainImage, 'images/')) {
-        //             $mainImage = 'images/products/' . $mainImage;
-        //         }
 
-        //         return [
-        //             'id' => $product->id,
-        //             'name' => $product->name ?? 'Unknown Product',
-        //             'slug' => $product->slug ?? 'unknown',
-        //             'images' => [$mainImage],
-        //             'original_price' => $product->price ?? 0,
-        //             'discounted_price' => $product->sale_price ?? ($product->price ?? 0),
-        //             'discount_percentage' => $product->discount_percentage ?? 0,
-        //             'is_new' => $product->is_new ?? false,
-        //             'in_stock' => $product->in_stock ?? true,
-        //         ];
-        //     });
-
-        // If no products from database, use fallback data
-        // if ($offerProducts->isEmpty()) {
-        //     $offerProducts = $this->products();
-        // }
-        return [
-            'offerHeader' => $offerHeadData,
-            'offerProducts' => $offerProducts
-        ];
+        return $offerHeadData;
     }
 }

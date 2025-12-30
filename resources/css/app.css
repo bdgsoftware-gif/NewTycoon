@@ -143,13 +143,21 @@
     animation: none;
 }
 
-/* ============= Button Shine Effect ============= */
+/* ============= Button Shine Effect (Balanced) ============= */
 @keyframes button-shine {
     0% {
-        transform: translateX(-120%) skewX(-20deg);
+        transform: translateX(-150%) skewX(-20deg);
+        opacity: 0;
+    }
+    15% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
     }
     100% {
         transform: translateX(220%) skewX(-20deg);
+        opacity: 0;
     }
 }
 
@@ -162,15 +170,17 @@
     content: "";
     position: absolute;
     inset: 0;
-    width: 50%;
+    width: 65%;
     background: linear-gradient(
         120deg,
-        transparent,
-        rgba(255, 255, 255, 0.6),
-        transparent
+        transparent 0%,
+        rgba(255, 255, 255, 0.15) 35%,
+        rgba(255, 255, 255, 0.35) 50%,
+        rgba(255, 255, 255, 0.15) 65%,
+        transparent 100%
     );
-    transform: translateX(-120%) skewX(-20deg);
-    animation: button-shine 2.8s ease-in-out infinite;
+    transform: translateX(-150%) skewX(-20deg);
+    animation: button-shine 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
     pointer-events: none;
     z-index: 10;
 }
@@ -181,8 +191,73 @@
 }
 
 .btn-shine:hover::after {
-    animation: none;
+    animation-play-state: paused;
 }
 
-/* ============= Text rolling Effect ============= */
+/* ============= Badge Shine Effect ============= */
+@keyframes badge-shine {
+    0% {
+        transform: translateX(-120%);
+        opacity: 0;
+    }
+    40% {
+        opacity: 0.6;
+    }
+    100% {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+}
 
+.badge-shine {
+    position: relative;
+    overflow: hidden;
+}
+
+.badge-shine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 35%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.35),
+        transparent
+    );
+    animation: badge-shine 4.5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.offer-bg-svg {
+    animation: float-bg 18s linear infinite alternate;
+}
+
+/* ============= Offer Section background SVG ============= */
+@keyframes float-bg {
+    0% {
+        transform: translateY(0) translateX(0) scale(1);
+    }
+    50% {
+        transform: translateY(-20px) translateX(10px) scale(1.03);
+    }
+    100% {
+        transform: translateY(10px) translateX(-10px) scale(1.05);
+    }
+}
+
+.snow-layer circle {
+    animation: snow-fall 10s linear infinite;
+}
+
+@keyframes snow-fall {
+    from {
+        transform: translateY(-20px);
+    }
+    to {
+        transform: translateY(600px);
+    }
+}
+.offer-bg-svg svg {
+    animation: float-bg 20s ease-in-out infinite alternate;
+}

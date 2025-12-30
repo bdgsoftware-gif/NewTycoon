@@ -55,7 +55,6 @@
     <script src="{{ asset('js/gsap/gsap-featured-products.js') }}"></script>
     <script src="{{ asset('js/gsap/gsap-tilt-category-card.js') }}"></script>
     <script src="{{ asset('js/gsap/gsap-offer-products.js') }}"></script>
-    {{-- <script src="{{ asset('js/gsap/gsap-ads-pannel.js') }}"></script> --}}
 
     @stack('scripts')
 
