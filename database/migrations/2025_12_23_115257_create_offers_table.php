@@ -13,7 +13,8 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug')->unique();
             $table->text('subtitle')->nullable();
-            $table->enum('background_type', ['image', 'video', 'color'])->default('image');
+            $table->enum('background_type', ['svg', 'image', 'video', 'color'])->default('svg');
+            $table->longText('background_svg')->nullable();
             $table->string('background_image')->nullable();
             $table->string('background_video')->nullable();
             $table->string('background_color')->nullable();

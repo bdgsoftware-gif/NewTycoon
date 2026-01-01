@@ -57,10 +57,11 @@
                                         </form>
                                     @else
                                         <form action="{{ route('wishlist.add', $product->id) }}" method="POST"
-                                            class="inline-block">
+                                            class="add-to-wishlist-form inline-block">
                                             @csrf
                                             <button type="submit"
-                                                class="bg-white text-gray-900 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center space-x-2">
+                                                class="wishlist-btn bg-white text-gray-900 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center space-x-2"
+                                                title="Add to Wishlist">
                                                 <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -139,17 +140,21 @@
                                         <div class="flex items-center justify-between pt-1">
                                             <div class="flex items-center space-x-1">
                                                 <!-- Wishlist Icon -->
-                                                <button type="button"
-                                                    class="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200"
-                                                    title="Add to Wishlist">
-                                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                                        class="h-5 w-5 text-gray-400 hover:text-red-500" fill="none"
-                                                        viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                                    </svg>
-                                                </button>
+                                                <form action="{{ route('wishlist.add', $product->id) }}" method="POST"
+                                                    class="add-to-wishlist-form inline-block">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="wishlist-btn p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                                                        title="Add to Wishlist">
+                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                            class="h-5 w-5 text-gray-400 hover:text-red-500"
+                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                        </svg>
+                                                    </button>
+                                                </form>
 
                                                 <!-- Cart/Call Icon -->
                                                 @if ($product->in_stock)
@@ -202,18 +207,21 @@
                                         <div class="flex items-center justify-between pt-1">
                                             <div class="flex items-center space-x-1">
                                                 <!-- Wishlist Icon -->
-                                                <button type="button"
-                                                    class="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200"
-                                                    title="Add to Wishlist">
-                                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                                        class="h-5 w-5 text-gray-400 hover:text-red-500"
-                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                                    </svg>
-                                                </button>
-
+                                                <form action="{{ route('wishlist.add', $product->id) }}"
+                                                    method="POST" class="add-to-wishlist-form inline-block">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="wishlist-btn p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                                                        title="Add to Wishlist">
+                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                            class="h-5 w-5 text-gray-400 hover:text-red-500"
+                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                        </svg>
+                                                    </button>
+                                                </form>
                                                 <!-- Cart Icon -->
                                                 <button type="button"
                                                     class="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200"
@@ -261,52 +269,8 @@
                             View More Products
                         </span>
                     </div>
-
                 </a>
             </div>
         @endif
     </div>
 </section>
-@push('scripts')
-    <script>
-        function quickView(productId) {
-            // Implement quick view modal functionality
-            console.log('Quick view for product:', productId);
-            // You can use AJAX to fetch product details and show in a modal
-        }
-
-        // Add to wishlist with feedback
-        document.addEventListener('DOMContentLoaded', function() {
-            const wishlistForms = document.querySelectorAll('form[action*="wishlist"]');
-
-            wishlistForms.forEach(form => {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-
-                    // Add your AJAX request here
-                    fetch(form.action, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            body: JSON.stringify({
-                                product_id: form.querySelector(
-                                    'input[name="product_id"]')?.value
-                            })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                // Show success message
-                                alert('Product added to wishlist!');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
-                });
-            });
-        });
-    </script>
-@endpush

@@ -270,65 +270,136 @@
 </nav>
 
 <!-- Full Page Search Modal -->
-<div id="search-modal" class="fixed inset-0 bg-white z-50 hidden transition-opacity duration-300">
-    <div class="container mx-auto px-4 pt-20">
+<div id="search-modal"
+    class="fixed top-16 left-1/2 transform -translate-x-1/2 w-full max-w-3xl bg-white shadow-2xl rounded-b-lg z-50 hidden border border-gray-200">
+
+    <!-- Modal content container -->
+    <div class="p-4">
         <!-- Close button -->
         <button id="search-close"
-            class="absolute top-6 right-6 text-gray-500 hover:text-primary transition-transform duration-300 hover:rotate-90 z-10">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            class="absolute top-2 right-2 text-gray-500 hover:text-primary transition-transform duration-300 hover:rotate-90 z-10">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                 </path>
             </svg>
         </button>
 
+        <!-- Search header with categories dropdown -->
+        <div class="mb-3">
+            <div class="flex items-center space-x-2">
+                <!-- Categories dropdown -->
+                <div class="relative group">
+                    <button id="categories-toggle"
+                        class="flex items-center space-x-1 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 rounded-md text-sm font-medium text-gray-700 transition-colors duration-200 border border-gray-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h7"></path>
+                        </svg>
+                        <span>All Categories</span>
+                        <svg class="w-4 h-4 transition-transform duration-200 group-hover:rotate-180" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </button>
+
+                    <!-- Categories dropdown menu -->
+                    <div id="categories-dropdown"
+                        class="absolute left-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                        <div class="py-1">
+                            <!-- Add your categories here -->
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">All
+                                Categories</a>
+                            <a href="#"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Electronics</a>
+                            <a href="#"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Fashion</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Home &
+                                Garden</a>
+                            <a href="#"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Sports</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Books</a>
+                        </div>
+                    </div>
+                </div>
+
+                <span class="text-gray-400">|</span>
+                <span class="text-xs text-gray-500">Press ESC to close</span>
+            </div>
+        </div>
+
         <!-- Search input -->
-        <div class="max-w-2xl mx-auto relative">
+        <div class="relative">
             <form action="{{ route('search') }}" method="GET" class="relative">
-                <input type="text" name="q" placeholder="What are you looking for?" autocomplete="off"
-                    class="w-full py-4 text-2xl md:text-4xl font-light border-0 border-b-2 border-gray-300 focus:border-primary focus:ring-0 outline-none transition-all duration-300 bg-transparent pr-12"
+                <input type="text" name="q" placeholder="Search for products, brands, and more..."
+                    autocomplete="off"
+                    class="w-full py-3 px-4 text-base bg-gray-50 border border-gray-300 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 pr-12"
                     id="search-input">
                 <button type="submit"
-                    class="absolute right-0 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary p-2">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="absolute right-0 top-0 h-full px-4 text-gray-400 hover:text-primary transition-colors duration-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
                 </button>
             </form>
+        </div>
 
-            <!-- Search suggestions dropdown -->
-            <div id="search-suggestions"
-                class="absolute top-full left-0 right-0 bg-white shadow-xl rounded-b-lg mt-1 border border-gray-200 hidden max-h-96 overflow-y-auto z-50">
-                <div class="py-2">
-                    <!-- Loading state -->
-                    <div id="search-loading" class="hidden px-4 py-3 text-gray-500">
-                        <div class="flex items-center space-x-2">
-                            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                            <span>Searching...</span>
-                        </div>
+        <!-- Search suggestions dropdown -->
+        <div id="search-suggestions"
+            class="mt-2 bg-white rounded-lg shadow-lg border border-gray-200 hidden max-h-80 overflow-y-auto">
+            <div class="p-2">
+                <!-- Loading state -->
+                <div id="search-loading" class="hidden px-3 py-2">
+                    <div class="flex items-center space-x-2">
+                        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                        <span class="text-sm text-gray-600">Searching...</span>
                     </div>
+                </div>
 
-                    <!-- No results -->
-                    <div id="search-empty" class="hidden px-4 py-3 text-gray-500">
-                        No results found
-                    </div>
+                <!-- No results -->
+                <div id="search-empty" class="hidden px-3 py-2 text-sm text-gray-500">
+                    No results found. Try different keywords.
+                </div>
 
-                    <!-- Suggestions list -->
-                    <div id="search-results">
-                        <!-- Results will be populated here dynamically -->
-                    </div>
-
-                    <!-- View all results -->
-                    <div id="search-view-all" class="hidden border-t border-gray-100 mt-2">
-                        <a href="#" id="search-view-all-link"
-                            class="flex items-center justify-center text-primary hover:text-primary-dark font-medium text-sm py-3 px-4">
-                            <span>View all results</span>
-                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 5l7 7-7 7"></path>
-                            </svg>
+                <!-- Popular searches (shown when empty) -->
+                <div id="popular-searches" class="px-3 py-2">
+                    <p class="text-xs font-medium text-gray-500 mb-2">POPULAR SEARCHES</p>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="#"
+                            class="px-3 py-1.5 bg-gray-50 hover:bg-gray-100 rounded-full text-sm text-gray-700 transition-colors duration-200">
+                            Laptop
+                        </a>
+                        <a href="#"
+                            class="px-3 py-1.5 bg-gray-50 hover:bg-gray-100 rounded-full text-sm text-gray-700 transition-colors duration-200">
+                            Smartphone
+                        </a>
+                        <a href="#"
+                            class="px-3 py-1.5 bg-gray-50 hover:bg-gray-100 rounded-full text-sm text-gray-700 transition-colors duration-200">
+                            Headphones
+                        </a>
+                        <a href="#"
+                            class="px-3 py-1.5 bg-gray-50 hover:bg-gray-100 rounded-full text-sm text-gray-700 transition-colors duration-200">
+                            Watch
                         </a>
                     </div>
+                </div>
+
+                <!-- Suggestions list -->
+                <div id="search-results" class="mt-2">
+                    <!-- Results will be populated here dynamically -->
+                </div>
+
+                <!-- View all results -->
+                <div id="search-view-all" class="hidden border-t border-gray-100 mt-2 pt-2">
+                    <a href="#" id="search-view-all-link"
+                        class="flex items-center justify-center text-primary hover:text-primary-dark font-medium text-sm py-2 px-3 bg-gray-50 hover:bg-gray-100 rounded transition-colors duration-200">
+                        <span>View all results</span>
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                            </path>
+                        </svg>
+                    </a>
                 </div>
             </div>
         </div>
@@ -440,7 +511,24 @@
             // Functions
             function openSearchModal() {
                 searchModal.classList.remove('hidden');
+
+                // Position modal below search icon in navbar
+                const searchToggleRect = searchToggle.getBoundingClientRect();
+                const navbar = document.querySelector('nav');
+                const navbarRect = navbar.getBoundingClientRect();
+
+                // Calculate position relative to centered navigation area
+                const centeredNav = document.querySelector('.gsap-nav-links');
+                if (centeredNav) {
+                    const centeredNavRect = centeredNav.getBoundingClientRect();
+                    // Position modal at the center of navigation area
+                    const modalLeft = centeredNavRect.left + (centeredNavRect.width / 2);
+                    searchModal.style.left = `${modalLeft}px`;
+                    searchModal.style.transform = 'translateX(-50%)';
+                }
+
                 document.body.style.overflow = 'hidden';
+
                 setTimeout(() => {
                     searchInput.focus();
                 }, 100);
@@ -666,7 +754,26 @@
 
 @push('styles')
     <style>
-        /* Add these styles to your main CSS file or in a style tag */
+        #search-modal {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+
+        #search-suggestions {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Categories dropdown styling */
+        #categories-dropdown {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Ensure modal appears above other content */
+        .fixed.z-50 {
+            z-index: 9999 !important;
+        }
+
         #search-suggestions::-webkit-scrollbar {
             width: 6px;
         }

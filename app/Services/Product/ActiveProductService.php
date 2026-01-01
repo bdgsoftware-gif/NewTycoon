@@ -83,6 +83,22 @@ class ActiveProductService
             ->get();
     }
 
+    /**
+     * Get Offer Products where discount more than 10% with active category hierarchy.
+     */
+    public function getActiveOfferProducts(int $limit = 12, array $withRelations = ['category'], float $minDiscount = 10): Collection
+    {
+        return Product::with($withRelations)
+            ->active()
+            ->withActiveCategory()
+            ->inStock()
+            ->offerAbove($minDiscount)
+            ->orderByDesc('discount_percentage')
+            ->orderByDesc('total_sold')
+            ->limit($limit)
+            ->get();
+    }
+
 
     /**
      * Get products by category with active hierarchy check.

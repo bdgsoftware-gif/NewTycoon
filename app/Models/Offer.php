@@ -58,7 +58,7 @@ class Offer extends Model
     /**
      * Boot the model.
      */
-    protected static function boot()
+    protected static function booted()
     {
         parent::boot();
 
@@ -151,7 +151,7 @@ class Offer extends Model
             return asset('storage/' . $this->main_banner_image);
         }
 
-        return asset('images/offers/default-banner.jpg');
+        return asset('images/offers/main-banner.jpeg');
     }
 
     /**

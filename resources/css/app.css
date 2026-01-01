@@ -234,30 +234,21 @@
 }
 
 /* ============= Offer Section background SVG ============= */
-@keyframes float-bg {
-    0% {
-        transform: translateY(0) translateX(0) scale(1);
-    }
-    50% {
-        transform: translateY(-20px) translateX(10px) scale(1.03);
-    }
-    100% {
-        transform: translateY(10px) translateX(-10px) scale(1.05);
-    }
+@keyframes winterFloat {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0); }
 }
 
-.snow-layer circle {
-    animation: snow-fall 10s linear infinite;
+.animate-winter-bg {
+    animation: winterFloat 18s ease-in-out infinite;
 }
 
-@keyframes snow-fall {
-    from {
-        transform: translateY(-20px);
-    }
-    to {
-        transform: translateY(600px);
-    }
+.snow circle {
+    animation: snowFall 12s linear infinite;
 }
-.offer-bg-svg svg {
-    animation: float-bg 20s ease-in-out infinite alternate;
+
+@keyframes snowFall {
+    from { transform: translateY(-40px); opacity: 0; }
+    to { transform: translateY(600px); opacity: 1; }
 }

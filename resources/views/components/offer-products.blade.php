@@ -1,212 +1,139 @@
-<!-- Offers Section -->
-<section class="relative w-full py-12 md:py-16 px-4">
-    {{-- Top Blur/Shadow Effect for smooth transition from previous section --}}
-    <div class="absolute top-0 left-0 right-0 h-10 bg-gradient-to-b from-gray-50 via-cyan-400/20 to-transparent z-20">
-    </div>
-    <div class="absolute -bottom-8 left-0 right-0 h-12 bg-gradient-to-b from-cyan-600/20 via-white  to-transparent z-20">
-    </div>
+{{-- ================== OFFER SECTION ================== --}}
+<section class="relative w-full overflow-hidden">
 
-    @php
-        // Ensure data exists with proper fallbacks
-        $offerData = $offerData ?? [];
-        $offerProducts = $offerProducts ?? [];
+    {{-- ================== BACKGROUND ================== --}}
+    <div class="absolute inset-0 z-0 overflow-hidden">
 
-        $backgroundType = $offerData['background_type'] ?? 'image'; // 'image' or 'video'
-        $backgroundImage = $offerData['background_image'] ?? 'images/offers/bg.jpg';
-        $backgroundVideo = $offerData['background_video'] ?? 'videos/offers-bg.mp4';
-        $offerTitle = $offerData['title'] ?? 'Winter Offer';
-        $offerSubtitle = $offerData['subtitle'] ?? 'Enjoy amazing discounts!';
-        $mainBannerImage = $offerData['main_banner_image'] ?? 'images/offers/main-banner.jpg';
-        $timerEnabled = $offerData['timer_enabled'] ?? true;
-        $timerEndDate = $offerData['timer_end_date'] ?? now()->addDays(7)->format('Y-m-d H:i:s');
-        $viewAllLink = $offerData['view_all_link'] ?? route('products.offers');
-
-        // Fix route if it's just a string
-if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
-    try {
-        $viewAllLink = route($viewAllLink);
-    } catch (\Exception $e) {
-        $viewAllLink = '#';
-            }
-        }
-    @endphp
-
-    {{-- Full Width Background Container --}}
-    <div class="absolute inset-0 w-full h-full overflow-hidden">
-        {{-- <div class="max-w-8xl mx-auto h-full"> --}}
-        {{-- Background Image / Video constrained to 8xl --}}
-        <div class="relative w-full h-full">
-            @if ($backgroundType === 'video' && $backgroundVideo && file_exists(public_path($backgroundVideo)))
-                <video autoplay loop muted playsinline class="w-full h-full object-cover">
-                    <source src="{{ asset($backgroundVideo) }}" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-            @else
-                <img src="{{ asset($backgroundImage) }}" class="w-full h-full object-cover"
-                    alt="{{ $offerTitle }} Background" loading="lazy"
-                    onerror="this.src='{{ asset('images/offers/default-bg.jpg') }}'">
-            @endif
-        </div>
-        {{-- </div> --}}
-    </div>
-
-    {{-- Gradient Overlay for better readability --}}
-    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/40 to-black/20"></div>
-
-    {{-- CONTENT constrained to 8xl --}}
-    <div class="relative max-w-8xl mx-auto overflow-hidden  px-4">
-        {{-- TOP BANNER AREA --}}
-        <div class="w-full relative mb-4 overflow-hidden rounded-xl">
-            {{-- Background Image (Full Width + Full Height) --}}
-            @if ($mainBannerImage)
-                <div class="absolute inset-0">
-                    <img src="{{ asset($mainBannerImage) }}" alt="{{ $offerTitle }} Banner"
-                        class="w-full h-full object-cover" loading="lazy"
-                        onerror="this.src='{{ asset('images/offers/default-banner.jpg') }}'">
-                </div>
-
-                {{-- Optional Overlay for readability --}}
-                {{-- <div class="absolute inset-0 bg-gray-50/10 backdrop-blur-[1px]"></div> --}}
-            @endif
-
-            {{-- Content on top of the image --}}
-            <div class="relative z-10 p-4 md:p-6 offer-products-banner-content">
-                <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
-
-                    {{-- Left: Title & Info --}}
-                    <div class="text-center lg:text-left">
-                        <h2 class="text-white text-2xl md:text-3xl font-bold font-quantico mb-2">
-                            {{ $offerTitle }}
-                        </h2>
-                        <p class="text-white/90 text-base md:text-lg font-cambay max-w-2xl">
-                            {{ $offerSubtitle }}
-                        </p>
-                    </div>
-
-                    {{-- Right: Timer --}}
-                    @if ($timerEnabled)
-                        <div class="flex-shrink-0">
-                            <div class="backdrop-blur-md bg-white/10 border border-white/20 px-6 py-3 rounded-xl">
-                                <div class="text-xs tracking-wide text-white/80 font-cambay mb-1 text-center">
-                                    OFFER ENDS IN
-                                </div>
-
-                                <div id="offer-timer"
-                                    class="flex items-center justify-center gap-3 text-white font-quantico text-lg md:text-xl"
-                                    data-end-date="{{ $timerEndDate }}">
-
-                                    {{-- Days --}}
-                                    <div class="flex items-center gap-1">
-                                        <span class="timer-days font-bold"></span>
-                                        <span class="text-[11px] opacity-70">d</span>
-                                    </div>
-
-                                    {{-- Divider --}}
-                                    <div class="w-1 h-1 bg-white/40 rounded-full"></div>
-
-                                    {{-- Hours --}}
-                                    <div class="flex items-center gap-1">
-                                        <span class="timer-hours font-bold"></span>
-                                        <span class="text-[11px] opacity-70">h</span>
-                                    </div>
-
-                                    <div class="w-1 h-1 bg-white/40 rounded-full"></div>
-
-                                    {{-- Minutes --}}
-                                    <div class="flex items-center gap-1">
-                                        <span class="timer-minutes font-bold"></span>
-                                        <span class="text-[11px] opacity-70">m</span>
-                                    </div>
-
-                                    <div class="w-1 h-1 bg-white/40 rounded-full"></div>
-
-                                    {{-- Seconds --}}
-                                    <div class="flex items-center gap-1">
-                                        <span class="timer-seconds font-bold"></span>
-                                        <span class="text-[11px] opacity-70">s</span>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
-                </div>
-
-                {{-- Force minimum banner height --}}
-                <div class="h-[200px] md:h-[250px]"></div>
+        {{-- SVG Background (DEFAULT) --}}
+        @if ($offer->background_type === 'svg' && $offer->background_svg)
+            <div class="absolute inset-0 animate-bg-float">
+                {!! $offer->background_svg !!}
             </div>
+
+            {{-- Image Background --}}
+        @elseif($offer->background_type === 'image' && $offer->background_image)
+            <img src="{{ asset('storage/' . $offer->background_image) }}"
+                class="absolute inset-0 w-full h-full object-cover" alt="Offer Background" />
+
+            {{-- Video Background --}}
+        @elseif($offer->background_type === 'video' && $offer->background_video)
+            <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover">
+                <source src="{{ asset('storage/' . $offer->background_video) }}" type="video/mp4">
+            </video>
+
+            {{-- Gradient Fallback --}}
+        @else
+            <div class="absolute inset-0 bg-gradient-to-br from-primary via-indigo-600 to-sky-500"></div>
+        @endif
+
+        {{-- Overlay for readability --}}
+        <div class="absolute inset-0 bg-black/50"></div>
+    </div>
+
+    {{-- ================== CONTENT ================== --}}
+    <div class="relative z-10 max-w-8xl mx-auto px-4 py-14">
+
+        {{-- ================== MAIN BANNER ================== --}}
+        <div class="relative rounded-2xl overflow-hidden mb-10">
+
+            {{-- Banner Image --}}
+            @if ($offer->main_banner_image)
+                <img src="{{ asset($offer->main_banner_image) }}" class="absolute inset-0 w-full h-full object-cover"
+                    alt="{{ $offer->title }}" />
+                <div class="absolute inset-0 bg-black/40"></div>
+            @endif
+
+            {{-- Banner Content --}}
+            <div class="relative z-10 p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
+
+                {{-- Title --}}
+                <div class="text-center md:text-left">
+                    <h2 class="text-white text-3xl md:text-4xl font-bold font-quantico mb-2">
+                        {{ $offer->title }}
+                    </h2>
+                    <p class="text-white/90 text-base md:text-lg font-cambay max-w-xl">
+                        {{ $offer->subtitle }}
+                    </p>
+                </div>
+
+                {{-- Timer --}}
+                @if ($offer->timer_enabled && $offer->timer_end_date)
+                    <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-6 py-4">
+                        <div class="text-xs text-white/80 text-center mb-1">OFFER ENDS IN</div>
+
+                        <div id="offer-timer" data-end="{{ $offer->timer_end_date }}"
+                            class="flex gap-3 text-white font-quantico text-lg">
+                            <span class="days">00</span>d
+                            <span class="hours">00</span>h
+                            <span class="minutes">00</span>m
+                            <span class="seconds">00</span>s
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            <div class="h-[200px] md:h-[260px]"></div>
         </div>
 
-        {{-- PRODUCT SLIDER SECTION --}}
-        @if (count($offerProducts) > 0)
-            <div class="mt-4">
-                {{-- Header Row --}}
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
-                    <div>
-                        <h3 class="text-white text-2xl md:text-3xl font-bold font-quantico">
-                            Special Offer Products
-                        </h3>
-                        <p class="text-white/80 text-sm md:text-base font-cambay mt-1">
-                            {{ count($offerProducts) }} products on discount
-                        </p>
-                    </div>
+        {{-- ================== PRODUCTS SLIDER ================== --}}
+        @if ($offerProducts->count())
+            <div class="relative">
 
-                    <a href="{{ $viewAllLink }}"
-                        class="inline-flex items-center px-5 py-2.5 bg-white text-gray-900 font-semibold rounded-md ">
-                        View All
-                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
+                {{-- Header --}}
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-white text-2xl font-bold font-quantico">
+                        Special Offer Products
+                    </h3>
+
+                    {{-- View All Button --}}
+                    <a href="{{ $offer->formatted_view_all_link }}" target="_self"
+                        class="group relative inline-flex items-center justify-center
+                              bg-primary text-white px-8 py-3 rounded-full
+                              font-semibold transition-all duration-300
+                              transform font-quantico overflow-hidden">
+
+                        <div class="relative overflow-hidden">
+                            <span class="inline-block transition-transform duration-300 group-hover:-translate-y-full">
+                                {{ $offer->view_all_text ?? 'View More Products' }}
+                            </span>
+                            <span
+                                class="absolute top-full left-0 inline-block w-full
+                                         transition-transform duration-300 group-hover:-translate-y-full">
+                                {{ $offer->view_all_text ?? 'View More Products' }}
+                            </span>
+                        </div>
                     </a>
                 </div>
 
-                {{-- Swiper Slider --}}
-                <div class="swiper offer-products-swiper relative z-[40] pb-10">
+                {{-- Swiper --}}
+                <div class="swiper offer-products-swiper pb-10">
                     <div class="swiper-wrapper">
+
                         @foreach ($offerProducts as $product)
-                            @php
-                                $productSlug = $product['slug'] ?? '#';
-                                $productId = $product['id'] ?? '#';
-                                $productName = $product['name'] ?? 'Product Name';
-                                $primaryImage = $product['images'][0] ?? 'images/placeholder.jpg';
-                                $secondaryImage = $product['images'][1] ?? null;
-                                $discountedPrice = $product['discounted_price'] ?? ($product['original_price'] ?? 0);
-                                $originalPrice = $product['original_price'] ?? 0;
-                                $discountPercentage = $product['discount_percentage'] ?? 0;
-                                $inStock = $product['in_stock'] ?? true;
-                                $isNew = $product['is_new'] ?? false;
-
-                                // Ensure images exist
-                                $primaryImageSrc = asset($primaryImage);
-                                $secondaryImageSrc = $secondaryImage ? asset($secondaryImage) : $primaryImageSrc;
-                            @endphp
-
                             <div class="swiper-slide !h-auto">
                                 <div
                                     class="group relative h-full bg-white border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col rounded-xl overflow-hidden">
                                     <!-- Image Section -->
-                                    <a href="{{ route('product.show', $productSlug) }}">
+                                    <a href="{{ route('product.show', $product->slug) }}">
                                         <div class="w-full aspect-square bg-white overflow-hidden relative">
-                                            <img src="{{ $primaryImageSrc }}"
+                                            <img src="{{ $product->featured_image_url }}"
                                                 class="absolute inset-0 w-full h-full object-contain transition-opacity duration-300 group-hover:opacity-0"
-                                                alt="{{ $productName }}" loading="lazy"
+                                                alt="{{ $product->name }}" loading="lazy"
                                                 onerror="this.src='{{ asset('images/products/default.png') }}'">
-                                            <img src="{{ $secondaryImageSrc }}"
-                                                class="absolute inset-0 w-full h-full object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100 {{ !$secondaryImage ? 'group-hover:scale-105' : '' }}"
-                                                alt="{{ $productName }} - Alternate View" loading="lazy"
-                                                onerror="this.src='{{ $primaryImageSrc }}'">
+                                            <img src="{{ $product->featured_image_url }}"
+                                                class="absolute inset-0 w-full h-full object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100 {{ !$product->featured_image_url ? 'group-hover:scale-105' : '' }}"
+                                                alt="{{ $product->name }} - Alternate View" loading="lazy"
+                                                onerror="this.src='{{ asset('images/offers/default-bg.jpg') }}'">
                                         </div>
                                     </a>
 
                                     <!-- Stock Badge -->
-                                    @if (!$inStock)
+                                    @if (!$product->in_stock)
                                         <div
                                             class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 z-20 font-quantico">
                                             OUT OF STOCK
                                         </div>
-                                    @elseif($isNew)
+                                    @elseif($product->is_new)
                                         <div
                                             class="absolute top-2 right-2 bg-accent text-white text-xs font-bold px-2 py-1 z-20 font-quantico">
                                             NEW
@@ -214,13 +141,13 @@ if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
                                     @endif
 
                                     <!-- Buy Now Overlay -->
-                                    @if ($inStock)
+                                    @if ($product->in_stock)
                                         <div
                                             class="absolute bottom-0 left-0 right-0 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
                                             <div
                                                 class="bg-gradient-to-t from-black/90 via-black/70 to-transparent pt-6 pb-4 px-4">
                                                 <div class="flex space-x-2">
-                                                    <a href="{{ route('checkout.process', $productId) }}"
+                                                    <a href="{{ route('checkout.process', $product->id) }}"
                                                         class="flex-1 bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-quantico">
                                                         <span class="flex items-center justify-center">
                                                             <svg class="w-4 h-4 mr-2 hidden 2xl:block" fill="none"
@@ -233,7 +160,7 @@ if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
                                                         </span>
                                                     </a>
 
-                                                    <form action="{{ route('cart.add', $productId) }}" method="POST"
+                                                    <form action="{{ route('cart.add', $product->id) }}" method="POST"
                                                         class="add-to-cart-form inline-block">
                                                         @csrf
                                                         <button type="submit" title="Add to Cart"
@@ -241,8 +168,8 @@ if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
                                                             <span class="flex items-center">
                                                                 <svg class="w-4 h-4 mr-1" fill="none"
                                                                     stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round"
-                                                                        stroke-linejoin="round" stroke-width="2"
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
                                                                         d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                                                 </svg>
                                                                 Cart
@@ -254,7 +181,7 @@ if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
                                         </div>
                                     @endif
 
-                                    @if (!$inStock)
+                                    @if (!$product->in_stock)
                                         <div
                                             class="absolute bottom-0 left-0 right-0 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-20">
                                             <div
@@ -280,19 +207,19 @@ if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
                                     @endif
                                     <!-- Product Info -->
                                     <div class="p-4 border-t border-gray-100 flex-grow flex flex-col">
-                                        <a href="{{ route('product.show', $productSlug) }}"
+                                        <a href="{{ route('product.show', $product->slug) }}"
                                             class="font-medium font-quantico text-gray-900 text-sm mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-200 flex-grow">
-                                            {{ $productName }}
+                                            {{ $product->name }}
                                         </a>
 
                                         <!-- Price + Wishlist -->
                                         <div class="mt-auto">
                                             <div class="flex items-center justify-between">
                                                 <span class="text-lg font-bold font-quantico text-gray-900">
-                                                    TK{{ number_format($discountedPrice, 0) }}
+                                                    TK{{ number_format($product->price, 0) }}
                                                 </span>
 
-                                                @if (!$inStock)
+                                                @if (!$product->in_stock)
                                                     <button
                                                         class="wishlist-btn p-1 hover:text-red-500 transition-colors duration-200"
                                                         title="Add to Wishlist">
@@ -306,14 +233,14 @@ if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
                                                 @endif
                                             </div>
 
-                                            @if ($discountPercentage > 0)
+                                            @if ($product->discount_percentage > 0)
                                                 <div class="flex items-center space-x-2 mt-2 font-inter">
                                                     <span
                                                         class="text-xs bg-accent/10 text-accent font-semibold px-2 py-1">
-                                                        Save {{ $discountPercentage }}%
+                                                        Save {{ $product->discount_percentage }}%
                                                     </span>
                                                     <span class="text-xs text-gray-500 line-through">
-                                                        TK{{ number_format($originalPrice, 0) }}
+                                                        TK{{ number_format($product->compare_price, 0) }}
                                                     </span>
                                                 </div>
                                             @endif
@@ -322,6 +249,7 @@ if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
                                 </div>
                             </div>
                         @endforeach
+
                     </div>
 
                     {{-- Swiper Navigation --}}
@@ -349,17 +277,57 @@ if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
                             </button>
                         </div>
                     @endif
-
                 </div>
             </div>
         @endif
     </div>
 </section>
 
+{{-- ================== STYLES ================== --}}
+<style>
+    @keyframes bg-float {
+        0% {
+            transform: translateY(0) scale(1);
+        }
+
+        50% {
+            transform: translateY(-20px) scale(1.03);
+        }
+
+        100% {
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .animate-bg-float {
+        animation: bg-float 16s ease-in-out infinite;
+    }
+</style>
+
+{{-- ================== SCRIPTS ================== --}}
 @push('scripts')
     <script>
-        // Initialize Offer Products Swiper
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // TIMER
+            const timer = document.getElementById('offer-timer');
+            if (timer) {
+                const end = new Date(timer.dataset.end).getTime();
+
+                setInterval(() => {
+                    const now = Date.now();
+                    const diff = end - now;
+
+                    if (diff <= 0) return;
+
+                    timer.querySelector('.days').textContent = Math.floor(diff / 86400000);
+                    timer.querySelector('.hours').textContent = Math.floor(diff / 3600000) % 24;
+                    timer.querySelector('.minutes').textContent = Math.floor(diff / 60000) % 60;
+                    timer.querySelector('.seconds').textContent = Math.floor(diff / 1000) % 60;
+                }, 1000);
+            }
+
+            // SWIPER
             const offerSwiperElement = document.querySelector('.offer-products-swiper');
             if (offerSwiperElement) {
                 const productCount = {{ count($offerProducts) }};
@@ -412,49 +380,6 @@ if (!str_contains($viewAllLink, '://') && !str_starts_with($viewAllLink, '/')) {
                     new Swiper(offerSwiperElement, swiperConfig);
                 } catch (error) {
                     console.error('Swiper initialization error:', error);
-                }
-            }
-
-            // Countdown Timer Functionality
-            const timerElement = document.getElementById('offer-timer');
-            if (timerElement) {
-                const endDateString = timerElement.dataset.endDate;
-                if (endDateString) {
-                    const endDate = new Date(endDateString).getTime();
-
-                    function updateTimer() {
-                        const now = new Date().getTime();
-                        const timeLeft = endDate - now;
-
-                        if (timeLeft < 0) {
-                            timerElement.innerHTML = '<div class="text-sm font-medium">Offer Expired</div>';
-                            return;
-                        }
-
-                        const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-                        const daysElement = timerElement.querySelector('.timer-days');
-                        const hoursElement = timerElement.querySelector('.timer-hours');
-                        const minutesElement = timerElement.querySelector('.timer-minutes');
-                        const secondsElement = timerElement.querySelector('.timer-seconds');
-
-                        if (daysElement) daysElement.textContent = days.toString().padStart(2, '0');
-                        if (hoursElement) hoursElement.textContent = hours.toString().padStart(2, '0');
-                        if (minutesElement) minutesElement.textContent = minutes.toString().padStart(2, '0');
-                        if (secondsElement) secondsElement.textContent = seconds.toString().padStart(2, '0');
-                    }
-
-                    // Update immediately and then every second
-                    updateTimer();
-                    const timerInterval = setInterval(updateTimer, 1000);
-
-                    // Clean up on page unload
-                    window.addEventListener('beforeunload', () => {
-                        clearInterval(timerInterval);
-                    });
                 }
             }
         });

@@ -259,6 +259,14 @@ class Product extends Model
     {
         return $this->stock_status === 'in_stock';
     }
+
+    public function scopeOfferAbove($query, float $minDiscount = 10)
+    {
+        return $query->where(function ($q) use ($minDiscount) {
+            $q->where('discount_percentage', '>=', $minDiscount);
+        });
+    }
+
     // Single Image fetching
     public function getFeaturedImageUrlAttribute(): string
     {

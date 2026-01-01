@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Models\Offer;
 use App\Models\Product;
 use App\Models\AdBanner;
 use App\Models\Category;
@@ -50,9 +51,9 @@ class HomeController extends Controller
         $adsAnotherBanners = $this->getAnotherAdsBanners();
 
         // Get offer data
-        $offerData = $this->offerHeadData() ?? [];
-        $offerProducts = $this->activeProductService->getActiveBestSells() ?? [];
-        // dd($offerData, $offerProducts);
+        $offer = Offer::active()->with('products')->first();
+        $offerProducts = $this->activeProductService->getActiveOfferProducts(8) ?? [];
+        // dd($featuredProducts, $offerProducts);
         $userStories = $this->getUserStories();
 
 
@@ -68,7 +69,7 @@ class HomeController extends Controller
             'adsBanners',
             'userStories',
             'adsAnotherBanners',
-            'offerData',
+            'offer',
             'offerProducts'
         ));
     }
