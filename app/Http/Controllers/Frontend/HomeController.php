@@ -186,23 +186,6 @@ class HomeController extends Controller
                 ]
             ],
             [
-                'type' => 'video',
-                'background' => 'videos/hero-background.mp4',
-                'has_content' => true,
-                'content_position' => 'center',
-                'badge' => 'Limited Time',
-                'title' => 'Summer <span class="text-accent">Sale</span>',
-                'subtitle' => 'Up to 50% off on selected items. Limited stock available.',
-                'has_cta' => true,
-                'cta_buttons' => [
-                    [
-                        'text' => 'View Deals',
-                        'url' => '/sale',
-                        'type' => 'primary'
-                    ]
-                ]
-            ],
-            [
                 'type' => 'image',
                 'background' => 'images/hero/demo-banner.jpg',
                 'has_content' => true,
@@ -213,17 +196,17 @@ class HomeController extends Controller
                 'has_cta' => false,
                 'cta_buttons' => []
             ],
-            [
-                'type' => 'video',
-                'background' => 'videos/back-cover-video.mp4',
-                'has_content' => false,
-                'content_position' => 'center',
-                'badge' => null,
-                'title' => null,
-                'subtitle' => null,
-                'has_cta' => false,
-                'cta_buttons' => []
-            ],
+            // [
+            //     'type' => 'video',
+            //     'background' => 'videos/back-cover-video.mp4',
+            //     'has_content' => false,
+            //     'content_position' => 'center',
+            //     'badge' => null,
+            //     'title' => null,
+            //     'subtitle' => null,
+            //     'has_cta' => false,
+            //     'cta_buttons' => []
+            // ],
             [
                 'type' => 'image',
                 'background' => 'images/hero/demo-banner.jpg',
