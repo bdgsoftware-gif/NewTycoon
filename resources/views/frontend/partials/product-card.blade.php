@@ -116,7 +116,7 @@
                 <div class="mt-auto">
                     <div class="flex items-center justify-between">
                         <span class="text-lg font-bold font-quantico text-gray-900">
-                            TK{{ number_format($discountedPrice, 0) }}
+                            <span class="font-bengali">৳</span>{{ number_format($discountedPrice, 0) }}
                         </span>
 
                         @if (!$inStock)
@@ -137,7 +137,7 @@
                                 Save {{ $discountPercentage }}%
                             </span>
                             <span class="text-xs text-gray-500 line-through">
-                                TK{{ number_format($originalPrice, 0) }}
+                                <span class="font-bengali">৳</span>{{ number_format($originalPrice, 0) }}
                             </span>
                         </div>
                     @endif

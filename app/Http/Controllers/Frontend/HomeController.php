@@ -165,7 +165,7 @@ class HomeController extends Controller
         return [
             [
                 'type' => 'image',
-                'background' => 'images/hero/demo-banner.jpg',
+                'background' => 'images/hero/demo-banner-no.jpg',
                 'has_content' => true,
                 'content_position' => 'left',
                 'badge' => 'New Collection',
@@ -187,7 +187,7 @@ class HomeController extends Controller
             ],
             [
                 'type' => 'image',
-                'background' => 'images/hero/demo-banner.jpg',
+                'background' => 'images/hero/demo-banner-no.jpg',
                 'has_content' => true,
                 'content_position' => 'right',
                 'badge' => 'Featured',

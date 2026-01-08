@@ -5,8 +5,8 @@ if (! function_exists('format_currency')) {
     {
         if ($amount === null) return null;
 
-        // Format numeric value
-        $formatted = number_format($amount, 0);
+        $formatted = number_format($amount, 2, '.', ',');
+        $formatted = rtrim(rtrim($formatted, '0'), '.');
 
         return "{$formatted} {$currency}";
     }

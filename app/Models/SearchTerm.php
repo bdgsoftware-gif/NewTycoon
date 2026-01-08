@@ -11,4 +11,7 @@ class SearchTerm extends Model
     protected $casts = [
         'last_searched_at' => 'datetime',
     ];
+
+    public $timestamps = false;
+  
 }

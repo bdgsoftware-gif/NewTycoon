@@ -370,7 +370,8 @@
                                         </div>
                                     </div>
                                     <div class="text-gray-900 font-semibold font-quantico">
-                                        TK{{ number_format($item->quantity * $item->price, 2) }}
+                                        <span
+                                            class="font-bengali">৳</span>{{ number_format($item->quantity * $item->price, 2) }}
                                     </div>
                                 </div>
                             @endforeach
@@ -380,8 +381,8 @@
                         <div class="space-y-3">
                             <div class="flex justify-between">
                                 <span class="text-gray-600 font-inter">Subtotal</span>
-                                <span
-                                    class="font-semibold text-gray-900 font-quantico">TK{{ number_format($cart->subtotal, 2) }}</span>
+                                <span class="font-semibold text-gray-900 font-quantico"><span
+                                        class="font-bengali">৳</span>{{ number_format($cart->subtotal, 2) }}</span>
                             </div>
 
                             <div class="flex justify-between">
@@ -401,7 +402,8 @@
                                     <span class="text-lg font-bold text-gray-900 font-quantico">Total</span>
                                     <div class="text-right">
                                         <div class="text-2xl font-bold text-gray-900 font-quantico">
-                                            TK<span id="totalAmount">{{ number_format($cart->subtotal, 2) }}</span>
+                                            <span class="font-bengali">৳</span><span
+                                                id="totalAmount">{{ number_format($cart->subtotal, 2) }}</span>
                                         </div>
                                         <div class="text-sm text-gray-500 font-inter mt-1">
                                             Including VAT
@@ -570,7 +572,7 @@
                 const totalElement = document.getElementById('totalAmount');
 
                 if (shippingElement && totalElement) {
-                    shippingElement.textContent = `TK${shippingAmount.toFixed(2)}`;
+                    shippingElement.textContent = `<span class="font-bengali">৳</span>${shippingAmount.toFixed(2)}`;
                     totalElement.textContent = (subtotal + shippingAmount).toFixed(2);
                 }
             }

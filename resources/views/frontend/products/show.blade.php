@@ -86,7 +86,7 @@
                         @if ($product->compare_price > $product->price)
                             <span class="text-xl text-gray-500 line-through">
                                 <span class="font-bengali">৳</span>{{ number_format($product->compare_price, 2) }}
-                            </span>                            
+                            </span>
                         @endif
                     </div>
                     @if ($product->discount_percentage)
@@ -603,11 +603,12 @@
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <span class="font-bold text-gray-900">
-                                                TK{{ number_format($related->price, 2) }}
+                                                <span class="font-bengali">৳</span>{{ number_format($related->price, 2) }}
                                             </span>
                                             @if ($related->compare_price > $related->price)
                                                 <span class="text-xs text-gray-500 line-through ml-1">
-                                                    TK{{ number_format($related->compare_price, 2) }}
+                                                    <span
+                                                        class="font-bengali">৳</span>{{ number_format($related->compare_price, 2) }}
                                                 </span>
                                             @endif
                                         </div>

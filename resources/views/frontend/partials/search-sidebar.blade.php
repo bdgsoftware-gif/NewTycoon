@@ -160,10 +160,12 @@
             <div class="space-y-4">
                 <div class="flex items-center justify-between">
                     <span class="text-sm font-medium text-gray-700 font-inter">
-                        TK{{ number_format(request('min_price', $priceRange['min'])) }}
+                        <span
+                            class="font-bengali">৳</span>{{ number_format(request('min_price', $priceRange['min'])) }}
                     </span>
                     <span class="text-sm font-medium text-gray-700 font-inter">
-                        TK{{ number_format(request('max_price', $priceRange['max'])) }}
+                        <span
+                            class="font-bengali">৳</span>{{ number_format(request('max_price', $priceRange['max'])) }}
                     </span>
                 </div>
                 <div class="px-2">

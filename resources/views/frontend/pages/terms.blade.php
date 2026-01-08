@@ -39,7 +39,8 @@
                 <div class="space-y-4">
                     <p class="text-gray-600 font-inter">All orders are subject to product availability and our acceptance.
                         We reserve the right to refuse or cancel any order for any reason.</p>
-                    <p class="text-gray-600 font-inter">Prices are shown in Bangladeshi Taka (TK) and are subject to change
+                    <p class="text-gray-600 font-inter">Prices are shown in Bangladeshi Taka (<span
+                            class="font-bengali">৳</span>) and are subject to change
                         without notice. We accept various payment methods as indicated during checkout.</p>
                 </div>
             </div>

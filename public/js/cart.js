@@ -332,7 +332,7 @@ class CartManager {
         if (itemElement) {
             const totalElement = itemElement.querySelector(".item-total");
             if (totalElement) {
-                totalElement.textContent = `TK${parseFloat(
+                totalElement.textContent = `<span class="font-bengali">৳</span>${parseFloat(
                     itemTotal || 0
                 ).toFixed(2)}`;
 

@@ -190,6 +190,15 @@ class SearchController extends Controller
         ]);
     }
 
+    public function popular()
+    {
+        $terms = SearchTerm::orderByDesc('search_count')
+            ->limit(8)
+            ->get(['id', 'term', 'search_count', 'last_searched_at']);
+
+        return response()->json($terms);
+    }
+    
     /**
      * Get all products count for search
      */

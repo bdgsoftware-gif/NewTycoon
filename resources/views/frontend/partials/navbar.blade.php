@@ -11,7 +11,7 @@
             </div>
 
             <!-- Centered navigation links -->
-            <div class="hidden md:flex items-center justify-start flex-1 pl-4 gsap-nav-links">
+            <div class="hidden lg:flex items-center justify-start flex-1 pl-4 gsap-nav-links">
                 <div class="flex md:space-x-1 2xl:space-x-3">
                     @foreach ($navigation as $item)
                         @if (isset($item['children']) && count($item['children']) > 0)
@@ -248,7 +248,7 @@
     </div>
 
     <!-- Mobile menu (updated for three-level) -->
-    <div class="md:hidden hidden bg-white border-t" id="mobile-menu">
+    <div class="lg:hidden hidden bg-white border-t" id="mobile-menu">
         <div class="px-4 py-3 space-y-1">
 
             @foreach ($categoriesDropdown as $item)
@@ -709,7 +709,7 @@
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-sm text-primary font-semibold">
-                                        TK${result.price}
+                                        <span class="font-bengali">৳</span>${result.price}
                                     </span>
                                     ${result.in_stock ? 
                                         '<span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">In Stock</span>' : 

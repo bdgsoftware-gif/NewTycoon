@@ -7,6 +7,7 @@ use App\Models\Footer;
 use App\Models\Category;
 use App\Services\SearchService;
 use App\Services\NavigationService;
+use App\Services\SearchTermService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -32,6 +33,11 @@ class ViewServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
             $categoriesDropdown = app(SearchService::class)->getCategoryTree();
             $view->with('categoriesDropdown', $categoriesDropdown);
+        });
+
+        View::composer('*', function ($view) {
+            $topSearchedTerms = app(SearchTermService::class)->getTopSearchedTerms(8);
+            $view->with('topSearchedTerms', $topSearchedTerms);
         });
 
         // Global Cart Data for authenticated users

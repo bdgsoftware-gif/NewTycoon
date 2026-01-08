@@ -29,7 +29,8 @@
                             <h3 class="text-xl font-bold text-gray-900 font-quantico">Standard Shipping</h3>
                         </div>
                         <p class="text-gray-600 mb-3 font-inter">3-5 business days</p>
-                        <p class="text-gray-600 text-sm font-inter">Free shipping on orders over TK 5000</p>
+                        <p class="text-gray-600 text-sm font-inter">Free shipping on orders over <span
+                                class="font-bengali">৳</span> 5000</p>
                     </div>
 
                     <div class="bg-white p-6 rounded-xl border border-gray-200">
@@ -66,7 +67,7 @@
                             <h3 class="text-lg font-bold text-gray-900 mb-3 font-quantico">Other Cities</h3>
                             <ul class="space-y-2 text-gray-600 font-inter">
                                 <li>• 2-3 business days</li>
-                                <li>• Free shipping over TK 5000</li>
+                                <li>• Free shipping over <span class="font-bengali">৳</span>5000</li>
                                 <li>• Online payment preferred</li>
                             </ul>
                         </div>

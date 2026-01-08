@@ -26,6 +26,8 @@
 
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css" />
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
 
     <!-- Additional Head Scripts & Styles -->
     @stack('head-scripts')
@@ -45,8 +47,6 @@
         @include('frontend.partials.footer')
     </div>
 
-    <!-- Swiper JS -->
-    <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
 
     <!-- Additional Scripts -->
     <script src="{{ asset('js/cart.js') }}"></script>

@@ -110,10 +110,12 @@
                         <div class="space-y-4">
                             <div class="flex items-center justify-between">
                                 <span class="text-sm font-medium text-gray-700 font-inter">
-                                    TK{{ number_format(request('min_price', $priceRange['min'])) }}
+                                    <span
+                                        class="font-bengali">৳</span>{{ number_format(request('min_price', $priceRange['min'])) }}
                                 </span>
                                 <span class="text-sm font-medium text-gray-700 font-inter">
-                                    TK{{ number_format(request('max_price', $priceRange['max'])) }}
+                                    <span
+                                        class="font-bengali">৳</span>{{ number_format(request('max_price', $priceRange['max'])) }}
                                 </span>
                             </div>
                             <div class="px-2">
@@ -271,7 +273,7 @@
                                     <div class="mt-auto">
                                         <div class="flex items-center justify-between">
                                             <span class="text-lg font-bold font-quantico text-gray-900">
-                                                TK{{ number_format($product->price, 2) }}
+                                                <span class="font-bengali">৳</span>{{ number_format($product->price, 2) }}
                                             </span>
 
                                             <button
@@ -291,7 +293,8 @@
                                                     Save {{ $product->discount_percentage }}%
                                                 </span>
                                                 <span class="text-xs text-gray-500 line-through">
-                                                    TK{{ number_format($product->compare_price, 2) }}
+                                                    <span
+                                                        class="font-bengali">৳</span>{{ number_format($product->compare_price, 2) }}
                                                 </span>
                                             </div>
                                         @endif

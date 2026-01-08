@@ -76,10 +76,10 @@
                         <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Price Range</h3>
                         <div class="space-y-4">
                             <div class="flex items-center justify-between">
-                                <span
-                                    class="text-sm font-medium text-gray-700 font-inter">TK{{ number_format(request('min_price', $priceRange['min'])) }}</span>
-                                <span
-                                    class="text-sm font-medium text-gray-700 font-inter">TK{{ number_format(request('max_price', $priceRange['max'])) }}</span>
+                                <span class="text-sm font-medium text-gray-700 font-inter"><span
+                                        class="font-bengali">৳</span>{{ number_format(request('min_price', $priceRange['min'])) }}</span>
+                                <span class="text-sm font-medium text-gray-700 font-inter"><span
+                                        class="font-bengali">৳</span>{{ number_format(request('max_price', $priceRange['max'])) }}</span>
                             </div>
                             <div class="px-2">
                                 <input type="range" id="min_price_slider" min="{{ $priceRange['min'] }}"
@@ -267,7 +267,8 @@
                                     <div class="mt-auto">
                                         <div class="flex items-center justify-between">
                                             <span class="text-lg font-bold font-quantico text-gray-900">
-                                                TK{{ number_format($discountedPrice, 2) }}
+                                                <span
+                                                    class="font-bengali">৳</span>{{ number_format($discountedPrice, 2) }}
                                             </span>
 
                                             @if ($inStock)
@@ -290,7 +291,8 @@
                                                     Save {{ $discountPercentage }}%
                                                 </span>
                                                 <span class="text-xs text-gray-500 line-through">
-                                                    TK{{ number_format($originalPrice, 2) }}
+                                                    <span
+                                                        class="font-bengali">৳</span>{{ number_format($originalPrice, 2) }}
                                                 </span>
                                             </div>
                                         @endif

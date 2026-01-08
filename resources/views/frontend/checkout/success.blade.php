@@ -41,7 +41,7 @@
                     <div class="flex justify-between">
                         <span class="text-gray-600 font-inter">Total Amount:</span>
                         <span class="text-lg font-bold text-gray-900 font-quantico">
-                            TK{{ number_format($order->total_amount, 2) }}
+                            <span class="font-bengali">৳</span>{{ number_format($order->total_amount, 2) }}
                         </span>
                     </div>
 

@@ -103,7 +103,7 @@
                                     <!-- Price -->
                                     <div class="col-span-2 text-center">
                                         <span class="text-gray-900 font-semibold font-quantico">
-                                            TK{{ number_format($item->price, 2) }}
+                                            <span class="font-bengali">৳</span>{{ number_format($item->price, 2) }}
                                         </span>
                                     </div>
 
@@ -146,7 +146,7 @@
                                     <!-- Total -->
                                     <div class="col-span-2 text-center">
                                         <span class="item-total text-lg font-bold text-gray-900 font-quantico">
-                                            TK{{ number_format($itemTotal, 2) }}
+                                            <span class="font-bengali">৳</span>{{ number_format($itemTotal, 2) }}
                                         </span>
                                     </div>
                                 </div>
@@ -187,7 +187,8 @@
 
                                                 <div class="mt-1">
                                                     <span class="text-gray-900 font-semibold font-quantico">
-                                                        TK{{ number_format($item->price, 2) }}
+                                                        <span
+                                                            class="font-bengali">৳</span>{{ number_format($item->price, 2) }}
                                                     </span>
                                                 </div>
 
@@ -264,7 +265,7 @@
                                             <div class="text-right">
                                                 <div class="text-sm text-gray-500 font-inter">Total</div>
                                                 <div class="item-total text-lg font-bold text-gray-900 font-quantico">
-                                                    TK{{ number_format($itemTotal, 2) }}
+                                                    <span class="font-bengali">৳</span>{{ number_format($itemTotal, 2) }}
                                                 </div>
                                             </div>
                                         </div>
@@ -309,8 +310,8 @@
                             <!-- Items Count -->
                             <div class="flex justify-between items-center">
                                 <span class="text-gray-600 font-inter">Items ({{ $cart->total_items }})</span>
-                                <span
-                                    class="text-gray-900 font-semibold font-quantico">TK{{ number_format($cart->subtotal, 2) }}</span>
+                                <span class="text-gray-900 font-semibold font-quantico"><span
+                                        class="font-bengali">৳</span>{{ number_format($cart->subtotal, 2) }}</span>
                             </div>
 
                             <!-- Shipping -->
@@ -331,7 +332,7 @@
                                     <span class="text-lg font-bold text-gray-900 font-quantico">Total</span>
                                     <div class="text-right">
                                         <div id="cart-total" class="text-2xl font-bold text-gray-900 font-quantico">
-                                            TK{{ number_format($cart->subtotal, 2) }}
+                                            <span class="font-bengali">৳</span>{{ number_format($cart->subtotal, 2) }}
                                         </div>
                                         <div class="text-sm text-gray-500 font-inter mt-1">
                                             Including VAT
@@ -412,6 +413,7 @@
             from {
                 opacity: 0;
             }
+
             to {
                 opacity: 1;
             }
