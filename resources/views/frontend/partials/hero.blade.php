@@ -1,61 +1,59 @@
 <!-- resources/views/components/hero-swiper.blade.php -->
-<section class="relative">
-    <!-- Swiper Container -->
+<section class="relative w-full overflow-hidden">
     <div
-        class="swiper heroSwiper w-full h-[60vh] min-h-[400px] md:h-screen md:max-h-[650px] lg:max-h-[750px] xl:max-h-[660px] 2xl:max-h-[800px] overflow-hidden">
+        class="swiper heroSwiper w-full aspect-video md:aspect-auto md:h-[70vh] lg:h-[80vh] max-h-[850px] overflow-hidden bg-gray-900">
         <div class="swiper-wrapper">
             @foreach ($heroSlides as $slide)
-                <div class="swiper-slide relative">
-                    <!-- Background Media -->
+                <div class="swiper-slide relative w-full h-full">
+
                     @if ($slide['type'] === 'video')
-                        <video class="w-full h-full object-cover" autoplay muted loop playsinline>
+                        <video class="absolute inset-0 w-full h-full object-cover" autoplay muted loop playsinline>
                             <source src="{{ asset($slide['background']) }}" type="video/mp4">
                         </video>
                     @else
                         <img src="{{ asset($slide['background']) }}" alt="{{ $slide['title'] ?? '' }}"
-                            class="w-full h-full md:object-cover 2xl:object-contain">
+                            class="absolute inset-0 w-full h-full object-contain lg:object-cover">
                     @endif
 
-                    <!-- Overlay -->
                     <div class="absolute inset-0 bg-black/40 {{ $slide['has_content'] ? '' : 'hidden' }}"></div>
 
-                    <!-- Content -->
                     @if ($slide['has_content'])
-                        <div class="absolute inset-0 flex items-center">
-                            <div class="max-w-8xl mx-auto px-4 md:px-16 2xl:px-4 w-full">
-                                <div class="max-w-2xl {{ $slide['content_position'] === 'right' ? 'ml-auto text-right' : ($slide['content_position'] === 'center' ? 'mx-auto text-center' : '') }}"
-                                    data-hero-content data-content-position>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="container mx-auto px-6 md:px-12 lg:px-16 w-full">
+
+                                <div
+                                    class="max-w-3xl transition-all duration-700 {{ $slide['content_position'] === 'right' ? 'ml-auto text-right' : ($slide['content_position'] === 'center' ? 'mx-auto text-center' : 'text-left') }}">
 
                                     @if (!empty($slide['badge']))
-                                        <div class="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-6 font-inter"
-                                            data-hero-badge>
-                                            <span class="text-sm font-semibold text-white">{{ $slide['badge'] }}</span>
+                                        <div
+                                            class="inline-flex items-center px-3 py-1 md:px-4 md:py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full mb-3 md:mb-4">
+                                            <span
+                                                class="text-[10px] md:text-xs uppercase tracking-widest font-inter font-bold text-white">
+                                                {{ $slide['badge'] }}
+                                            </span>
                                         </div>
                                     @endif
 
                                     @if (!empty($slide['title']))
-                                        <h1 class="text-4xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight mb-4 font-quantico"
-                                            data-hero-title>
+                                        <h1
+                                            class="text-2xl md:text-5xl lg:text-6xl xl:text-7xl font-quantico font-bold text-white leading-[1.1] mb-4">
                                             {!! $slide['title'] !!}
                                         </h1>
                                     @endif
 
                                     @if (!empty($slide['subtitle']))
-                                        <p class="text-base md:text-xl text-white/90 leading-relaxed mb-8 font-inter"
-                                            data-hero-subtitle>
+                                        <p
+                                            class="font-inter text-sm md:text-lg lg:text-xl text-white/80 max-w-xl {{ $slide['content_position'] === 'center' ? 'mx-auto' : ($slide['content_position'] === 'right' ? 'ml-auto' : '') }} mb-6 md:mb-8">
                                             {{ $slide['subtitle'] }}
                                         </p>
                                     @endif
 
                                     @if ($slide['has_cta'] && !empty($slide['cta_buttons']))
-                                        <div class="flex flex-wrap items-center gap-2 {{ $slide['content_position'] === 'center' ? 'justify-center' : ($slide['content_position'] === 'right' ? 'justify-end' : 'justify-start') }}"
-                                            data-hero-cta>
-
+                                        <div
+                                            class="flex flex-wrap items-center gap-4 {{ $slide['content_position'] === 'center' ? 'justify-center' : ($slide['content_position'] === 'right' ? 'justify-end' : 'justify-start') }}">
                                             @foreach ($slide['cta_buttons'] as $button)
                                                 <a href="{{ $button['url'] }}"
-                                                    class="inline-flex items-center justify-center text-sm sm:text-base md:text-lg px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 rounded-lg font-semibold font-quantico transition-all duration-300 shadow-md hover:shadow-lg active:scale-95 md:hover:scale-105 {{ $button['type'] === 'primary'
-                                                        ? 'bg-accent text-white hover:bg-accent/90'
-                                                        : 'border border-white text-white hover:bg-white hover:text-primary' }}">
+                                                    class="text-[10px] md:text-sm lg:text-base inline-flex items-center justify-center px-3 py-1.5 md:px-4 md:py-3 xl:px-8 xl:py-4 rounded-lg font-bold transition-all active:scale-95 {{ $button['type'] === 'primary' ? 'bg-white text-black hover:bg-gray-200' : 'border-2 border-white text-white hover:bg-white/10' }}">
                                                     {{ $button['text'] }}
                                                 </a>
                                             @endforeach
@@ -145,8 +143,6 @@
                 </svg>
             </button>
         </div>
-
-
         <!-- Bullet Indicators (Optional - Removed if you want only progress bar) -->
         <div class="md:hidden swiper-pagination"></div>
     </div>
@@ -195,7 +191,7 @@
                         updateSlideCounter(this);
                         updateProgressBar(this, 0);
                         setupAutoplayToggle(this);
-                        
+
                     },
                     slideChange: function() {
                         updateSlideCounter(this);

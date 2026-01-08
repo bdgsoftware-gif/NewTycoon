@@ -37,6 +37,8 @@ Route::get('/brands', [ProductController::class, 'brands'])->name('brands.index'
 // Search Routes
 Route::get('/search/suggest', [SearchController::class, 'suggest'])->name('search.suggest');
 Route::get('/search', [SearchController::class, 'search'])->name('search');
+Route::get('/search/popular', [SearchController::class, 'popular'])->name('search.popular');
+
 
 // Cart Routes (available for guests and user)
 Route::prefix('cart')->name('cart.')->group(function () {

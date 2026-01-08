@@ -6,7 +6,7 @@
             <!-- Logo on the left -->
             <div class="flex-shrink-0 gsap-nav-logo">
                 <a href="{{ url('/') }}" aria-label="Home" class="inline-block" title="Tycoon Hi-Tech Park">
-                    <img src="{{ asset('images/bk-logo.png') }}" alt="BK Logo" class="h-4 md:h-7 2xl:h-8 w-auto">
+                    <img src="{{ asset('images/bk-logo.png') }}" alt="BK Logo" class="h-6 md:h-5 xl:h-7 2xl:h-8 w-auto">
                 </a>
             </div>
 
@@ -18,9 +18,9 @@
                             <!-- Parent link with three-level dropdown -->
                             <div class="relative group">
                                 <button
-                                    class="text-gray-700 hover:text-primary p-2 2xl:px-3 2xl:py-2 rounded-md text-base font-semibold flex items-center">
+                                    class="text-gray-700 hover:text-primary md:px-1 md:py-2 xl:px-3 rounded-md text-base md:text-sm xl:text-base font-semibold flex items-center">
                                     {{ $item['name'] }}
-                                    <svg class="md:ml-0 xl:ml-1 w-4 h-4 transition-transform duration-200 group-hover:rotate-180"
+                                    <svg class="md:ml-0 xl:ml-1 w-2.5 h-2.5 xl:w-5 xl:h-5 transition-transform duration-200 group-hover:rotate-180"
                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M19 9l-7 7-7-7"></path>
@@ -36,7 +36,7 @@
                                                 <div class="space-y-2">
                                                     <!-- Second Level Title -->
                                                     <a href="{{ $child['url'] }}"
-                                                        class="block font-semibold text-gray-900 hover:text-primary text-base font-inter mb-3 pb-2 border-b border-gray-100">
+                                                        class="block font-semibold text-gray-900 hover:text-primary text-base md:text-sm xl:text-base font-inter mb-3 pb-2 border-b border-gray-100">
                                                         {{ $child['name'] }}
                                                     </a>
 
@@ -73,18 +73,18 @@
                         @else
                             <!-- Single link -->
                             <a href="{{ $item['url'] }}"
-                                class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-base font-semibold transition-colors duration-200">
+                                class="text-gray-700 hover:text-primary md:px-1 md:py-2 xl:px-3 rounded-md text-base md:text-sm xl:text-base font-semibold transition-colors duration-200">
                                 {{ $item['name'] }}
                             </a>
                         @endif
                     @endforeach
                     <!-- Single link -->
                     <a href="/catalog"
-                        class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-base font-semibold transition-colors duration-200">
+                        class="text-gray-700 hover:text-primary md:px-1 md:py-2 xl:px-3 rounded-md text-base md:text-sm xl:text-base font-semibold transition-colors duration-200">
                         Catalog
                     </a>
                     <a href="{{ route('categories.index') }}"
-                        class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-base font-semibold transition-colors duration-200">
+                        class="text-gray-700 hover:text-primary md:px-1 md:py-2 xl:px-3 rounded-md text-base md:text-sm xl:text-base font-semibold transition-colors duration-200">
                         All Categories
                     </a>
                 </div>
@@ -95,10 +95,11 @@
 
                 <div class="relative group hidden md:block">
                     <button
-                        class="flex items-center space-x-1 text-gray-600 hover:text-primary p-1 rounded-md transition-colors duration-200"
+                        class="flex items-center space-x-2 md:space-x-0 xl:space-x-1 text-gray-600 hover:text-primary p-1 rounded-md transition-colors duration-200"
                         title="Change Language">
                         {{-- <span class="text-base font-semibold">EN</span> --}}
-                        <span><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <span><svg class="w-5 h-5 md:w-4 md:h-4 xl:w-5 xl:h-5" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129">
                                 </path>
@@ -115,11 +116,11 @@
                         class="absolute right-0 mt-2 w-24 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 border border-gray-200">
                         <div class="py-2">
                             <button
-                                class="w-full px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
+                                class="w-full px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
                                 English
                             </button>
                             <button
-                                class="w-full px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
+                                class="w-full px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
                                 বাংলা
                             </button>
                         </div>
@@ -130,7 +131,8 @@
                 <button id="search-toggle"
                     class="text-gray-600 hover:text-primary p-1 transition-all duration-300 hover:rotate-90"
                     title="Click to Search">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 md:w-4 md:h-4 xl:w-5 xl:h-5" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
@@ -139,8 +141,8 @@
                 <!-- User icon -->
                 <div class="relative group">
                     <button class="text-gray-600 hover:text-primary p-1">
-                        <svg fill="currentColor" stroke="currentColor" class="w-5 h-5" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
+                        <svg class="w-5 h-5 md:w-4 md:h-4 xl:w-5 xl:h-5" fill="currentColor" stroke="currentColor"
+                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path clip-rule="evenodd" stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5"
                                 d="M9.667 3.5a3.532 3.532 0 1 0 0 7.063 3.532 3.532 0 0 0 0-7.063M4.636 7.032a5.032 5.032 0 1 1 10.063 0 5.032 5.032 0 0 1-10.063 0m10.8-2.564a.75.75 0 0 1 .75-.75 4.13 4.13 0 1 1-.83 8.178.75.75 0 0 1 .3-1.47q.256.052.53.053a2.63 2.63 0 1 0 0-5.261.75.75 0 0 1-.75-.75m1.001 9.34a.75.75 0 0 1 .75-.75 4.75 4.75 0 0 1 4.75 4.75v.725a1.75 1.75 0 0 1-1.75 1.75h-.877a.75.75 0 1 1 0-1.5h.877a.25.25 0 0 0 .25-.25v-.725a3.25 3.25 0 0 0-3.25-3.25.75.75 0 0 1-.75-.75M2.062 19a5.75 5.75 0 0 1 5.75-5.75h3.713a5.75 5.75 0 0 1 5.75 5.75v.25a2.75 2.75 0 0 1-2.75 2.75H4.812a2.75 2.75 0 0 1-2.75-2.75zm5.75-4.25A4.25 4.25 0 0 0 3.562 19v.25c0 .69.56 1.25 1.25 1.25h9.713c.69 0 1.25-.56 1.25-1.25V19a4.25 4.25 0 0 0-4.25-4.25z"
                                 fill-rule="evenodd" />
@@ -155,30 +157,30 @@
                                 <!-- Show only for admins/moderators -->
                                 @if (auth()->user()->hasAnyRole(['admin', 'moderator']))
                                     <a href="{{ route('admin.dashboard') }}"
-                                        class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
+                                        class="block px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
                                         Admin Panel</a>
                                 @endif
                                 <!-- Authenticated user menu -->
                                 <a href="{{ route('profile') }}"
-                                    class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
+                                    class="block px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
                                     Profile
                                 </a>
 
                                 <a href="{{ route('orders.track') }}"
-                                    class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
+                                    class="block px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
                                     Track Order
                                 </a>
                                 <!-- Show only for customers -->
                                 @if (auth()->user()->hasRole('customer'))
                                     <a href="/orders"
-                                        class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
+                                        class="block px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
                                         My Orders</a>
                                 @endif
 
                                 <!-- Show only with specific permission -->
                                 @if (auth()->user()->hasPermission('manage_products'))
                                     <a href="/admin/products"
-                                        class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
+                                        class="block px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
                                         Products</a>
                                 @endif
                                 {{--  --}}
@@ -186,23 +188,23 @@
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit"
-                                        class="block w-full text-left px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
+                                        class="block w-full text-left px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
                                         Logout
                                     </button>
                                 </form>
                             @else
                                 <!-- Guest user menu -->
                                 <a href="{{ route('login') }}"
-                                    class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
+                                    class="block px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
                                     Sign In
                                 </a>
                                 <a href="{{ route('register') }}"
-                                    class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
+                                    class="block px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
                                     Sign Up
                                 </a>
                                 <hr class="my-1">
                                 <a href="{{ route('orders.track') }}"
-                                    class="block px-4 py-2 text-base text-gray-700 hover:bg-accent/70 hover:text-white">
+                                    class="block px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
                                     Track Order
                                 </a>
                             @endauth
@@ -213,7 +215,8 @@
                 <!-- Cart Icon Button -->
                 <a href="{{ route('cart.index') }}"
                     class="text-gray-600 hover:text-primary p-1 transition-all duration-300 relative">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 md:w-4 md:h-4 xl:w-5 xl:h-5" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
@@ -248,7 +251,7 @@
     <div class="md:hidden hidden bg-white border-t" id="mobile-menu">
         <div class="px-4 py-3 space-y-1">
 
-            @foreach ($navigation as $item)
+            @foreach ($categoriesDropdown as $item)
                 @if (isset($item['children']) && count($item['children']) > 0)
                     <div class="relative">
                         <button
@@ -295,7 +298,7 @@
                     </div>
                 @else
                     <a href="{{ $item['url'] }}"
-                        class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-semibold">
+                        class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base md:text-sm xl:text-base font-semibold">
                         {{ $item['name'] }}
                     </a>
                 @endif
@@ -307,13 +310,13 @@
 
 <!-- Full Page Search Modal -->
 <div id="search-modal"
-    class="fixed top-16 left-1/2 transform -translate-x-1/2 w-full max-w-3xl bg-white shadow-2xl rounded-b-lg z-50 hidden border border-gray-200">
+    class="fixed top-16 !left-1/2 transform -translate-x-1/2 w-full max-w-3xl bg-white shadow-2xl rounded-b-lg z-50 hidden border border-gray-200">
 
     <!-- Modal content container -->
     <div class="p-4">
         <!-- Close button -->
         <button id="search-close"
-            class="absolute top-2 right-2 text-gray-500 hover:text-primary transition-transform duration-300 hover:rotate-90 z-10">
+            class="absolute top-2 right-2 p-1 text-gray-500 bg-gray-200 hover:bg-accent/45 rounded-full hover:text-primary transition-transform duration-300 hover:rotate-90 z-10">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                 </path>
@@ -325,7 +328,7 @@
             <!-- Categories dropdown -->
             <div class="relative group w-full overflow-visible">
                 <button id="categories-toggle"
-                    class="flex items-center space-x-1 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 rounded-md text-sm font-medium text-gray-700 transition-colors duration-200 border border-gray-200">
+                    class="hidden md:flex items-center space-x-1 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 rounded-md text-sm font-medium text-gray-700 transition-colors duration-200 border border-gray-200">
                     <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 6h16M4 12h16M4 18h7"></path>
@@ -340,84 +343,41 @@
 
                 <!-- Categories dropdown menu -->
                 <div id="categories-dropdown"
-                    class="absolute left-0 top-full mt-1 w-full
-                   opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200
-                   z-20 overflow-y-auto no-scrollbar">
-                    <div class="py-1 w-48 bg-white rounded-md shadow-lg border border-gray-200">
-                        @foreach ($categoriesDropdown as $category)
-                            <!-- Level 1 Category Item -->
-                            <div class="relative group/level1 ">
-                                <div
-                                    class="flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer">
-                                    <a href="{{ $category['url'] }}"
-                                        class="flex-1 hover:text-primary font-medium truncate pr-2">
-                                        {{ $category['name'] }}
-                                    </a>
+                    class="absolute left-0 top-full mt-1 w-[720px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 bg-white rounded-md shadow-lg border border-gray-200">
 
-                                    @if ($category['has_children'] && !empty($category['children']))
-                                        <svg class="w-4 h-4 text-gray-400 ml-2 flex-shrink-0
-                                            group-hover/level1:rotate-90 transition-transform duration-200"
-                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 5l7 7-7 7"></path>
-                                        </svg>
-                                    @endif
+                    <div class="grid grid-cols-3 min-h-[300px]">
+
+                        <!-- Level 1 -->
+                        <div class="border-r border-gray-100">
+                            @foreach ($categoriesDropdown as $category)
+                                <div class="group/level1 relative">
+                                    <button
+                                        class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex justify-between items-center category-level1"
+                                        data-id="{{ $category['id'] }}">
+                                        <span class="truncate">{{ $category['name'] }}</span>
+
+                                        @if ($category['has_children'])
+                                            <svg class="w-4 h-4 transition-transform duration-200 group-hover:-rotate-90"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7">
+                                                </path>
+                                            </svg>
+                                        @endif
+                                    </button>
                                 </div>
+                            @endforeach
+                        </div>
 
-                                <!-- Level 2 Submenu -->
-                                @if ($category['has_children'] && !empty($category['children']))
-                                    <div
-                                        class="absolute top-0 left-full ml-1 w-96
-                                       opacity-0 invisible group-hover/level1:opacity-100 group-hover/level1:visible
-                                       transition-all duration-200 z-30 overflow-y-auto no-scrollbar">
-                                        <div class="py-1 w-48 bg-white rounded-md shadow-lg border border-gray-200">
-                                            @foreach ($category['children'] as $child)
-                                                <!-- Level 2 Category Item -->
-                                                <div class="relative group/level2">
-                                                    <div
-                                                        class="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer">
-                                                        <a href="{{ $child['url'] }}"
-                                                            class="flex-1 hover:text-primary truncate pr-2">
-                                                            {{ $child['name'] }}
-                                                        </a>
+                        <!-- Level 2 -->
+                        <div id="level2-container" class="border-r border-gray-100 hidden"></div>
 
-                                                        @if ($child['has_children'] && !empty($child['children']))
-                                                            <svg class="w-4 h-4 text-gray-400 ml-2 flex-shrink-0
-                                                                group-hover/level2:rotate-90 transition-transform duration-200"
-                                                                fill="none" stroke="currentColor"
-                                                                viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                                            </svg>
-                                                        @endif
-                                                    </div>
+                        <!-- Level 3 -->
+                        <div id="level3-container" class="hidden"></div>
 
-                                                    <!-- Level 3 Submenu -->
-                                                    @if ($child['has_children'] && !empty($child['children']))
-                                                        <div
-                                                            class="absolute top-0 left-full ml-1 w-full bg-white rounded-md shadow-xl border border-gray-200
-                                                           opacity-0 invisible group-hover/level2:opacity-100 group-hover/level2:visible
-                                                           transition-all duration-200 z-40  overflow-y-auto no-scrollbar">
-                                                            <div
-                                                                class="py-1 w-56 bg-white rounded-md shadow-lg border border-gray-200">
-                                                                @foreach ($child['children'] as $grandchild)
-                                                                    <a href="{{ $grandchild['url'] }}"
-                                                                        class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary truncate">
-                                                                        {{ $grandchild['name'] }}
-                                                                    </a>
-                                                                @endforeach
-                                                            </div>
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                @endif
-                            </div>
-                        @endforeach
                     </div>
                 </div>
+
             </div>
         </div>
 
@@ -426,16 +386,31 @@
             <form action="{{ route('search') }}" method="GET" class="relative">
                 <input type="text" name="q" placeholder="Search for products, brands, and more..."
                     autocomplete="off"
-                    class="w-full py-3 px-4 text-base bg-gray-50 border border-gray-300 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 pr-12"
+                    class="w-full py-3 px-4 text-base md:text-sm xl:text-base bg-gray-50 border border-gray-300 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 pr-12"
                     id="search-input">
                 <button type="submit"
                     class="absolute right-0 top-0 h-full px-4 text-gray-400 hover:text-primary transition-colors duration-200">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 md:w-4 md:h-4 xl:w-5 xl:h-5" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
                 </button>
             </form>
+        </div>
+
+        <!-- Popular searches (AJAX loaded) -->
+        <div id="popular-searches" class="px-3 py-2 hidden">
+            <p class="text-xs font-medium text-gray-500 mb-2">POPULAR SEARCHES</p>
+
+            <!-- Loading -->
+            <div id="popular-loading" class="hidden flex items-center space-x-2 px-2 py-2">
+                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                <span class="text-sm text-gray-600">Loading popular searches...</span>
+            </div>
+
+            <!-- Results -->
+            <div id="popular-results" class="flex flex-wrap gap-2"></div>
         </div>
 
         <!-- Search suggestions dropdown -->
@@ -453,19 +428,6 @@
                 <!-- No results -->
                 <div id="search-empty" class="hidden px-3 py-2 text-sm text-gray-500">
                     No results found. Try different keywords.
-                </div>
-
-                <!-- Popular searches (shown when empty) -->
-                <div id="popular-searches" class="px-3 py-2">
-                    <p class="text-xs font-medium text-gray-500 mb-2">POPULAR SEARCHES</p>
-                    <div class="flex flex-wrap gap-2">
-                        @foreach (['Laptop', 'Smartphone', 'Headphones', 'Watch', 'Camera', 'Tablet'] as $term)
-                            <a href="{{ route('search') }}?q={{ $term }}"
-                                class="px-3 py-1.5 bg-gray-50 hover:bg-gray-100 rounded-full text-sm text-gray-700 transition-colors duration-200">
-                                {{ $term }}
-                            </a>
-                        @endforeach
-                    </div>
                 </div>
 
                 <!-- Suggestions list -->
@@ -511,6 +473,13 @@
             const searchViewAllLink = document.getElementById('search-view-all-link');
             const searchForm = searchModal.querySelector('form');
 
+            const popularContainer = document.getElementById('popular-searches');
+            const popularResults = document.getElementById('popular-results');
+            const popularLoading = document.getElementById('popular-loading');
+
+            let popularLoaded = false;
+            let popularAbortController = null;
+
             // Search variables
             let searchTimeout = null;
             let currentSearchQuery = '';
@@ -553,27 +522,23 @@
                 const query = e.target.value.trim();
                 currentSearchQuery = query;
 
-                if (query.length < 2) {
+                if (query.length >= 2) {
+                    popularContainer.classList.add('hidden');
+                } else {
+                    popularContainer.classList.remove('hidden');
                     hideSuggestions();
                     return;
                 }
 
-                // Debounce search requests
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => {
                     fetchSearchSuggestions(query);
                 }, DEBOUNCE_DELAY);
             });
 
+
             searchInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
-                    hideSuggestions();
-                }
-            });
-
-            // Click outside to close suggestions
-            document.addEventListener('click', function(e) {
-                if (!searchModal.contains(e.target) && !searchToggle.contains(e.target)) {
                     hideSuggestions();
                 }
             });
@@ -598,7 +563,9 @@
                 // Position modal below search icon in navbar
                 const searchToggleRect = searchToggle.getBoundingClientRect();
                 const navbar = document.querySelector('nav');
-                const navbarRect = navbar.getBoundingClientRect();
+                if (navbar) {
+                    const navbarRect = navbar.getBoundingClientRect();
+                }
 
                 // Calculate position relative to centered navigation area
                 const centeredNav = document.querySelector('.gsap-nav-links');
@@ -615,6 +582,9 @@
                 setTimeout(() => {
                     searchInput.focus();
                 }, 100);
+
+                // Load popular searches
+                fetchPopularSearches();
             }
 
             function closeSearchModal() {
@@ -622,6 +592,8 @@
                 document.body.style.overflow = '';
                 searchInput.value = '';
                 hideSuggestions();
+                // Clear popular search data
+                clearPopularSearches();
             }
 
             function hideSuggestions() {
@@ -630,7 +602,9 @@
                 searchEmpty.classList.add('hidden');
                 searchViewAll.classList.add('hidden');
                 searchResults.innerHTML = '';
+                popularContainer.classList.add('hidden');
             }
+
 
             function showSuggestions() {
                 searchSuggestions.classList.remove('hidden');
@@ -773,6 +747,68 @@
                 return div;
             }
 
+            function fetchPopularSearches() {
+                if (popularLoaded) return;
+
+                popularContainer.classList.remove('hidden');
+                popularLoading.classList.remove('hidden');
+                popularResults.innerHTML = '';
+
+                if (popularAbortController) {
+                    popularAbortController.abort();
+                }
+
+                popularAbortController = new AbortController();
+
+                fetch(`{{ route('search.popular') }}`, {
+                        signal: popularAbortController.signal,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        popularLoading.classList.add('hidden');
+
+                        if (!data || data.length === 0) {
+                            popularResults.innerHTML =
+                                `<p class="text-sm text-gray-500">No popular searches found.</p>`;
+                            return;
+                        }
+
+                        data.forEach(term => {
+                            const el = document.createElement('a');
+                            el.href = `{{ route('search') }}?q=${encodeURIComponent(term.term)}`;
+                            el.className =
+                                'px-3 py-1.5 bg-gray-50 hover:bg-gray-100 rounded-full text-sm text-gray-700 transition-colors duration-200';
+
+                            el.innerHTML = `<span class="font-medium">${term.term}</span>`;
+
+                            popularResults.appendChild(el);
+                        });
+
+                        popularLoaded = true;
+                    })
+                    .catch(err => {
+                        console.error('Popular search error:', err);
+                        popularLoading.classList.add('hidden');
+                        popularResults.innerHTML =
+                            `<p class="text-sm text-red-500">Failed to load popular searches.</p>`;
+                    });
+            }
+
+            function clearPopularSearches() {
+                if (popularAbortController) {
+                    popularAbortController.abort();
+                    popularAbortController = null;
+                }
+
+                popularResults.innerHTML = '';
+                popularContainer.classList.add('hidden');
+            }
+
+
             // Close modal on ESC key
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
@@ -782,14 +818,86 @@
                 }
             });
 
-            // Close modal when clicking outside content
-            searchModal.addEventListener('click', function(e) {
-                if (e.target === searchModal) {
+            document.addEventListener('click', function(e) {
+                if (!searchModal.contains(e.target) && !searchToggle.contains(e.target)) {
                     closeSearchModal();
                 }
             });
+
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const categoriesData = @json($categoriesDropdown);
+            const level2Container = document.getElementById('level2-container');
+            const level3Container = document.getElementById('level3-container');
+
+            const categoryDropdown = document.getElementById('categories-dropdown');
+
+            categoryDropdown.addEventListener('mouseleave', () => {
+                level2Container.classList.add('hidden');
+                level3Container.classList.add('hidden');
+            });
+
+            document.querySelectorAll('.category-level1').forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    const id = this.dataset.id;
+                    const category = categoriesData.find(c => c.id == id);
+
+                    if (!category || !category.children || category.children.length === 0) {
+                        level2Container.classList.add('hidden');
+                        level3Container.classList.add('hidden');
+                        return;
+                    }
+
+                    renderLevel2(category.children);
+                });
+            });
+
+            function renderLevel2(children) {
+                level2Container.innerHTML = '';
+                level2Container.classList.remove('hidden');
+                level3Container.classList.add('hidden');
+
+                children.forEach(child => {
+                    const btn = document.createElement('button');
+                    btn.className =
+                        'w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex justify-between items-center';
+                    btn.innerHTML = `
+                <span class="truncate">${child.name}</span>
+                ${child.has_children ? '<svg class="w-4 h-4 transition-transform duration-200 group-hover:-rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>' : ''}
+            `;
+
+                    btn.addEventListener('mouseenter', () => {
+                        if (child.children && child.children.length) {
+                            renderLevel3(child.children);
+                        } else {
+                            level3Container.classList.add('hidden');
+                        }
+                    });
+
+                    level2Container.appendChild(btn);
+                });
+            }
+
+            function renderLevel3(children) {
+                level3Container.innerHTML = '';
+                level3Container.classList.remove('hidden');
+
+                children.forEach(grandchild => {
+                    const link = document.createElement('a');
+                    link.href = grandchild.url;
+                    link.className =
+                        'block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary truncate';
+                    link.textContent = grandchild.name;
+
+                    level3Container.appendChild(link);
+                });
+            }
+        });
+    </script>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -832,60 +940,4 @@
                 }, '-=0.25');
         });
     </script>
-@endpush
-
-
-@push('styles')
-    <style>
-        #search-modal {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            max-height: calc(100vh - 4rem);
-            overflow-y: auto;
-        }
-
-        #search-suggestions {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Categories dropdown styling */
-        #categories-dropdown {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Ensure modal appears above other content */
-        .fixed.z-50 {
-            z-index: 9999 !important;
-        }
-
-        #search-suggestions::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        #search-suggestions::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 0 0 6px 6px;
-        }
-
-        #search-suggestions::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 3px;
-        }
-
-        #search-suggestions::-webkit-scrollbar-thumb:hover {
-            background: #a1a1a1;
-        }
-
-        .search-result-item:hover {
-            background-color: #f9fafb;
-        }
-
-        /* Ensure search suggestions appear above other content */
-        #search-modal {
-            z-index: 9999;
-        }
-
-        #search-suggestions {
-            z-index: 10000;
-        }
-    </style>
 @endpush
