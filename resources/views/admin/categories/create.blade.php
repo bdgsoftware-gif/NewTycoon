@@ -42,6 +42,7 @@
                                 class="px-4 py-2 bg-gradient-to-r from-primary to-primary/80 text-white rounded-xl hover:shadow-md transition-all">
                                 Create Category
                             </button>
+
                         </div>
                     </div>
                 </div>
@@ -189,10 +190,10 @@
                                         </label>
 
                                         <label class="flex items-center">
-                                            <input type="checkbox" name="show_on_homepage" value="1"
-                                                {{ old('show_on_homepage') ? 'checked' : '' }}
+                                            <input type="checkbox" name="show_in_nav" value="1"
+                                                {{ old('show_in_nav') ? 'checked' : '' }}
                                                 class="h-4 w-4 text-primary rounded border-gray-300 focus:ring-primary">
-                                            <span class="ml-2 text-sm text-gray-700">Show on homepage</span>
+                                            <span class="ml-2 text-sm text-gray-700">Show in navigation</span>
                                         </label>
                                     </div>
                                 </div>
@@ -299,27 +300,27 @@
         }
 
         // Auto-generate slug from name
-        document.getElementById('name').addEventListener('input', function() {
-            const name = this.value;
-            const slug = name.toLowerCase()
-                .replace(/[^\w\s-]/g, '')
-                .replace(/\s+/g, '-')
-                .replace(/--+/g, '-');
+        // document.getElementById('name').addEventListener('input', function() {
+        //     const name = this.value;
+        //     const slug = name.toLowerCase()
+        //         .replace(/[^\w\s-]/g, '')
+        //         .replace(/\s+/g, '-')
+        //         .replace(/--+/g, '-');
 
-            // If you have a slug field, uncomment this:
-            // document.getElementById('slug').value = slug;
+        //     // If you have a slug field, uncomment this:
+        //     // document.getElementById('slug').value = slug;
 
-            // If you have meta title, auto-fill it
-            if (!document.getElementById('meta_title').value) {
-                document.getElementById('meta_title').value = name + ' - Shop Category';
-            }
+        //     // If you have meta title, auto-fill it
+        //     if (!document.getElementById('meta_title').value) {
+        //         document.getElementById('meta_title').value = name + ' - Shop Category';
+        //     }
 
-            // If you have meta description, auto-fill it
-            if (!document.getElementById('meta_description').value && document.getElementById('description')
-                .value) {
-                const desc = document.getElementById('description').value;
-                document.getElementById('meta_description').value = desc.substring(0, 160);
-            }
-        });
+        //     // If you have meta description, auto-fill it
+        //     if (!document.getElementById('meta_description').value && document.getElementById('description')
+        //         .value) {
+        //         const desc = document.getElementById('description').value;
+        //         document.getElementById('meta_description').value = desc.substring(0, 160);
+        //     }
+        // });
     </script>
 @endpush

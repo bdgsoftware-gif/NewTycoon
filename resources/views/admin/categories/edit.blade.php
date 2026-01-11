@@ -68,6 +68,21 @@
                                 @enderror
                             </div>
 
+                            <!-- Slug Field (Add this if you want to edit slug) -->
+                            {{-- <div>
+                                <label for="slug" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Slug
+                                </label>
+                                <input type="text" id="slug" name="slug"
+                                    value="{{ old('slug', $category->slug) }}"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                                    placeholder="category-slug">
+                                <p class="mt-1 text-xs text-gray-500">Leave empty to auto-generate from name</p>
+                                @error('slug')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div> --}}
+
                             <!-- Parent Category -->
                             <div>
                                 <label for="parent_id" class="block text-sm font-medium text-gray-700 mb-1">
@@ -81,6 +96,9 @@
                                             <option value="{{ $parent->id }}"
                                                 {{ old('parent_id', $category->parent_id) == $parent->id ? 'selected' : '' }}>
                                                 {{ $parent->name }}
+                                                @if ($parent->parent)
+                                                    ({{ $parent->parent->name }})
+                                                @endif
                                             </option>
                                         @endif
                                     @endforeach
@@ -89,6 +107,20 @@
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
+
+                            <!-- Navigation Order (Add this field) -->
+                            {{-- <div>
+                                <label for="nav_order" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Navigation Order
+                                </label>
+                                <input type="number" id="nav_order" name="nav_order"
+                                    value="{{ old('nav_order', $category->nav_order) }}" min="0"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                                    placeholder="0">
+                                @error('nav_order')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div> --}}
 
                             <!-- Order -->
                             <div>
@@ -112,13 +144,13 @@
                                 <div class="mt-2">
                                     <label class="inline-flex items-center mr-4">
                                         <input type="radio" name="is_active" value="1"
-                                            {{ old('is_active', $category->is_active) ? 'checked' : '' }}
+                                            {{ old('is_active', $category->is_active) == '1' ? 'checked' : '' }}
                                             class="h-4 w-4 text-primary focus:ring-primary border-gray-300">
                                         <span class="ml-2 text-sm text-gray-700">Active</span>
                                     </label>
                                     <label class="inline-flex items-center">
                                         <input type="radio" name="is_active" value="0"
-                                            {{ old('is_active', $category->is_active) === false ? 'checked' : '' }}
+                                            {{ old('is_active', $category->is_active) == '0' ? 'checked' : '' }}
                                             class="h-4 w-4 text-primary focus:ring-primary border-gray-300">
                                         <span class="ml-2 text-sm text-gray-700">Inactive</span>
                                     </label>
@@ -153,11 +185,11 @@
                                 @if ($category->image)
                                     <div id="imagePreview"
                                         class="h-40 w-40 border-2 border-gray-300 rounded-2xl overflow-hidden relative group">
-                                        <img id="previewImage" src="{{ Storage::url($category->image) }}"
+                                        <img id="previewImage" src="{{ asset('storage/' . $category->image) }}"
                                             class="h-full w-full object-cover">
                                         <div
                                             class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <button type="button" onclick="removeImage()"
+                                            <button type="button" onclick="removeExistingImage()"
                                                 class="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
                                                 <svg class="h-5 w-5" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
@@ -168,6 +200,7 @@
                                         </div>
                                     </div>
                                     <input type="hidden" name="remove_image" id="removeImageField" value="0">
+                                    <div id="noImage" class="hidden"></div>
                                 @else
                                     <div id="imagePreview"
                                         class="h-40 w-40 border-2 border-dashed border-gray-300 rounded-2xl flex items-center justify-center bg-gray-50 overflow-hidden hidden">
@@ -190,7 +223,11 @@
                                 <div class="space-y-4">
                                     <div>
                                         <label for="image" class="block text-sm font-medium text-gray-700 mb-1">
-                                            Upload New Image
+                                            @if ($category->image)
+                                                Replace Image
+                                            @else
+                                                Upload Image
+                                            @endif
                                         </label>
                                         <input type="file" id="image" name="image" accept="image/*"
                                             class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
@@ -207,16 +244,16 @@
                                     <div class="space-y-2">
                                         <label class="flex items-center">
                                             <input type="checkbox" name="is_featured" value="1"
-                                                {{ old('is_featured', $category->is_featured) ? 'checked' : '' }}
+                                                {{ old('is_featured', $category->is_featured) == '1' ? 'checked' : '' }}
                                                 class="h-4 w-4 text-primary rounded border-gray-300 focus:ring-primary">
                                             <span class="ml-2 text-sm text-gray-700">Mark as featured category</span>
                                         </label>
 
                                         <label class="flex items-center">
-                                            <input type="checkbox" name="show_on_homepage" value="1"
-                                                {{ old('show_on_homepage') ? 'checked' : '' }}
+                                            <input type="checkbox" name="show_in_nav" value="1"
+                                                {{ old('show_in_nav', $category->show_in_nav) == '1' ? 'checked' : '' }}
                                                 class="h-4 w-4 text-primary rounded border-gray-300 focus:ring-primary">
-                                            <span class="ml-2 text-sm text-gray-700">Show on homepage</span>
+                                            <span class="ml-2 text-sm text-gray-700">Show in navigation</span>
                                         </label>
                                     </div>
                                 </div>
@@ -279,7 +316,7 @@
                     <!-- Statistics -->
                     <div class="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-xl p-5">
                         <h3 class="text-lg font-medium text-gray-900 mb-4">Category Statistics</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div class="bg-white rounded-lg p-4 border border-gray-200">
                                 <p class="text-sm text-gray-600">Total Products</p>
                                 <p class="text-2xl font-bold text-gray-900">{{ $category->products_count ?? 0 }}</p>
@@ -291,6 +328,11 @@
                             <div class="bg-white rounded-lg p-4 border border-gray-200">
                                 <p class="text-sm text-gray-600">Created</p>
                                 <p class="text-lg font-medium text-gray-900">{{ $category->created_at->format('M d, Y') }}
+                                </p>
+                            </div>
+                            <div class="bg-white rounded-lg p-4 border border-gray-200">
+                                <p class="text-sm text-gray-600">Last Updated</p>
+                                <p class="text-lg font-medium text-gray-900">{{ $category->updated_at->format('M d, Y') }}
                                 </p>
                             </div>
                         </div>
@@ -387,21 +429,39 @@
                 const reader = new FileReader();
 
                 reader.onload = function(e) {
-                    preview.src = e.target.result;
+                    // If preview div exists, show it
                     if (previewDiv) {
                         previewDiv.classList.remove('hidden');
-                        previewDiv.classList.add('group');
                         previewDiv.innerHTML = `
-                        <img id="previewImage" class="h-full w-full object-cover">
-                        <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <button type="button" onclick="removeImage()" class="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                            </button>
-                        </div>
-                    `;
+                            <img id="previewImage" src="${e.target.result}" class="h-full w-full object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <button type="button" onclick="removeNewImage()" class="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        // Create preview div if it doesn't exist
+                        const newPreviewDiv = document.createElement('div');
+                        newPreviewDiv.id = 'imagePreview';
+                        newPreviewDiv.className =
+                            'h-40 w-40 border-2 border-gray-300 rounded-2xl overflow-hidden relative group';
+                        newPreviewDiv.innerHTML = `
+                            <img id="previewImage" src="${e.target.result}" class="h-full w-full object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <button type="button" onclick="removeNewImage()" class="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        `;
+                        document.querySelector('.w-40').prepend(newPreviewDiv);
                     }
+
+                    // Hide no image div if it exists
                     if (noImageDiv) {
                         noImageDiv.classList.add('hidden');
                     }
@@ -411,13 +471,41 @@
             }
         }
 
-        function removeImage() {
+        function removeExistingImage() {
             document.getElementById('removeImageField').value = '1';
-            document.getElementById('imagePreview').classList.add('hidden');
-            if (document.getElementById('noImage')) {
-                document.getElementById('noImage').classList.remove('hidden');
+            document.getElementById('imagePreview').style.display = 'none';
+
+            // Show no image placeholder
+            const noImageDiv = document.getElementById('noImage');
+            if (!noImageDiv) {
+                const newNoImageDiv = document.createElement('div');
+                newNoImageDiv.id = 'noImage';
+                newNoImageDiv.className =
+                    'h-40 w-40 border-2 border-dashed border-gray-300 rounded-2xl flex flex-col items-center justify-center bg-gray-50';
+                newNoImageDiv.innerHTML = `
+                    <svg class="h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <p class="mt-2 text-xs text-gray-500">No image</p>
+                `;
+                document.querySelector('.w-40').appendChild(newNoImageDiv);
+            } else {
+                noImageDiv.classList.remove('hidden');
             }
+        }
+
+        function removeNewImage() {
             document.getElementById('image').value = '';
+            const previewDiv = document.getElementById('imagePreview');
+            const noImageDiv = document.getElementById('noImage');
+
+            if (previewDiv) {
+                previewDiv.remove();
+            }
+
+            if (noImageDiv) {
+                noImageDiv.classList.remove('hidden');
+            }
         }
 
         function deleteCategory() {
@@ -431,6 +519,26 @@
         function confirmDelete() {
             document.getElementById('deleteForm').submit();
         }
+
+        // Auto-generate slug from name
+        // document.getElementById('name').addEventListener('input', function() {
+        //     const name = this.value;
+        //     const slugField = document.getElementById('slug');
+
+        //     // Only auto-generate if slug field is empty or hasn't been manually modified
+        //     if (!slugField.dataset.manual && (!slugField.value || slugField.value === '{{ $category->slug }}')) {
+        //         const slug = name.toLowerCase()
+        //             .replace(/[^\w\s-]/g, '')
+        //             .replace(/\s+/g, '-')
+        //             .replace(/--+/g, '-');
+        //         slugField.value = slug;
+        //     }
+        // });
+
+        // Mark slug as manually modified
+        // document.getElementById('slug').addEventListener('input', function() {
+        //     this.dataset.manual = 'true';
+        // });
 
         // Close modal on ESC key
         document.addEventListener('keydown', function(e) {
