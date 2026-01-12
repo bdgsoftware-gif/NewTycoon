@@ -56,27 +56,6 @@
 
                 <!-- Card Content -->
                 <div class="px-6 py-8">
-                    <!-- Session Status for Breeze -->
-                    @if (session('status'))
-                        <div class="mb-4 font-medium text-sm text-green-600">
-                            {{ session('status') }}
-                        </div>
-                    @endif
-
-                    <!-- Validation Errors for Breeze -->
-                    @if ($errors->any())
-                        <div class="mb-4">
-                            <div class="font-medium text-red-600">
-                                {{ __('Whoops! Something went wrong.') }}
-                            </div>
-                            <ul class="mt-3 list-disc list-inside text-sm text-red-600">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
                     <!-- Main Content -->
                     @yield('content')
                 </div>

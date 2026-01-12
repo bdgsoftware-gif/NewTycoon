@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             RolePermissionSeeder::class,
             CategorySeeder::class,
-            BrandSeeder::class,
+            // BrandSeeder::class,
             UserSeeder::class,
             UserProfileSeeder::class,
             ProductSeeder::class,
@@ -24,6 +24,8 @@ class DatabaseSeeder extends Seeder
             CartSeeder::class,
             ReviewSeeder::class,
             FooterSeeder::class,
+            OfferSeeder::class,
+            HeroSlideSeeder::class
         ]);
     }
 }

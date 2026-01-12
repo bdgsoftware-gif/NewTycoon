@@ -13,6 +13,13 @@ class ProductObserver
         protected ProductPricingService $pricingService
     ) {}
 
+    public function creating(Product $product)
+    {
+        if (blank($product->name_bn)) {
+            $product->name_bn = $product->name_en;
+        }
+    }
+
     /**
      * Handle the Product "created" event.
      */

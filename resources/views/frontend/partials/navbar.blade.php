@@ -81,11 +81,11 @@
                     <!-- Single link -->
                     <a href="/catalog"
                         class="text-gray-700 hover:text-primary md:px-1 md:py-2 xl:px-3 rounded-md text-base md:text-sm xl:text-base font-semibold transition-colors duration-200">
-                        Catalog
+                        {{ __('navbar.catalog') }}
                     </a>
                     <a href="{{ route('categories.index') }}"
                         class="text-gray-700 hover:text-primary md:px-1 md:py-2 xl:px-3 rounded-md text-base md:text-sm xl:text-base font-semibold transition-colors duration-200">
-                        All Categories
+                        {{ __('navbar.all-categories') }}
                     </a>
                 </div>
             </div>
@@ -115,12 +115,12 @@
                     <div
                         class="absolute right-0 mt-2 w-24 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 border border-gray-200">
                         <div class="py-2">
-                            <button
-                                class="w-full px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
+                            <button onclick="location.href='{{ url('language/en') }}'"
+                                class="w-full px-4 py-2 text-base md:text-sm xl:text-base {{ app()->getLocale() == 'en' ? 'bg-primary/60 text-white' : 'text-gray-700' }} hover:bg-accent/70 hover:text-white">
                                 English
                             </button>
-                            <button
-                                class="w-full px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
+                            <button onclick="location.href='{{ url('language/bn') }}'"
+                                class="w-full px-4 py-2 text-base md:text-sm xl:text-base {{ app()->getLocale() == 'bn' ? 'bg-primary/60 text-white' : 'text-gray-700' }} hover:bg-accent/70 hover:text-white">
                                 বাংলা
                             </button>
                         </div>
@@ -158,30 +158,30 @@
                                 @if (auth()->user()->hasAnyRole(['admin', 'moderator']))
                                     <a href="{{ route('admin.dashboard') }}"
                                         class="block px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
-                                        Admin Panel</a>
+                                        {{ __('navbar.admin-dashboard') }}</a>
                                 @endif
                                 <!-- Authenticated user menu -->
                                 <a href="{{ route('profile') }}"
                                     class="block px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
-                                    Profile
+                                    {{ __('navbar.profile') }}</a>
                                 </a>
 
                                 <a href="{{ route('orders.track') }}"
                                     class="block px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
-                                    Track Order
+                                    {{ __('navbar.track-order') }}</a>
                                 </a>
                                 <!-- Show only for customers -->
                                 @if (auth()->user()->hasRole('customer'))
                                     <a href="/orders"
                                         class="block px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
-                                        My Orders</a>
+                                        {{ __('navbar.my-orders') }}</a>
                                 @endif
 
                                 <!-- Show only with specific permission -->
                                 @if (auth()->user()->hasPermission('manage_products'))
                                     <a href="/admin/products"
                                         class="block px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
-                                        Products</a>
+                                        {{ __('navbar.products-management') }}</a>
                                 @endif
                                 {{--  --}}
                                 <hr class="my-1">
@@ -189,23 +189,23 @@
                                     @csrf
                                     <button type="submit"
                                         class="block w-full text-left px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
-                                        Logout
+                                        {{ __('navbar.logout') }}
                                     </button>
                                 </form>
                             @else
                                 <!-- Guest user menu -->
                                 <a href="{{ route('login') }}"
                                     class="block px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
-                                    Sign In
+                                    {{ __('navbar.sign-in') }}
                                 </a>
                                 <a href="{{ route('register') }}"
                                     class="block px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
-                                    Sign Up
+                                    {{ __('navbar.sign-up') }}
                                 </a>
                                 <hr class="my-1">
                                 <a href="{{ route('orders.track') }}"
                                     class="block px-4 py-2 text-base md:text-sm xl:text-base text-gray-700 hover:bg-accent/70 hover:text-white">
-                                    Track Order
+                                    {{ __('navbar.track-order') }}
                                 </a>
                             @endauth
                         </div>

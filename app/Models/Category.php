@@ -13,27 +13,23 @@ class Category extends Model
 {
     use HasFactory, SoftDeletes;
 
+
     protected $fillable = [
-        'name',
+        'name_en',
+        'name_bn',
+        'description_en',
+        'description_bn',
         'slug',
-        'description',
         'image',
         'parent_id',
-
-        // Ordering
         'order',
         'nav_order',
-
-        // Flags
         'is_featured',
         'show_in_nav',
         'is_active',
-
-        // SEO
-        'meta_title',
-        'meta_description',
         'meta_keywords',
     ];
+
 
     protected $casts = [
         'is_featured' => 'boolean',
@@ -52,13 +48,13 @@ class Category extends Model
 
         static::creating(function ($category) {
             if (empty($category->slug)) {
-                $category->slug = Str::slug($category->name);
+                $category->slug = Str::slug($category->name_en);
             }
         });
 
         static::updating(function ($category) {
-            if ($category->isDirty('name') && empty($category->slug)) {
-                $category->slug = Str::slug($category->name);
+            if ($category->isDirty('name_en') && empty($category->slug)) {
+                $category->slug = Str::slug($category->name_en);
             }
         });
     }
@@ -211,5 +207,19 @@ class Category extends Model
         }
 
         return $parents;
+    }
+
+    public function getNameAttribute(): string
+    {
+        return app()->getLocale() === 'bn'
+            ? ($this->name_bn ?: $this->name_en)
+            : $this->name_en;
+    }
+
+    public function getDescriptionAttribute(): ?string
+    {
+        return app()->getLocale() === 'bn'
+            ? ($this->description_bn ?: $this->description_en)
+            : $this->description_en;
     }
 }

@@ -13,6 +13,7 @@ use App\Http\Controllers\Controller;
 use App\Services\Product\ProductService;
 use App\Services\Product\ActiveProductService;
 use App\Http\Resources\FeaturedProductViewResource;
+use App\Models\HeroSlide;
 
 class HomeController extends Controller
 {
@@ -23,7 +24,8 @@ class HomeController extends Controller
 
     public function index()
     {
-        $heroSlides = $this->heroSlides();
+        $heroSlides = HeroSlide::active()->sorted()->get();
+        // dd($heroSlides);
 
         // Get active categories with active parents
         $categories = Category::active()->root()->featured()->limit(12)->get();

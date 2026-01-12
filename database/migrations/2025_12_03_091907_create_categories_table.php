@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
 
-            $table->string('name');
+            // $table->string('name');
             $table->string('slug')->unique();
-            $table->text('description')->nullable();
+            // $table->text('description')->nullable();
             $table->string('image')->nullable();
 
             $table->unsignedBigInteger('parent_id')->nullable();
@@ -48,6 +48,7 @@ return new class extends Migration
                 ->onDelete('cascade');
 
             $table->index('is_active');
+            $table->index('slug');
             $table->index('parent_id');
             $table->index(['is_active', 'parent_id']);
         });

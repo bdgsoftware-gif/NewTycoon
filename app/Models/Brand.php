@@ -13,17 +13,17 @@ class Brand extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'name_en',
+        'name_bn',
+        'description_en',
+        'description_bn',
+
         'name',
         'slug',
         'description',
         'logo',
-        'website',
         'is_featured',
         'is_active',
-        'meta_title',
-        'meta_description',
-        'meta_keywords',
-        'order',
     ];
 
     protected $casts = [
@@ -40,13 +40,13 @@ class Brand extends Model
 
         static::creating(function ($brand) {
             if (empty($brand->slug)) {
-                $brand->slug = Str::slug($brand->name);
+                $brand->slug = Str::slug($brand->name_en);
             }
         });
 
         static::updating(function ($brand) {
-            if ($brand->isDirty('name') && empty($brand->slug)) {
-                $brand->slug = Str::slug($brand->name);
+            if ($brand->isDirty('name_en') && empty($brand->slug)) {
+                $brand->slug = Str::slug($brand->name_en);
             }
         });
     }

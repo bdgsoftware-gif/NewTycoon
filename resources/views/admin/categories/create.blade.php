@@ -38,11 +38,10 @@
                                 class="px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors">
                                 Cancel
                             </a>
-                            <button type="submit"
+                            <button type="submit" data-loading data-loading-text="Creating..."
                                 class="px-4 py-2 bg-gradient-to-r from-primary to-primary/80 text-white rounded-xl hover:shadow-md transition-all">
                                 Create Category
                             </button>
-
                         </div>
                     </div>
                 </div>
@@ -53,21 +52,35 @@
                     <div class="space-y-4">
                         <h3 class="text-lg font-medium text-gray-900">Basic Information</h3>
 
+                        <!-- English & Bengali Names -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Name -->
                             <div>
-                                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Category Name *
+                                <label for="name_en" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Category Name (English) *
                                 </label>
-                                <input type="text" id="name" name="name" value="{{ old('name') }}" required
+                                <input type="text" id="name_en" name="name_en" value="{{ old('name_en') }}" required
                                     class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
-                                    placeholder="Enter category name">
-                                @error('name')
+                                    placeholder="Enter category name in English">
+                                @error('name_en')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
 
-                            <!-- Parent Category -->
+                            <div>
+                                <label for="name_bn" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Category Name (Bengali)
+                                </label>
+                                <input type="text" id="name_bn" name="name_bn" value="{{ old('name_bn') }}"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                                    placeholder="বাংলায় ক্যাটাগরির নাম লিখুন">
+                                @error('name_bn')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Parent Category & Order -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label for="parent_id" class="block text-sm font-medium text-gray-700 mb-1">
                                     Parent Category
@@ -78,7 +91,10 @@
                                     @foreach ($parentCategories as $parent)
                                         <option value="{{ $parent->id }}"
                                             {{ old('parent_id') == $parent->id ? 'selected' : '' }}>
-                                            {{ $parent->name }}
+                                            {{ $parent->name_en }}
+                                            @if ($parent->name_bn)
+                                                ({{ $parent->name_bn }})
+                                            @endif
                                         </option>
                                     @endforeach
                                 </select>
@@ -87,21 +103,64 @@
                                 @enderror
                             </div>
 
-                            <!-- Order -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="order" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Display Order
+                                    </label>
+                                    <input type="number" id="order" name="order" value="{{ old('order', 0) }}"
+                                        min="0"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                                        placeholder="0">
+                                    @error('order')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div>
+                                    <label for="nav_order" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Nav Order
+                                    </label>
+                                    <input type="number" id="nav_order" name="nav_order" value="{{ old('nav_order', 0) }}"
+                                        min="0"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                                        placeholder="0">
+                                    @error('nav_order')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- English & Bengali Descriptions -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label for="order" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Display Order
+                                <label for="description_en" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Description (English)
                                 </label>
-                                <input type="number" id="order" name="order" value="{{ old('order', 0) }}"
-                                    min="0"
+                                <textarea id="description_en" name="description_en" rows="3"
                                     class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
-                                    placeholder="0">
-                                @error('order')
+                                    placeholder="Enter category description in English">{{ old('description_en') }}</textarea>
+                                @error('description_en')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
 
-                            <!-- Status -->
+                            <div>
+                                <label for="description_bn" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Description (Bengali)
+                                </label>
+                                <textarea id="description_bn" name="description_bn" rows="3"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                                    placeholder="বাংলায় ক্যাটাগরির বিবরণ লিখুন">{{ old('description_bn') }}</textarea>
+                                @error('description_bn')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <!-- Status & Features -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">
                                     Status
@@ -124,19 +183,35 @@
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
-                        </div>
 
-                        <!-- Description -->
-                        <div>
-                            <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
-                                Description
-                            </label>
-                            <textarea id="description" name="description" rows="3"
-                                class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
-                                placeholder="Enter category description">{{ old('description') }}</textarea>
-                            @error('description')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
+                            <div class="space-y-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="is_featured" value="1"
+                                        {{ old('is_featured') ? 'checked' : '' }}
+                                        class="h-4 w-4 text-primary rounded border-gray-300 focus:ring-primary">
+                                    <span class="ml-2 text-sm text-gray-700">Featured Category</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="show_in_nav" value="1"
+                                        {{ old('show_in_nav') ? 'checked' : '' }}
+                                        class="h-4 w-4 text-primary rounded border-gray-300 focus:ring-primary">
+                                    <span class="ml-2 text-sm text-gray-700">Show in Navigation</span>
+                                </label>
+                            </div>
+
+                            <!-- Slug Field -->
+                            {{-- <div>
+                                <label for="slug" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Custom Slug
+                                </label>
+                                <input type="text" id="slug" name="slug" value="{{ old('slug') }}"
+                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                                    placeholder="custom-slug (optional)">
+                                <p class="mt-1 text-xs text-gray-500">Leave empty to auto-generate from English name</p>
+                                @error('slug')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div> --}}
                         </div>
                     </div>
 
@@ -164,38 +239,19 @@
 
                             <!-- Upload Controls -->
                             <div class="flex-1">
-                                <div class="space-y-4">
-                                    <div>
-                                        <label for="image" class="block text-sm font-medium text-gray-700 mb-1">
-                                            Upload Image
-                                        </label>
-                                        <input type="file" id="image" name="image" accept="image/*"
-                                            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
-                                            onchange="previewFile(event)">
-                                        <p class="mt-1 text-xs text-gray-500">
-                                            Recommended size: 400x400px. Supports: JPG, PNG, GIF, WEBP
-                                        </p>
-                                        @error('image')
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-
-                                    <!-- Features -->
-                                    <div class="space-y-2">
-                                        <label class="flex items-center">
-                                            <input type="checkbox" name="is_featured" value="1"
-                                                {{ old('is_featured') ? 'checked' : '' }}
-                                                class="h-4 w-4 text-primary rounded border-gray-300 focus:ring-primary">
-                                            <span class="ml-2 text-sm text-gray-700">Mark as featured category</span>
-                                        </label>
-
-                                        <label class="flex items-center">
-                                            <input type="checkbox" name="show_in_nav" value="1"
-                                                {{ old('show_in_nav') ? 'checked' : '' }}
-                                                class="h-4 w-4 text-primary rounded border-gray-300 focus:ring-primary">
-                                            <span class="ml-2 text-sm text-gray-700">Show in navigation</span>
-                                        </label>
-                                    </div>
+                                <div>
+                                    <label for="image" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Upload Image
+                                    </label>
+                                    <input type="file" id="image" name="image" accept="image/*"
+                                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+                                        onchange="previewFile(event)">
+                                    <p class="mt-1 text-xs text-gray-500">
+                                        Recommended size: 400x400px. Supports: JPG, PNG, JPEG, WEBP (Max: 2MB)
+                                    </p>
+                                    @error('image')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -207,32 +263,35 @@
                         <p class="text-sm text-gray-600">Customize how this category appears in search engines</p>
 
                         <div class="space-y-4">
-                            <!-- Meta Title -->
-                            <div>
-                                <label for="meta_title" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Meta Title
-                                </label>
-                                <input type="text" id="meta_title" name="meta_title" value="{{ old('meta_title') }}"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
-                                    placeholder="Enter meta title for SEO">
-                                <p class="mt-1 text-xs text-gray-500">Recommended: 50-60 characters</p>
-                                @error('meta_title')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <!-- Meta Title -->
+                                <div>
+                                    <label for="meta_title" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Meta Title
+                                    </label>
+                                    <input type="text" id="meta_title" name="meta_title"
+                                        value="{{ old('meta_title') }}"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                                        placeholder="Enter meta title">
+                                    <p class="mt-1 text-xs text-gray-500">50-60 characters</p>
+                                    @error('meta_title')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                            <!-- Meta Description -->
-                            <div>
-                                <label for="meta_description" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Meta Description
-                                </label>
-                                <textarea id="meta_description" name="meta_description" rows="3"
-                                    class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
-                                    placeholder="Enter meta description for SEO">{{ old('meta_description') }}</textarea>
-                                <p class="mt-1 text-xs text-gray-500">Recommended: 150-160 characters</p>
-                                @error('meta_description')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
+                                <!-- Meta Description -->
+                                <div class="md:col-span-2">
+                                    <label for="meta_description" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Meta Description
+                                    </label>
+                                    <textarea id="meta_description" name="meta_description" rows="2"
+                                        class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                                        placeholder="Enter meta description for SEO">{{ old('meta_description') }}</textarea>
+                                    <p class="mt-1 text-xs text-gray-500">150-160 characters recommended</p>
+                                    @error('meta_description')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
                             </div>
 
                             <!-- Meta Keywords -->
@@ -260,7 +319,7 @@
                             class="px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors">
                             Cancel
                         </a>
-                        <button type="submit"
+                        <button type="submit" data-loading data-loading-text="Creating..."
                             class="px-6 py-2.5 bg-gradient-to-r from-primary to-primary/80 text-white font-medium rounded-xl hover:shadow-md transition-all flex items-center">
                             <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -299,28 +358,21 @@
             }
         }
 
-        // Auto-generate slug from name
-        // document.getElementById('name').addEventListener('input', function() {
-        //     const name = this.value;
-        //     const slug = name.toLowerCase()
-        //         .replace(/[^\w\s-]/g, '')
-        //         .replace(/\s+/g, '-')
-        //         .replace(/--+/g, '-');
+        // Auto-generate slug from English name
+        document.getElementById('name_en').addEventListener('input', function() {
+            const slugField = document.getElementById('slug');
+            if (!slugField.value) {
+                const slug = this.value.toLowerCase()
+                    .replace(/[^\w\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/--+/g, '-');
+                slugField.value = slug;
+            }
+        });
 
-        //     // If you have a slug field, uncomment this:
-        //     // document.getElementById('slug').value = slug;
-
-        //     // If you have meta title, auto-fill it
-        //     if (!document.getElementById('meta_title').value) {
-        //         document.getElementById('meta_title').value = name + ' - Shop Category';
-        //     }
-
-        //     // If you have meta description, auto-fill it
-        //     if (!document.getElementById('meta_description').value && document.getElementById('description')
-        //         .value) {
-        //         const desc = document.getElementById('description').value;
-        //         document.getElementById('meta_description').value = desc.substring(0, 160);
-        //     }
-        // });
+        // Mark slug as manually modified
+        document.getElementById('slug').addEventListener('input', function() {
+            this.dataset.manual = 'true';
+        });
     </script>
 @endpush

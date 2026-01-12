@@ -1,18 +1,19 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\ProfileController;
-use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\ContentController;
-use App\Http\Controllers\Admin\AnalyticsController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\SettingsController;
-use App\Http\Controllers\Admin\MediaController;
+use App\Http\Controllers\Admin\AnalyticsController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\HeroSlideController;
 
 // ==============================
 // ADMIN ROUTES (Admin Only)
@@ -101,7 +102,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
         // Actions
         Route::post('/{category}/toggle-feature', [CategoryController::class, 'toggleFeature'])->name('toggle.feature');
-        Route::post('/{category}/toggle-status', [CategoryController::class, 'toggleStatus'])->name('toggle.status');
+        Route::post('/{category}/change-status', [CategoryController::class, 'changeStatus'])->name('change.status');
         Route::post('/{category}/reorder', [CategoryController::class, 'reorder'])->name('reorder');
 
         // Bulk Actions
@@ -293,6 +294,21 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     });
 });
 
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Hero Slides Management
+    Route::prefix('hero-slides')->name('hero-slides.')->group(function () {
+        Route::get('/', [HeroSlideController::class, 'index'])->name('index');
+        Route::get('/create', [HeroSlideController::class, 'create'])->name('create');
+        Route::post('/', [HeroSlideController::class, 'store'])->name('store');
+        Route::get('/{heroSlide}/edit', [HeroSlideController::class, 'edit'])->name('edit');
+        Route::put('/{heroSlide}', [HeroSlideController::class, 'update'])->name('update');
+        Route::delete('/{heroSlide}', [HeroSlideController::class, 'destroy'])->name('destroy');
+
+        // Actions
+        Route::post('/{heroSlide}/toggle-status', [HeroSlideController::class, 'toggleStatus'])->name('toggle.status');
+        Route::post('/reorder', [HeroSlideController::class, 'reorder'])->name('reorder');
+    });
+});
 // ==============================
 // MODERATOR ROUTES (Admin + Moderator)
 // ==============================

@@ -56,15 +56,16 @@ class CategoryController extends Controller
     {
         try {
             $data = $request->validated();
+
+            // Handle image upload
             if ($request->hasFile('image')) {
-                $filename = Str::slug($data['name']) . '.' . $request->file('image')->extension();
+                $filename = Str::slug($data['name_en']) . '-' . time() . '.' . $request->file('image')->extension();
                 $data['image'] = $request->file('image')->storeAs('categories', $filename, 'public');
             }
 
             // Create the category
             Category::create($data);
 
-            // Success feedback - CORRECTED
             flash('Category created successfully!', 'success', 5000, 'The category has been added to the system.');
             return redirect()->route('admin.categories.index');
         } catch (\Exception $e) {
@@ -73,7 +74,6 @@ class CategoryController extends Controller
                 'request' => $request->all(),
             ]);
 
-            // Error feedback - CORRECTED
             flash('Category creation failed!', 'error', 8000, 'There was a problem creating the category. Please try again.');
             return redirect()->back()->withInput();
         }
@@ -85,7 +85,7 @@ class CategoryController extends Controller
             ->where('id', '!=', $category->id)
             ->where('is_active', true)
             ->get();
-
+        // dd($category);
         return view('admin.categories.edit', [
             'category' => $category->load('children'),
             'parentCategories' => $parentCategories,
@@ -105,29 +105,28 @@ class CategoryController extends Controller
                 }
 
                 // Upload new image
-                $filename = Str::slug($data['name']) . '-' . time() . '.' . $request->file('image')->extension();
+                $filename = Str::slug($data['name_en']) . '-' . time() . '.' . $request->file('image')->extension();
                 $data['image'] = $request->file('image')->storeAs('categories', $filename, 'public');
             }
-            // If remove_image flag is true (handled in request's passedValidation)
+            // If remove_image flag is true
             elseif ($request->has('remove_image') && $request->boolean('remove_image')) {
                 // Delete the image file
                 if ($category->image) {
                     Storage::disk('public')->delete($category->image);
                 }
+                $data['image'] = null;
             }
 
             // Prevent setting self as parent
             if (isset($data['parent_id']) && $data['parent_id'] == $category->id) {
-                flash('Invalid Selection', 'error', 8000,  'A category cannot be its own parent.');
+                flash('Invalid Selection', 'error', 8000, 'A category cannot be its own parent.');
                 return redirect()->back()->withInput();
             }
 
             // Update the category
             $category->update($data);
 
-            // Success feedback
-            flash('Category Updated!',  'success',  5000, $category->name . ' has been successfully updated.');
-
+            flash('Category Updated!', 'success', 5000, $category->name_en . ' has been successfully updated.');
             return redirect()->route('admin.categories.index');
         } catch (\Exception $e) {
             Log::error('Error updating category: ' . $e->getMessage(), [
@@ -136,14 +135,11 @@ class CategoryController extends Controller
                 'request' => $request->all(),
             ]);
 
-            // If it's a validation error, let the form request handle it
             if ($e instanceof \Illuminate\Validation\ValidationException) {
                 throw $e;
             }
 
-            // For other errors
-            flash('Update Failed!',  'error',  8000, 'An unexpected error occurred while updating the category. Please try again.');
-
+            flash('Update Failed!', 'error', 8000, 'An unexpected error occurred while updating the category. Please try again.');
             return redirect()->back()->withInput();
         }
     }
@@ -172,6 +168,168 @@ class CategoryController extends Controller
             flash('Deletion Failed!', 'error', 8000, 'An error occurred while deleting the category. Please try again.');
 
             return redirect()->back();
+        }
+    }
+
+    public function toggleFeature(Category $category)
+    {
+        $category->is_featured = !$category->is_featured;
+        $category->save();
+
+        return response()->json([
+            'success' => true,
+            'is_featured' => $category->is_featured,
+        ]);
+    }
+
+    public function changeStatus(Request $request, Category $category)
+    {
+        $request->validate([
+            'is_active' => 'required|boolean',
+        ]);
+
+        $category->is_active = $request->is_active;
+        $category->save();
+
+        return response()->json([
+            'success' => true,
+            'is_active' => $category->is_active,
+        ]);
+    }
+    
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:categories,id'
+        ]);
+
+        try {
+            $categories = Category::whereIn('id', $request->ids)->get();
+            $count = 0;
+
+            foreach ($categories as $category) {
+                // Don't delete if has children
+                if ($category->children()->count() > 0) {
+                    continue;
+                }
+
+                // Delete image if exists
+                if ($category->image) {
+                    Storage::disk('public')->delete($category->image);
+                }
+
+                $category->delete();
+                $count++;
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "{$count} categories deleted successfully.",
+                'count' => $count
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Bulk delete error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete categories.'
+            ], 500);
+        }
+    }
+
+    public function bulkActivate(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:categories,id'
+        ]);
+
+        try {
+            $count = Category::whereIn('id', $request->ids)
+                ->update(['is_active' => true]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "{$count} categories activated.",
+                'count' => $count
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Bulk activate error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to activate categories.'
+            ], 500);
+        }
+    }
+
+    public function bulkDeactivate(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:categories,id'
+        ]);
+
+        try {
+            $count = Category::whereIn('id', $request->ids)
+                ->update(['is_active' => false]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "{$count} categories deactivated.",
+                'count' => $count
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Bulk deactivate error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to deactivate categories.'
+            ], 500);
+        }
+    }
+
+    public function reorder(Request $request, Category $category)
+    {
+        $request->validate([
+            'direction' => 'required|in:up,down'
+        ]);
+
+        try {
+            $sibling = null;
+
+            if ($request->direction === 'up') {
+                // Move up - find previous sibling
+                $sibling = Category::where('parent_id', $category->parent_id)
+                    ->where('order', '<', $category->order)
+                    ->orderBy('order', 'desc')
+                    ->first();
+            } else {
+                // Move down - find next sibling
+                $sibling = Category::where('parent_id', $category->parent_id)
+                    ->where('order', '>', $category->order)
+                    ->orderBy('order', 'asc')
+                    ->first();
+            }
+
+            if ($sibling) {
+                // Swap orders
+                $tempOrder = $category->order;
+                $category->order = $sibling->order;
+                $sibling->order = $tempOrder;
+
+                $category->save();
+                $sibling->save();
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Category order updated.'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Reorder error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to reorder category.'
+            ], 500);
         }
     }
 }

@@ -20,6 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'anyrole' => App\Http\Middleware\CheckAnyRole::class,
             'permission' => App\Http\Middleware\PermissionMiddleware::class,
         ]);
+
+        // Apply global middleware
+        $middleware->appendToGroup('web', [
+            App\Http\Middleware\SetLocale::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

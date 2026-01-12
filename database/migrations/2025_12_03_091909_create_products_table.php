@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            // $table->string('name');
             $table->string('sku')->unique();
             $table->string('slug')->unique();
-            $table->text('short_description')->nullable();
-            $table->longText('description')->nullable();
+            // $table->text('short_description')->nullable();
+            // $table->longText('description')->nullable();
             $table->decimal('price', 10, 2);
             $table->decimal('compare_price', 10, 2)->nullable();
             $table->decimal('cost_price', 10, 2)->nullable();
@@ -42,8 +42,8 @@ return new class extends Migration
             $table->decimal('height', 8, 2)->nullable();
 
             // SEO
-            $table->string('meta_title')->nullable();
-            $table->text('meta_description')->nullable();
+            // $table->string('meta_title')->nullable();
+            // $table->text('meta_description')->nullable();
             $table->string('meta_keywords')->nullable();
 
             // Status flags
@@ -70,7 +70,7 @@ return new class extends Migration
             $table->softDeletes();
 
             // Indexes for performance
-            $table->index('name');
+            // $table->index('name');
             $table->index('category_id');
             $table->index('vendor_id');
             $table->index('status');

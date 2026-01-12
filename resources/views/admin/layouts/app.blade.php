@@ -62,7 +62,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script> --}}
     <!-- ApexCharts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
+    {{-- Global Button Lock Utility --}}
+    <script src="{{ asset('js/button-lock.js') }}"></script>
     <!-- Page specific scripts -->
     @stack('scripts')
 </body>

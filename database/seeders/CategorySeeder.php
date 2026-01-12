@@ -25,78 +25,6 @@ class CategorySeeder extends Seeder
         'led-tv' => 'led-tv',
         'monitor' => 'monitor',
         'refrigerator' => 'refrigerator',
-
-        // Level 2 - Air Conditioner
-        'split-ac' => 'split-ac',
-        'window-ac' => 'window-ac',
-        'portable-ac' => 'portable-ac',
-        'inverter-ac' => 'inverter-ac',
-
-        // Level 2 - Fan
-        'ceiling-fan' => 'ceiling-fan',
-        'tower-fan' => 'tower-fan',
-        'table-fan' => 'table-fan',
-        'wall-fan' => 'wall-fan',
-
-        // Level 2 - Room Comforter
-        'air-cooler' => 'air-cooler',
-        'heater' => 'heater',
-        'humidifier' => 'humidifier',
-        'air-purifier' => 'air-purifier',
-
-        // Level 2 - Cookware
-        'cookware-sets' => 'cookware-set',
-        'fry-pans' => 'fry-pan',
-        'saucepans' => 'saucepan',
-        'cooking-utensils' => 'utensils',
-
-        // Level 2 - Gas Burner
-        'gas-stoves' => 'gas-stove',
-        'induction-cooktops' => 'induction',
-        'table-top-burners' => 'table-burner',
-        'outdoor-burners' => 'outdoor-burner',
-
-        // Level 2 - Pressure Cooker
-        'stainless-steel-cookers' => 'ss-cooker',
-        'aluminum-cookers' => 'aluminum-cooker',
-        'electric-cookers' => 'electric-cooker',
-        'non-stick-cookers' => 'nonstick-cooker',
-
-        // Level 2 - Rice Cooker
-        'basic-rice-cookers' => 'basic-rice-cooker',
-        'multi-cookers' => 'multi-cooker',
-        'microwave-rice-cookers' => 'microwave-cooker',
-        'smart-rice-cookers' => 'smart-cooker',
-
-        // Level 2 - Electric Kettle
-        'glass-kettles' => 'glass-kettle',
-        'stainless-kettles' => 'stainless-kettle',
-        'cordless-kettles' => 'cordless-kettle',
-        'temperature-control-kettles' => 'temp-kettle',
-
-        // Level 2 - Mixer Grinder
-        'heavy-duty-mixers' => 'heavy-mixer',
-        'compact-mixers' => 'compact-mixer',
-        'blender-mixers' => 'blender',
-        'food-processors' => 'food-processor',
-
-        // Level 2 - LED TV
-        'smart-tvs' => 'smart-tv',
-        'android-tvs' => 'android-tv',
-        'oled-tvs' => 'oled-tv',
-        '4k-ultra-hd-tvs' => '4k-tv',
-
-        // Level 2 - Monitor
-        'gaming-monitors' => 'gaming-monitor',
-        'office-monitors' => 'office-monitor',
-        'curved-monitors' => 'curved-monitor',
-        'touchscreen-monitors' => 'touch-monitor',
-
-        // Level 2 - Refrigerator
-        'single-door-fridges' => 'single-fridge',
-        'double-door-fridges' => 'double-fridge',
-        'side-by-side-fridges' => 'side-fridge',
-        'mini-refrigerators' => 'mini-fridge',
     ];
 
     public function run(): void
@@ -104,403 +32,113 @@ class CategorySeeder extends Seeder
         // Define the category structure
         $categories = [
             'Air Conditioner' => [
+                'bn_name' => 'এয়ার কন্ডিশনার',
                 'children' => [
                     'Split AC' => [
+                        'bn_name' => 'স্প্লিট এয়ার কন্ডিশনার',
                         'children' => [
-                            '1 Ton Split AC',
-                            '1.5 Ton Split AC',
-                            '2 Ton Split AC',
-                            'Inverter Split AC',
+                            ['name' => '1 Ton Split AC', 'bn_name' => '১ টন স্প্লিট এসি'],
+                            ['name' => '1.5 Ton Split AC', 'bn_name' => '১.৫ টন স্প্লিট এসি'],
+                            ['name' => '2 Ton Split AC', 'bn_name' => '২ টন স্প্লিট এসি'],
+                            ['name' => 'Inverter Split AC', 'bn_name' => 'ইনভার্টার স্প্লিট এসি'],
                         ]
                     ],
                     'Window AC' => [
+                        'bn_name' => 'উইন্ডো এসি',
                         'children' => [
-                            '1 Ton Window AC',
-                            '1.5 Ton Window AC',
-                            '2 Ton Window AC',
+                            ['name' => '1 Ton Window AC', 'bn_name' => '১ টন উইন্ডো এসি'],
+                            ['name' => '1.5 Ton Window AC', 'bn_name' => '১.৫ টন উইন্ডো এসি'],
+                            ['name' => '2 Ton Window AC', 'bn_name' => '২ টন উইন্ডো এসি'],
                         ]
                     ],
-                    'Portable AC' => [
-                        'children' => [
-                            '12000 BTU Portable AC',
-                            '14000 BTU Portable AC',
-                            'Portable AC with Heater',
-                        ]
-                    ],
-                    'Inverter AC' => [
-                        'children' => [
-                            '5 Star Inverter AC',
-                            '3 Star Inverter AC',
-                            'Dual Inverter AC',
-                        ]
-                    ]
                 ]
             ],
 
             'Fan' => [
+                'bn_name' => 'পাখা',
                 'children' => [
                     'Ceiling Fan' => [
+                        'bn_name' => 'সিলিং ফ্যান',
                         'children' => [
-                            'Premium Ceiling Fans',
-                            'Energy Saving Fans',
-                            'Remote Control Fans',
-                            'Decorative Fans',
-                        ]
-                    ],
-                    'Tower Fan' => [
-                        'children' => [
-                            'Oscillating Tower Fans',
-                            'Bladeless Tower Fans',
-                            'Smart Tower Fans',
+                            ['name' => 'Premium Ceiling Fans', 'bn_name' => 'প্রিমিয়াম সিলিং ফ্যান'],
+                            ['name' => 'Energy Saving Fans', 'bn_name' => 'এনার্জি সেভিং ফ্যান'],
+                            ['name' => 'Remote Control Fans', 'bn_name' => 'রিমোট কন্ট্রোল ফ্যান'],
                         ]
                     ],
                     'Table Fan' => [
+                        'bn_name' => 'টেবিল ফ্যান',
                         'children' => [
-                            'USB Table Fans',
-                            'Rechargeable Fans',
-                            'High Speed Fans',
+                            ['name' => 'USB Table Fans', 'bn_name' => 'ইউএসবি টেবিল ফ্যান'],
+                            ['name' => 'Rechargeable Fans', 'bn_name' => 'রিচার্জেবল ফ্যান'],
+                            ['name' => 'High Speed Fans', 'bn_name' => 'হাই স্পিড ফ্যান'],
                         ]
                     ],
-                    'Wall Fan' => [
-                        'children' => [
-                            'Industrial Wall Fans',
-                            'Exhaust Fans',
-                            'Bracket Fans',
-                        ]
-                    ]
-                ]
-            ],
-
-            'Room Comforter' => [
-                'children' => [
-                    'Air Cooler' => [
-                        'children' => [
-                            'Desert Air Coolers',
-                            'Personal Air Coolers',
-                            'Tower Air Coolers',
-                        ]
-                    ],
-                    'Heater' => [
-                        'children' => [
-                            'Oil Filled Heaters',
-                            'Fan Heaters',
-                            'Ceramic Heaters',
-                        ]
-                    ],
-                    'Humidifier' => [
-                        'children' => [
-                            'Ultrasonic Humidifiers',
-                            'Warm Mist Humidifiers',
-                            'Cool Mist Humidifiers',
-                        ]
-                    ],
-                    'Air Purifier' => [
-                        'children' => [
-                            'HEPA Air Purifiers',
-                            'Ionizer Purifiers',
-                            'Smart Air Purifiers',
-                        ]
-                    ]
-                ]
-            ],
-
-            'Cookware' => [
-                'children' => [
-                    'Cookware Sets' => [
-                        'children' => [
-                            'Stainless Steel Sets',
-                            'Non-Stick Cookware Sets',
-                            'Ceramic Cookware Sets',
-                        ]
-                    ],
-                    'Fry Pans' => [
-                        'children' => [
-                            'Non-Stick Fry Pans',
-                            'Cast Iron Pans',
-                            'Ceramic Fry Pans',
-                        ]
-                    ],
-                    'Saucepans' => [
-                        'children' => [
-                            'Stainless Saucepans',
-                            'Copper Bottom Saucepans',
-                            'Glass Saucepan',
-                        ]
-                    ],
-                    'Cooking Utensils' => [
-                        'children' => [
-                            'Spatulas & Turners',
-                            'Ladles & Spoons',
-                            'Kitchen Tongs',
-                        ]
-                    ]
-                ]
-            ],
-
-            'Gas Burner' => [
-                'children' => [
-                    'Gas Stoves' => [
-                        'children' => [
-                            '2 Burner Gas Stove',
-                            '3 Burner Gas Stove',
-                            '4 Burner Gas Stove',
-                            'Auto Ignition Stoves',
-                        ]
-                    ],
-                    'Induction Cooktops' => [
-                        'children' => [
-                            'Single Induction',
-                            'Double Induction',
-                            'Touch Control Induction',
-                        ]
-                    ],
-                    'Table Top Burners' => [
-                        'children' => [
-                            'Single Burner',
-                            'Double Burner',
-                            'Portable Burners',
-                        ]
-                    ],
-                    'Outdoor Burners' => [
-                        'children' => [
-                            'Camping Burners',
-                            'BBQ Burners',
-                            'High Pressure Burners',
-                        ]
-                    ]
-                ]
-            ],
-
-            'Pressure Cooker' => [
-                'children' => [
-                    'Stainless Steel Cookers' => [
-                        'children' => [
-                            '3 Liter Pressure Cooker',
-                            '5 Liter Pressure Cooker',
-                            '7 Liter Pressure Cooker',
-                        ]
-                    ],
-                    'Aluminum Cookers' => [
-                        'children' => [
-                            'Traditional Pressure Cooker',
-                            'Hard Anodized Cooker',
-                            'Lightweight Cooker',
-                        ]
-                    ],
-                    'Electric Cookers' => [
-                        'children' => [
-                            'Digital Pressure Cooker',
-                            'Multi-Cooker',
-                            'Slow Cooker',
-                        ]
-                    ],
-                    'Non-Stick Cookers' => [
-                        'children' => [
-                            'Granite Coated Cooker',
-                            'Ceramic Coated Cooker',
-                            'Marble Coated Cooker',
-                        ]
-                    ]
-                ]
-            ],
-
-            'Rice Cooker' => [
-                'children' => [
-                    'Basic Rice Cookers' => [
-                        'children' => [
-                            '1 Liter Rice Cooker',
-                            '1.8 Liter Rice Cooker',
-                            '3 Liter Rice Cooker',
-                        ]
-                    ],
-                    'Multi-Cookers' => [
-                        'children' => [
-                            'Rice & Steamer Cooker',
-                            'Slow Cooker Combo',
-                            'Pressure Rice Cooker',
-                        ]
-                    ],
-                    'Microwave Rice Cookers' => [
-                        'children' => [
-                            'Microwave Safe Cookers',
-                            'Steam Rice Cookers',
-                            'Quick Rice Cookers',
-                        ]
-                    ],
-                    'Smart Rice Cookers' => [
-                        'children' => [
-                            'Fuzzy Logic Cookers',
-                            'WiFi Enabled Cookers',
-                            'Programmable Cookers',
-                        ]
-                    ]
-                ]
-            ],
-
-            'Electric Kettle' => [
-                'children' => [
-                    'Glass Kettles' => [
-                        'children' => [
-                            '1.5 Liter Glass Kettle',
-                            '1.8 Liter Glass Kettle',
-                            'LED Light Kettles',
-                        ]
-                    ],
-                    'Stainless Kettles' => [
-                        'children' => [
-                            'Stainless Steel Kettle',
-                            'Coated Stainless Kettle',
-                            'Premium Kettles',
-                        ]
-                    ],
-                    'Cordless Kettles' => [
-                        'children' => [
-                            '360° Cordless Kettle',
-                            'Fast Boil Kettles',
-                            'Safety Kettles',
-                        ]
-                    ],
-                    'Temperature Control Kettles' => [
-                        'children' => [
-                            'Variable Temp Kettles',
-                            'Keep Warm Kettles',
-                            'Gooseneck Kettles',
-                        ]
-                    ]
-                ]
-            ],
-
-            'Mixer Grinder' => [
-                'children' => [
-                    'Heavy Duty Mixers' => [
-                        'children' => [
-                            '1000W Mixer Grinder',
-                            '750W Mixer Grinder',
-                            'Commercial Mixers',
-                        ]
-                    ],
-                    'Compact Mixers' => [
-                        'children' => [
-                            '3 Jar Mixer',
-                            '500W Mixer Grinder',
-                            'Mini Mixer Grinder',
-                        ]
-                    ],
-                    'Blender Mixers' => [
-                        'children' => [
-                            'Juicer Mixer Grinder',
-                            'Smoothie Blender',
-                            'Immersion Blender',
-                        ]
-                    ],
-                    'Food Processors' => [
-                        'children' => [
-                            'Chopper & Grinder',
-                            'Dough Maker',
-                            'Multi-function Processor',
-                        ]
-                    ]
-                ]
-            ],
-
-            'LED TV' => [
-                'children' => [
-                    'Smart TVs' => [
-                        'children' => [
-                            '32 inch Smart TV',
-                            '43 inch Smart TV',
-                            '55 inch Smart TV',
-                            '65 inch Smart TV',
-                        ]
-                    ],
-                    'Android TVs' => [
-                        'children' => [
-                            'Android 11 TV',
-                            'Google TV',
-                            'Built-in Netflix TV',
-                        ]
-                    ],
-                    'OLED TVs' => [
-                        'children' => [
-                            '55 inch OLED TV',
-                            '65 inch OLED TV',
-                            '77 inch OLED TV',
-                        ]
-                    ],
-                    '4K Ultra HD TVs' => [
-                        'children' => [
-                            '4K HDR TV',
-                            '4K QLED TV',
-                            '8K Ultra HD TV',
-                        ]
-                    ]
-                ]
-            ],
-
-            'Monitor' => [
-                'children' => [
-                    'Gaming Monitors' => [
-                        'children' => [
-                            '144Hz Gaming Monitor',
-                            '240Hz Gaming Monitor',
-                            'Curved Gaming Monitor',
-                            '4K Gaming Monitor',
-                        ]
-                    ],
-                    'Office Monitors' => [
-                        'children' => [
-                            'Full HD Monitor',
-                            'Eye Care Monitor',
-                            'UltraWide Monitor',
-                        ]
-                    ],
-                    'Curved Monitors' => [
-                        'children' => [
-                            '1500R Curved Monitor',
-                            '1800R Curved Monitor',
-                            'Super UltraWide Curved',
-                        ]
-                    ],
-                    'Touchscreen Monitors' => [
-                        'children' => [
-                            '10 Point Touch Monitor',
-                            'Industrial Touch Monitor',
-                            'All-in-One Touch Screen',
-                        ]
-                    ]
                 ]
             ],
 
             'Refrigerator' => [
+                'bn_name' => 'রেফ্রিজারেটর',
                 'children' => [
                     'Single Door Fridges' => [
+                        'bn_name' => 'সিঙ্গেল ডোর ফ্রিজ',
                         'children' => [
-                            '165 Liter Refrigerator',
-                            '190 Liter Refrigerator',
-                            '230 Liter Refrigerator',
+                            ['name' => '165 Liter Refrigerator', 'bn_name' => '১৬৫ লিটার রেফ্রিজারেটর'],
+                            ['name' => '190 Liter Refrigerator', 'bn_name' => '১৯০ লিটার রেফ্রিজারেটর'],
+                            ['name' => '230 Liter Refrigerator', 'bn_name' => '২৩০ লিটার রেফ্রিজারেটর'],
                         ]
                     ],
                     'Double Door Fridges' => [
+                        'bn_name' => 'ডাবল ডোর ফ্রিজ',
                         'children' => [
-                            '250 Liter Refrigerator',
-                            '300 Liter Refrigerator',
-                            '350 Liter Refrigerator',
+                            ['name' => '250 Liter Refrigerator', 'bn_name' => '২৫০ লিটার রেফ্রিজারেটর'],
+                            ['name' => '300 Liter Refrigerator', 'bn_name' => '৩০০ লিটার রেফ্রিজারেটর'],
+                            ['name' => '350 Liter Refrigerator', 'bn_name' => '৩৫০ লিটার রেফ্রিজারেটর'],
                         ]
                     ],
-                    'Side by Side Fridges' => [
+                ]
+            ],
+
+            'LED TV' => [
+                'bn_name' => 'এলইডি টিভি',
+                'children' => [
+                    'Smart TVs' => [
+                        'bn_name' => 'স্মার্ট টিভি',
                         'children' => [
-                            'Side by Side 500L',
-                            'French Door Refrigerator',
-                            'Bottom Freezer Fridge',
+                            ['name' => '32 inch Smart TV', 'bn_name' => '৩২ ইঞ্চি স্মার্ট টিভি'],
+                            ['name' => '43 inch Smart TV', 'bn_name' => '৪৩ ইঞ্চি স্মার্ট টিভি'],
+                            ['name' => '55 inch Smart TV', 'bn_name' => '৫৫ ইঞ্চি স্মার্ট টিভি'],
                         ]
                     ],
-                    'Mini Refrigerators' => [
+                    'Android TVs' => [
+                        'bn_name' => 'অ্যান্ড্রয়েড টিভি',
                         'children' => [
-                            'Mini Bar Fridge',
-                            'Portable Refrigerator',
-                            'Compact Fridge',
+                            ['name' => 'Android 11 TV', 'bn_name' => 'অ্যান্ড্রয়েড ১১ টিভি'],
+                            ['name' => 'Google TV', 'bn_name' => 'গুগল টিভি'],
+                            ['name' => 'Built-in Netflix TV', 'bn_name' => 'নেটফ্লিক্স সহ টিভি'],
                         ]
-                    ]
+                    ],
+                ]
+            ],
+
+            'Mixer Grinder' => [
+                'bn_name' => 'মিক্সার গ্রাইন্ডার',
+                'children' => [
+                    'Heavy Duty Mixers' => [
+                        'bn_name' => 'হেভি ডিউটি মিক্সার',
+                        'children' => [
+                            ['name' => '1000W Mixer Grinder', 'bn_name' => '১০০০ ওয়াট মিক্সার গ্রাইন্ডার'],
+                            ['name' => '750W Mixer Grinder', 'bn_name' => '৭৫০ ওয়াট মিক্সার গ্রাইন্ডার'],
+                            ['name' => 'Commercial Mixers', 'bn_name' => 'কমার্শিয়াল মিক্সার'],
+                        ]
+                    ],
+                    'Compact Mixers' => [
+                        'bn_name' => 'কমপ্যাক্ট মিক্সার',
+                        'children' => [
+                            ['name' => '3 Jar Mixer', 'bn_name' => '৩ জার মিক্সার'],
+                            ['name' => '500W Mixer Grinder', 'bn_name' => '৫০০ ওয়াট মিক্সার গ্রাইন্ডার'],
+                            ['name' => 'Mini Mixer Grinder', 'bn_name' => 'মিনি মিক্সার গ্রাইন্ডার'],
+                        ]
+                    ],
                 ]
             ],
         ];
@@ -509,17 +147,24 @@ class CategorySeeder extends Seeder
 
         foreach ($categories as $name => $data) {
             $slug = Str::slug($name);
+            $bnName = $data['bn_name'] ?? '';
 
             // Create main category (Level 1)
             $mainCategory = Category::updateOrCreate(
                 ['slug' => $slug],
                 [
-                    'name' => $name,
-                    'description' => $this->getDescription($name),
+                    // 'name' => $name,
+                    'name_en' => $name,
+                    'name_bn' => $bnName,
+                    // 'description' => $this->getDescription($name),
+                    'description_en' => $this->getDescription($name),
+                    'description_bn' => $this->getBanglaDescription($name),
                     'image' => $this->getCategoryImage($slug),
                     'parent_id' => null,
                     'order' => $order++,
-                    'is_featured' =>  (bool) rand(0, 1),
+                    'nav_order' => $order,
+                    'show_in_nav' => true,
+                    'is_featured' => in_array($name, ['Air Conditioner', 'Refrigerator', 'LED TV']),
                     'is_active' => true,
                     'meta_title' => $name . ' - Best Products Online',
                     'meta_description' => 'Shop for ' . strtolower($name) . ' at best prices. Top brands available.',
@@ -532,6 +177,7 @@ class CategorySeeder extends Seeder
                 $childOrder = 1;
                 foreach ($data['children'] as $childName => $childData) {
                     $childSlug = Str::slug($childName);
+                    $childBnName = $childData['bn_name'] ?? '';
 
                     $childCategory = Category::updateOrCreate(
                         [
@@ -539,11 +185,16 @@ class CategorySeeder extends Seeder
                             'parent_id' => $mainCategory->id
                         ],
                         [
-                            'name' => $childName,
-                            'description' => $this->getDescription($childName),
+                            // 'name' => $childName,
+                            'name_en' => $childName,
+                            'name_bn' => $childBnName,
+                            // 'description' => $this->getDescription($childName),
+                            'description_en' => $this->getDescription($childName),
+                            'description_bn' => $this->getBanglaDescription($childName),
                             'image' => $this->getCategoryImage($childSlug),
                             'order' => $childOrder++,
-                            'is_featured' => true,
+                            'show_in_nav' => true,
+                            'is_featured' => false,
                             'is_active' => true,
                             'meta_title' => $childName . ' - ' . $name,
                             'meta_description' => 'Best ' . strtolower($childName) . ' under ' . $name . ' category.',
@@ -553,7 +204,9 @@ class CategorySeeder extends Seeder
                     // Create Level 3 categories (grandchildren)
                     if (isset($childData['children']) && is_array($childData['children'])) {
                         $grandChildOrder = 1;
-                        foreach ($childData['children'] as $grandChildName) {
+                        foreach ($childData['children'] as $grandChild) {
+                            $grandChildName = $grandChild['name'];
+                            $grandChildBnName = $grandChild['bn_name'] ?? '';
                             $grandChildSlug = Str::slug($grandChildName);
 
                             Category::updateOrCreate(
@@ -562,10 +215,15 @@ class CategorySeeder extends Seeder
                                     'parent_id' => $childCategory->id
                                 ],
                                 [
-                                    'name' => $grandChildName,
-                                    'description' => $this->getDescription($grandChildName),
+                                    // 'name' => $grandChildName,
+                                    'name_en' => $grandChildName,
+                                    'name_bn' => $grandChildBnName,
+                                    // 'description' => $this->getDescription($grandChildName),
+                                    'description_en' => $this->getDescription($grandChildName),
+                                    'description_bn' => $this->getBanglaDescription($grandChildName),
                                     'image' => $this->getCategoryImage($grandChildSlug, $childSlug),
                                     'order' => $grandChildOrder++,
+                                    'show_in_nav' => false,
                                     'is_featured' => false,
                                     'is_active' => true,
                                     'meta_title' => $grandChildName . ' - ' . $childName,
@@ -594,76 +252,40 @@ class CategorySeeder extends Seeder
     {
         // Check if we have a direct mapping
         if (isset($this->imageMapping[$slug])) {
-            return 'images/cat/' . $this->imageMapping[$slug] . '.png';
-        }
-
-        // Try to find size-based image (like 32-inch, 1-ton, etc.)
-        if (preg_match('/(\d+(?:-?\d+)?)\s*(inch|ton|liter|btu|w|hz)/i', str_replace('-', ' ', $slug), $matches)) {
-            $size = str_replace('.', '-', $matches[1]);
-            $unit = strtolower($matches[2]);
-
-            // Check for common parent patterns
-            if ($parentSlug) {
-                $parentImage = $this->imageMapping[$parentSlug] ?? null;
-                if ($parentImage) {
-                    return 'images/cat/' . $size . '-' . $unit . '-' . $parentImage . '.png';
-                }
-            }
-
-            // Generic size image
-            return 'images/cat/' . $size . '-' . $unit . '.png';
+            return 'categories/' . $this->imageMapping[$slug] . '.png';
         }
 
         // Try parent image with suffix if available
         if ($parentSlug && isset($this->imageMapping[$parentSlug])) {
             $parentImage = $this->imageMapping[$parentSlug];
-
-            // Check for special types
-            if (str_contains($slug, 'premium-') || str_contains($slug, 'deluxe-')) {
-                return 'images/cat/premium-' . $parentImage . '.png';
-            }
-            if (str_contains($slug, 'basic-') || str_contains($slug, 'standard-')) {
-                return 'images/cat/basic-' . $parentImage . '.png';
-            }
-            if (str_contains($slug, 'smart-') || str_contains($slug, 'digital-')) {
-                return 'images/cat/smart-' . $parentImage . '.png';
-            }
-
-            return 'images/cat/' . $parentImage . '-item.png';
+            return 'categories/' . $parentImage . '-item.png';
         }
 
         // Fallback to generic image
-        return 'images/cat/electronics.png';
+        return 'categories/electronics.png';
     }
 
     /**
-     * Get description for category
+     * Get English description for category
      */
     private function getDescription(string $categoryName): string
     {
         $descriptions = [
-            // Level 1
             'Air Conditioner' => 'Cooling solutions including split AC, window AC, and portable AC with energy-saving technology.',
             'Fan' => 'Wide range of fans including ceiling fans, tower fans, and table fans for all cooling needs.',
-            'Room Comforter' => 'Air coolers, heaters, humidifiers, and air purifiers for perfect room comfort.',
-            'Cookware' => 'High-quality cookware sets, fry pans, and kitchen utensils for modern cooking.',
-            'Gas Burner' => 'Gas stoves, induction cooktops, and burners for efficient cooking solutions.',
-            'Pressure Cooker' => 'Pressure cookers in stainless steel, aluminum, and non-stick varieties.',
-            'Rice Cooker' => 'Rice cookers from basic to smart models for perfect rice every time.',
-            'Electric Kettle' => 'Electric kettles in glass, stainless steel, and cordless designs.',
-            'Mixer Grinder' => 'Mixer grinders, blenders, and food processors for all kitchen needs.',
-            'LED TV' => 'LED TVs including Smart TVs, Android TVs, OLED, and 4K Ultra HD models.',
-            'Monitor' => 'Computer monitors for gaming, office work, and professional use.',
-            'Refrigerator' => 'Refrigerators including single door, double door, and side-by-side models.',
-
-            // Level 2 - Common patterns
-            'Split AC' => 'Energy efficient split air conditioners for home and office.',
-            'Window AC' => 'Compact window air conditioners for easy installation.',
-            'Portable AC' => 'Mobile air conditioners that can be moved between rooms.',
+            'Refrigerator' => 'Refrigerators including single door, double door, and side-by-side models with advanced cooling technology.',
+            'LED TV' => 'LED TVs including Smart TVs, Android TVs, OLED, and 4K Ultra HD models with latest display technology.',
+            'Mixer Grinder' => 'Mixer grinders, blenders, and food processors for all kitchen needs with powerful motors.',
+            'Split AC' => 'Energy efficient split air conditioners for home and office cooling.',
+            'Window AC' => 'Compact window air conditioners for easy installation and space saving.',
             'Ceiling Fan' => 'Ceiling fans with various designs and energy saving features.',
-            'Smart TV' => 'Smart televisions with built-in streaming apps and internet connectivity.',
-            'Gaming Monitor' => 'High refresh rate monitors for gaming enthusiasts.',
-            'Refrigerator' => 'Refrigerators with advanced cooling technology.',
+            'Table Fan' => 'Portable table fans for personal cooling needs.',
+            'Single Door Fridges' => 'Single door refrigerators perfect for small families and apartments.',
+            'Double Door Fridges' => 'Double door refrigerators with separate freezer compartments.',
+            'Smart TVs' => 'Smart televisions with built-in streaming apps and internet connectivity.',
+            'Android TVs' => 'Android based smart TVs with access to Google Play Store.',
+            'Heavy Duty Mixers' => 'Powerful mixer grinders for heavy kitchen use.',
+            'Compact Mixers' => 'Compact mixer grinders for small families and occasional use.',
         ];
 
         // Try exact match first
@@ -671,42 +293,40 @@ class CategorySeeder extends Seeder
             return $descriptions[$categoryName];
         }
 
-        // Generic description based on keywords
-        $lowerName = strtolower($categoryName);
-
-        if (str_contains($lowerName, 'tv') || str_contains($lowerName, 'television')) {
-            return 'Televisions with latest display technology and smart features.';
-        }
-
-        if (str_contains($lowerName, 'monitor')) {
-            return 'Computer monitors for various applications and user needs.';
-        }
-
-        if (str_contains($lowerName, 'fridge') || str_contains($lowerName, 'refrigerator')) {
-            return 'Refrigeration appliances with energy efficient cooling.';
-        }
-
-        if (str_contains($lowerName, 'ac') || str_contains($lowerName, 'air conditioner')) {
-            return 'Air conditioning units for cooling and climate control.';
-        }
-
-        if (str_contains($lowerName, 'fan')) {
-            return 'Fans for air circulation and cooling purposes.';
-        }
-
-        if (str_contains($lowerName, 'cook') || str_contains($lowerName, 'kitchen')) {
-            return 'Kitchen appliances and cookware for food preparation.';
-        }
-
-        if (str_contains($lowerName, 'mixer') || str_contains($lowerName, 'grinder')) {
-            return 'Kitchen appliances for mixing, grinding, and food processing.';
-        }
-
-        if (str_contains($lowerName, 'kettle')) {
-            return 'Electric kettles for boiling water quickly and safely.';
-        }
-
+        // Generic description
         return $categoryName . ' products with best quality and competitive prices.';
+    }
+
+    /**
+     * Get Bangla description for category
+     */
+    private function getBanglaDescription(string $categoryName): string
+    {
+        $descriptions = [
+            'Air Conditioner' => 'এনার্জি সেভিং টেকনোলজি সহ স্প্লিট এসি, উইন্ডো এসি এবং পোর্টেবল এসি সহ কুলিং সমাধান।',
+            'Fan' => 'সব কুলিং চাহিদার জন্য সিলিং ফ্যান, টাওয়ার ফ্যান এবং টেবিল ফ্যান সহ ফ্যানের বিস্তৃত পরিসর।',
+            'Refrigerator' => 'উন্নত কুলিং প্রযুক্তি সহ সিঙ্গেল ডোর, ডাবল ডোর এবং সাইড বাই সাইড মডেল সহ রেফ্রিজারেটর।',
+            'LED TV' => 'স্মার্ট টিভি, অ্যান্ড্রয়েড টিভি, ওএলইডি এবং ৪কে আলট্রা এইচডি মডেল সহ এলইডি টিভি।',
+            'Mixer Grinder' => 'শক্তিশালী মোটর সহ সমস্ত রান্নাঘরের প্রয়োজনের জন্য মিক্সার গ্রাইন্ডার, ব্লেন্ডার এবং ফুড প্রসেসর।',
+            'Split AC' => 'বাড়ি এবং অফিসের কুলিংয়ের জন্য শক্তি-দক্ষ স্প্লিট এয়ার কন্ডিশনার।',
+            'Window AC' => 'সহজ ইনস্টলেশন এবং স্পেস সেভিংয়ের জন্য কমপ্যাক্ট উইন্ডো এয়ার কন্ডিশনার।',
+            'Ceiling Fan' => 'বিভিন্ন ডিজাইন এবং শক্তি সঞ্চয় বৈশিষ্ট্য সহ সিলিং ফ্যান।',
+            'Table Fan' => 'ব্যক্তিগত কুলিং চাহিদার জন্য পোর্টেবল টেবিল ফ্যান।',
+            'Single Door Fridges' => 'ছোট পরিবার এবং অ্যাপার্টমেন্টের জন্য উপযুক্ত সিঙ্গেল ডোর রেফ্রিজারেটর।',
+            'Double Door Fridges' => 'পৃথক ফ্রিজার কম্পার্টমেন্ট সহ ডাবল ডোর রেফ্রিজারেটর।',
+            'Smart TVs' => 'বিল্ট-ইন স্ট্রিমিং অ্যাপস এবং ইন্টারনেট সংযোগ সহ স্মার্ট টেলিভিশন।',
+            'Android TVs' => 'গুগল প্লে স্টোরের অ্যাক্সেস সহ অ্যান্ড্রয়েড ভিত্তিক স্মার্ট টিভি।',
+            'Heavy Duty Mixers' => 'ভারী রান্নাঘরের ব্যবহারের জন্য শক্তিশালী মিক্সার গ্রাইন্ডার।',
+            'Compact Mixers' => 'ছোট পরিবার এবং মাঝে মাঝে ব্যবহারের জন্য কমপ্যাক্ট মিক্সার গ্রাইন্ডার।',
+        ];
+
+        // Try exact match first
+        if (isset($descriptions[$categoryName])) {
+            return $descriptions[$categoryName];
+        }
+
+        // Generic Bangla description
+        return 'সেরা গুণমান এবং প্রতিযোগিতামূলক মূল্যে ' . $categoryName . ' পণ্য।';
     }
 
     /**
@@ -717,16 +337,9 @@ class CategorySeeder extends Seeder
         $keywordsMap = [
             'Air Conditioner' => 'ac, air conditioning, cooling, split ac, window ac',
             'Fan' => 'ceiling fan, table fan, tower fan, wall fan, cooling fan',
-            'Room Comforter' => 'air cooler, heater, humidifier, air purifier, room comfort',
-            'Cookware' => 'cooking utensils, fry pan, saucepan, kitchenware',
-            'Gas Burner' => 'gas stove, induction cooktop, burner, cooking stove',
-            'Pressure Cooker' => 'pressure cooking, cooker, kitchen appliance',
-            'Rice Cooker' => 'rice maker, automatic rice cooker, electric rice cooker',
-            'Electric Kettle' => 'electric kettle, water boiler, cordless kettle',
-            'Mixer Grinder' => 'mixer, grinder, blender, food processor, kitchen appliance',
-            'LED TV' => 'television, smart tv, led television, android tv',
-            'Monitor' => 'computer monitor, display, screen, gaming monitor',
             'Refrigerator' => 'fridge, refrigerator, cooling appliance, freezer',
+            'LED TV' => 'television, smart tv, led television, android tv',
+            'Mixer Grinder' => 'mixer, grinder, blender, food processor, kitchen appliance',
         ];
 
         $baseKeywords = strtolower($categoryName);

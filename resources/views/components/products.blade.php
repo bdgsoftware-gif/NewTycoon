@@ -4,7 +4,7 @@
         <!-- Section Title -->
         <h2
             class="featured-products-title text-2xl md:text-4xl lg:text-5xl font-semibold text-center text-gray-900 mb-6 md:mb-12 leading-tight font-quantico">
-            Featured Products
+            {{ __('common.featured-products') }}
         </h2>
         <!-- Skeletons -->
         <div class="featured-skeletons grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6">
@@ -262,12 +262,12 @@
                     <div class="relative overflow-hidden">
                         <span
                             class="inline-block transition-transform duration-300 transform group-hover:-translate-y-full">
-                            View More Products
+                            {{ __('common.view-more-products') }}
                         </span>
 
                         <span
                             class="absolute top-full left-0 inline-block w-full transition-transform duration-300 transform group-hover:-translate-y-full">
-                            View More Products
+                            {{ __('common.view-more-products') }}
                         </span>
                     </div>
                 </a>

@@ -8,62 +8,63 @@
 
                     @if ($slide['type'] === 'video')
                         <video class="absolute inset-0 w-full h-full object-cover" autoplay muted loop playsinline>
-                            <source src="{{ asset($slide['background']) }}" type="video/mp4">
+                            <source src="{{ asset('storage/' . $slide['background']) }}" type="video/mp4">
                         </video>
                     @else
-                        <img src="{{ asset($slide['background']) }}" alt="{{ $slide['title'] ?? '' }}"
+                        <img src="{{ asset('storage/' . $slide['background']) }}" alt="{{ $slide['title'] ?? '' }}"
                             class="absolute inset-0 w-full h-full object-contain lg:object-cover">
                     @endif
 
                     <div class="absolute inset-0 bg-black/40 {{ $slide['has_content'] ? '' : 'hidden' }}"></div>
 
-                    @if ($slide['has_content'])
+                    @if ($slide->has_content)
                         <div class="absolute inset-0 flex items-center justify-center">
                             <div class="container mx-auto px-6 md:px-12 lg:px-16 w-full">
-
                                 <div
-                                    class="max-w-3xl transition-all duration-700 {{ $slide['content_position'] === 'right' ? 'ml-auto text-right' : ($slide['content_position'] === 'center' ? 'mx-auto text-center' : 'text-left') }}">
+                                    class="max-w-3xl transition-all duration-700 {{ $slide->content_position === 'right' ? 'ml-auto text-right' : ($slide->content_position === 'center' ? 'mx-auto text-center' : 'text-left') }}">
 
-                                    @if (!empty($slide['badge']))
-                                        <div
-                                            class="inline-flex items-center px-3 py-1 md:px-4 md:py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full mb-3 md:mb-4">
-                                            <span
-                                                class="text-[10px] md:text-xs uppercase tracking-widest font-inter font-bold text-white">
-                                                {{ $slide['badge'] }}
+                                    @if ($slide->badge)
+                                        <div class="inline-flex items-center px-3 py-1 bg-white/10 rounded-full mb-4">
+                                            <span class="text-xs uppercase font-bold text-white">
+                                                {{ $slide->badge }}
                                             </span>
                                         </div>
                                     @endif
 
-                                    @if (!empty($slide['title']))
-                                        <h1
-                                            class="text-2xl md:text-5xl lg:text-6xl xl:text-7xl font-quantico font-bold text-white leading-[1.1] mb-4">
-                                            {!! $slide['title'] !!}
+                                    @if ($slide->title)
+                                        <h1 class="text-4xl md:text-6xl font-bold text-white mb-4">
+                                            {!! $slide->title !!}
                                         </h1>
                                     @endif
 
-                                    @if (!empty($slide['subtitle']))
-                                        <p
-                                            class="font-inter text-sm md:text-lg lg:text-xl text-white/80 max-w-xl {{ $slide['content_position'] === 'center' ? 'mx-auto' : ($slide['content_position'] === 'right' ? 'ml-auto' : '') }} mb-6 md:mb-8">
-                                            {{ $slide['subtitle'] }}
+                                    @if ($slide->subtitle)
+                                        <p class="text-lg text-white/80 mb-8">
+                                            {{ $slide->subtitle }}
                                         </p>
                                     @endif
 
-                                    @if ($slide['has_cta'] && !empty($slide['cta_buttons']))
+                                    @if ($slide->has_cta && !empty($slide->cta_buttons))
                                         <div
-                                            class="flex flex-wrap items-center gap-4 {{ $slide['content_position'] === 'center' ? 'justify-center' : ($slide['content_position'] === 'right' ? 'justify-end' : 'justify-start') }}">
-                                            @foreach ($slide['cta_buttons'] as $button)
+                                            class="flex gap-4
+                        {{ $slide->content_position === 'center'
+                            ? 'justify-center'
+                            : ($slide->content_position === 'right'
+                                ? 'justify-end'
+                                : 'justify-start') }}">
+                                            @foreach ($slide->cta_buttons as $button)
                                                 <a href="{{ $button['url'] }}"
-                                                    class="text-[10px] md:text-sm lg:text-base inline-flex items-center justify-center px-3 py-1.5 md:px-4 md:py-3 xl:px-8 xl:py-4 rounded-lg font-bold transition-all active:scale-95 {{ $button['type'] === 'primary' ? 'bg-white text-black hover:bg-gray-200' : 'border-2 border-white text-white hover:bg-white/10' }}">
-                                                    {{ $button['text'] }}
+                                                    class="px-6 py-3 rounded-lg font-bold
+                               {{ $button['style'] === 'primary' ? 'bg-white text-black' : 'border border-white text-white' }}">
+                                                    {{ app()->getLocale() === 'bn' ? $button['label_bn'] ?? $button['label_en'] : $button['label_en'] }}
                                                 </a>
                                             @endforeach
                                         </div>
                                     @endif
-
                                 </div>
                             </div>
                         </div>
                     @endif
+
                 </div>
             @endforeach
         </div>

@@ -7,6 +7,13 @@ use App\Models\Category;
 
 class CategoryObserver
 {
+    public function creating(Category $category)
+    {
+        if (blank($category->name_bn)) {
+            $category->name_bn = $category->name_en;
+        }
+    }
+
     public function updating(Category $category)
     {
         // If category is being deactivated

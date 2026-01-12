@@ -7,6 +7,8 @@
             @if (request()->routeIs('admin.users.*')) this.activeGroup = 'users';
             @elseif(request()->routeIs('admin.products.*'))
                 this.activeGroup = 'products';
+            @elseif(request()->routeIs('admin.categories.*') || request()->routeIs('admin.hero-slides.*'))
+                this.activeGroup = 'content';
             @elseif(request()->routeIs('admin.orders.*'))
                 this.activeGroup = 'orders';
             @elseif(request()->routeIs('admin.settings.*'))
@@ -121,19 +123,6 @@
             </div>
         @endif
 
-        <!-- Categories -->
-        @if (auth()->user()->hasPermission('manage_products'))
-            <a href="{{ route('admin.categories.index') }}"
-                class="group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.categories.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
-                <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('admin.categories.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}"
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                        d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-                <span class="ml-3 font-inter">Categories</span>
-            </a>
-        @endif
-
         <!-- Brands -->
         @if (auth()->user()->hasPermission('manage_products'))
             {{-- {{ route('admin.brands.index') }} --}}
@@ -146,6 +135,61 @@
                 </svg>
                 <span class="ml-3 font-inter">Brands</span>
             </a>
+        @endif
+
+        <!-- Content -->
+        @if (auth()->user()->hasPermission('manage_content'))
+            <div x-data="{ open: activeGroup === 'content' }">
+                <button @click="open = !open; activeGroup = open ? 'content' : null"
+                    class="w-full group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.content.*', 'admin.categories.*', 'admin.hero-slides.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
+                    <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('admin.content.*', 'admin.categories.*', 'admin.hero-slides.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                    </svg>
+                    <span class="ml-3 font-inter flex-1 text-left">Content</span>
+                    <svg :class="{ 'transform rotate-90': open }"
+                        class="ml-2 h-4 w-4 text-gray-400 transition-transform duration-200 flex-shrink-0"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+
+                <div x-show="open" x-collapse class="ml-8 mt-1 space-y-1">
+                    <!-- Categories -->
+                    <a href="{{ route('admin.categories.index') }}"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.categories.*') ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:text-white hover:bg-gray-700/30' }}">
+                        <svg class="mr-3 h-4 w-4 {{ request()->routeIs('admin.categories.*') ? 'text-primary' : 'text-gray-500 group-hover:text-primary' }}"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        Categories
+                    </a>
+
+                    <!-- Hero Slides -->
+                    <a href="{{ route('admin.hero-slides.index') }}"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.hero-slides.*') ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:text-white hover:bg-gray-700/30' }}">
+                        <svg class="mr-3 h-4 w-4 {{ request()->routeIs('admin.hero-slides.*') ? 'text-primary' : 'text-gray-500 group-hover:text-primary' }}"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Hero Slides
+                    </a>
+
+                    <!-- Add more content management links here as needed -->
+                    {{-- <a href="javascript:void(0);"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors text-gray-400 hover:text-white hover:bg-gray-700/30">
+                        <svg class="mr-3 h-4 w-4 text-gray-500 group-hover:text-primary"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Pages
+                    </a> --}}
+                </div>
+            </div>
         @endif
 
         <!-- Orders -->
@@ -187,20 +231,6 @@
                     </a>
                 </div>
             </div>
-        @endif
-
-        <!-- Content -->
-        @if (auth()->user()->hasPermission('manage_content'))
-            {{-- {{ route('admin.content.index') }} --}}
-            <a href="javascript:void(0);"
-                class="group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.content.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
-                <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('admin.content.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}"
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                        d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                </svg>
-                <span class="ml-3 font-inter">Content</span>
-            </a>
         @endif
 
         <!-- Analytics -->
@@ -282,6 +312,17 @@
                             <i class="fas fa-plus-circle text-primary text-sm"></i>
                         </div>
                         Add Product
+                    </a>
+                @endif
+
+                @if (auth()->user()->hasPermission('manage_content'))
+                    <a href="{{ route('admin.hero-slides.create') }}"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors text-gray-300 hover:text-white hover:bg-gray-700/50">
+                        <div
+                            class="h-8 w-8 rounded-lg bg-primary/20 flex items-center justify-center mr-3 group-hover:bg-primary/30 transition-colors">
+                            <i class="fas fa-image text-primary text-sm"></i>
+                        </div>
+                        Add Hero Slide
                     </a>
                 @endif
             </div>

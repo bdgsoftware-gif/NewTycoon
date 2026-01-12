@@ -14,14 +14,22 @@ class Product extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'name',
+        'name_en',
+        'name_bn',
+        'short_description_en',
+        'short_description_bn',
+        'description_en',
+        'description_bn',
+        'meta_title_en',
+        'meta_title_bn',
+        'meta_description_en',
+        'meta_description_bn',
         'sku',
         'slug',
-        'short_description',
-        'description',
         'price',
         'compare_price',
         'cost_price',
+        'discount_percentage',
         'quantity',
         'alert_quantity',
         'track_quantity',
@@ -36,23 +44,16 @@ class Product extends Model
         'length',
         'width',
         'height',
-        'meta_title',
-        'meta_description',
-        'meta_keywords',
         'is_featured',
         'is_bestsells',
         'is_new',
         'status',
         'stock_status',
-        'average_rating',
-        'rating_count',
-        'total_sold',
-        'total_revenue',
         'category_id',
         'brand_id',
         'vendor_id',
-        'discount_percentage',
     ];
+
 
     protected $casts = [
         'price' => 'decimal:2',
@@ -116,7 +117,7 @@ class Product extends Model
      */
     public function generateUniqueSlug(?int $excludeId = null): string
     {
-        $baseSlug = Str::slug($this->name);
+        $baseSlug = Str::slug($this->name_en);
         $slug = $baseSlug;
         $counter = 1;
 
@@ -226,10 +227,12 @@ class Product extends Model
     public function scopeSearch($query, $search)
     {
         return $query->where(function ($q) use ($search) {
-            $q->where('name', 'LIKE', "%{$search}%")
+            $q->where('name_en', 'LIKE', "%{$search}%")
+                ->orWhere('name_bn', 'LIKE', "%{$search}%")
                 ->orWhere('sku', 'LIKE', "%{$search}%")
                 ->orWhere('model_number', 'LIKE', "%{$search}%")
-                ->orWhere('short_description', 'LIKE', "%{$search}%");
+                ->orWhere('short_description_en', 'LIKE', "%{$search}%")
+                ->orWhere('short_description_bn', 'LIKE', "%{$search}%");
         });
     }
 
@@ -282,5 +285,27 @@ class Product extends Model
         return collect($this->featured_images ?? [])
             ->map(fn($img) => asset('storage/' . $img))
             ->toArray();
+    }
+
+
+    public function getNameAttribute(): string
+    {
+        return app()->getLocale() === 'bn'
+            ? ($this->name_bn ?: $this->name_en)
+            : $this->name_en;
+    }
+
+    public function getShortDescriptionAttribute(): ?string
+    {
+        return app()->getLocale() === 'bn'
+            ? ($this->short_description_bn ?: $this->short_description_en)
+            : $this->short_description_en;
+    }
+
+    public function getDescriptionAttribute(): ?string
+    {
+        return app()->getLocale() === 'bn'
+            ? ($this->description_bn ?: $this->description_en)
+            : $this->description_en;
     }
 }

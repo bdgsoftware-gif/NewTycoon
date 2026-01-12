@@ -2,8 +2,9 @@
     <div class="flex justify-between items-end mb-6 md:mb-10">
         <h2
             class="category-heading text-xl md:text-2xl lg:text-4xl font-bold text-gray-900 leading-tight capitalize font-quantico">
-            The best way to buy <br> the categories you may love.
+            {!! __('home.home-categories-header', ['break' => '<br>']) !!}
         </h2>
+
         <a href="{{ route('categories.index') }}"
             class="group inline-flex items-center gap-1 transform text-gray-900 text-sm 2xl:text-base font-inter font-normal tracking-wide transition-colors duration-300 hover:text-primary">
 

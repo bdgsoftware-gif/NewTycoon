@@ -2,28 +2,22 @@
 
 namespace App\Http\Requests\Admin;
 
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateCategoryRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name_en' => ['required', 'string', 'max:255'],
+            'name_bn' => ['nullable', 'string', 'max:255'],
             'slug' => [
                 'nullable',
                 'string',
@@ -31,7 +25,8 @@ class UpdateCategoryRequest extends FormRequest
                 Rule::unique('categories', 'slug')->ignore($this->category)
             ],
             'parent_id' => ['nullable', 'exists:categories,id'],
-            'description' => ['nullable', 'string'],
+            'description_en' => ['nullable', 'string'],
+            'description_bn' => ['nullable', 'string'],
             'image' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:2048'],
             'remove_image' => ['nullable', 'boolean'],
             'is_featured' => ['boolean'],
@@ -45,17 +40,15 @@ class UpdateCategoryRequest extends FormRequest
         ];
     }
 
-    /**
-     * Get custom validation messages for the defined validation rules.
-     *
-     * @return array<string, string>
-     */
     public function messages(): array
     {
         return [
-            'name.required' => 'Category name is required.',
-            'name.string' => 'Category name must be a valid text.',
-            'name.max' => 'Category name cannot exceed 255 characters.',
+            'name_en.required' => 'English category name is required.',
+            'name_en.string' => 'English name must be a valid text.',
+            'name_en.max' => 'English name cannot exceed 255 characters.',
+
+            'name_bn.string' => 'Bengali name must be a valid text.',
+            'name_bn.max' => 'Bengali name cannot exceed 255 characters.',
 
             'slug.string' => 'Slug must be a valid text.',
             'slug.max' => 'Slug cannot exceed 255 characters.',
@@ -63,7 +56,8 @@ class UpdateCategoryRequest extends FormRequest
 
             'parent_id.exists' => 'The selected parent category does not exist.',
 
-            'description.string' => 'Description must be a valid text.',
+            'description_en.string' => 'English description must be a valid text.',
+            'description_bn.string' => 'Bengali description must be a valid text.',
 
             'image.image' => 'The file must be an image.',
             'image.mimes' => 'Allowed image formats: PNG, JPG, JPEG, WEBP.',
@@ -88,36 +82,15 @@ class UpdateCategoryRequest extends FormRequest
         ];
     }
 
-    /**
-     * Get custom attributes for validator errors.
-     *
-     * @return array<string, string>
-     */
-    public function attributes(): array
-    {
-        return [
-            'name' => 'category name',
-            'slug' => 'slug',
-            'parent_id' => 'parent category',
-            'description' => 'description',
-            'image' => 'category image',
-            'remove_image' => 'remove image',
-            'is_featured' => 'featured status',
-            'show_in_nav' => 'navigation display',
-            'is_active' => 'active status',
-            'meta_title' => 'meta title',
-            'meta_description' => 'meta description',
-            'meta_keywords' => 'meta keywords',
-            'order' => 'order',
-            'nav_order' => 'navigation order',
-        ];
-    }
-
-    /**
-     * Prepare the data for validation.
-     */
     protected function prepareForValidation(): void
     {
+        // Auto-generate slug from English name if not provided
+        if (!$this->has('slug') && $this->has('name_en')) {
+            $this->merge([
+                'slug' => Str::slug($this->name_en),
+            ]);
+        }
+
         // Ensure boolean values
         $booleans = ['remove_image', 'is_featured', 'show_in_nav', 'is_active'];
 
@@ -129,39 +102,24 @@ class UpdateCategoryRequest extends FormRequest
             }
         }
 
-        // Clean up empty strings to null for optional fields
-        $nullableFields = ['description', 'meta_title', 'meta_description', 'meta_keywords'];
+        // Set default values if not provided
+        if (!$this->has('order')) $this->merge(['order' => $this->category->order ?? 0]);
+        if (!$this->has('nav_order')) $this->merge(['nav_order' => $this->category->nav_order ?? 0]);
+
+        // Clean up empty strings to null
+        $nullableFields = ['name_bn', 'description_en', 'description_bn', 'meta_title', 'meta_description', 'meta_keywords'];
 
         foreach ($nullableFields as $field) {
             if ($this->has($field) && trim($this->$field) === '') {
                 $this->merge([$field => null]);
             }
         }
-
-        // Set default values if not provided
-        if (!$this->has('order')) {
-            $this->merge([
-                'order' => 0,
-            ]);
-        }
-
-        if (!$this->has('nav_order')) {
-            $this->merge([
-                'nav_order' => 0,
-            ]);
-        }
     }
 
-    /**
-     * Handle a passed validation attempt.
-     */
     protected function passedValidation(): void
     {
-        // If remove_image is true, set image to null
         if ($this->boolean('remove_image')) {
-            $this->merge([
-                'image' => null,
-            ]);
+            $this->merge(['image' => null]);
         }
     }
 }

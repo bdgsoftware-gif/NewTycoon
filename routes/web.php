@@ -22,6 +22,19 @@ use App\Http\Controllers\Frontend\NewsletterController;
 // Home
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Language Switcher
+Route::get('/language/{locale}', function ($locale) {
+    if (!in_array($locale, ['en', 'bn'])) {
+        abort(400);
+    }
+
+    session(['locale' => $locale]);
+    cookie()->queue('locale', $locale, 60 * 24 * 30);
+
+    return redirect()->back();
+});
+
+
 // Products
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/category/{category:slug}', [ProductController::class, 'category'])->name('products.category');
