@@ -190,12 +190,17 @@
                             </div>
 
                             <div class="space-y-2">
+                                <!-- Hidden input for is_featured -->
+                                <input type="hidden" name="is_featured" value="0">
                                 <label class="flex items-center">
                                     <input type="checkbox" name="is_featured" value="1"
                                         {{ old('is_featured', $category->is_featured) ? 'checked' : '' }}
                                         class="h-4 w-4 text-primary rounded border-gray-300 focus:ring-primary">
                                     <span class="ml-2 text-sm text-gray-700">Featured Category</span>
                                 </label>
+
+                                <!-- Hidden input for show_in_nav -->
+                                <input type="hidden" name="show_in_nav" value="0">
                                 <label class="flex items-center">
                                     <input type="checkbox" name="show_in_nav" value="1"
                                         {{ old('show_in_nav', $category->show_in_nav) ? 'checked' : '' }}
