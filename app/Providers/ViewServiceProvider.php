@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Cart;
 use App\Models\Footer;
 use App\Models\Category;
+use App\Services\FooterService;
 use App\Services\SearchService;
 use App\Services\NavigationService;
 use App\Services\SearchTermService;
@@ -61,7 +62,7 @@ class ViewServiceProvider extends ServiceProvider
         // Global Footer Data 
         View::composer('*', function ($view) {
 
-            $footerData = (new FooterController)->getFooterData();
+            $footerData = app(FooterService::class)->getFooterData();
 
             $view->with('footerData', $footerData);
         });

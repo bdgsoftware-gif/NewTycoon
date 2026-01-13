@@ -89,9 +89,9 @@
         <div class="bg-gradient-to-r from-primary/10 to-accent/10 rounded-2xl p-8 mb-12 border border-white/10"
             data-aos="fade-up">
             <div class="max-w-4xl mx-auto text-center">
-                <h3 class="text-2xl font-bold text-white mb-3 font-quantico">Stay Updated</h3>
-                <p class="text-gray-300 mb-6 max-w-2xl mx-auto font-cambay">Subscribe to our newsletter for the latest
-                    products, offers, and tech news.</p>
+                <h3 class="text-2xl font-bold text-white mb-3 font-quantico">{{ __('newsletter.subscribe-title') }}
+                </h3>
+                <p class="text-gray-300 mb-6 max-w-2xl mx-auto font-cambay">{{ __('newsletter.subscribe') }}</p>
 
                 <!-- Success/Error Messages -->
                 <div id="newsletter-message" class="hidden mb-4">
@@ -108,13 +108,13 @@
                 <form id="newsletter-form" class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto font-quantico">
                     @csrf
                     <input type="email" name="email" id="newsletter-email"
-                        placeholder="Enter your email"autocomplete="email"
+                        placeholder="{{ __('newsletter.enter-email') }}"autocomplete="email"
                         class="flex-1 px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-400
                        focus:outline-none focus:ring-0 focus:border-primary transition-colors font-quantico"
                         value="{{ auth()->check() ? auth()->user()->email : '' }}" required />
                     <button type="submit" id="subscribe-btn"
                         class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-red-600 transition-colors font-semibold whitespace-nowrap">
-                        Subscribe
+                        {{ __('newsletter.subscribe-button') }}
                     </button>
                 </form>
 

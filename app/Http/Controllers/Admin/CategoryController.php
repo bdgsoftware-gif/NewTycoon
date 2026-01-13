@@ -94,6 +94,7 @@ class CategoryController extends Controller
 
     public function update(UpdateCategoryRequest $request, Category $category)
     {
+        // dd($request->all());
         try {
             $data = $request->validated();
 
@@ -196,7 +197,7 @@ class CategoryController extends Controller
             'is_active' => $category->is_active,
         ]);
     }
-    
+
     public function bulkDelete(Request $request)
     {
         $request->validate([

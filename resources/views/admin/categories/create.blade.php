@@ -186,18 +186,28 @@
 
                             <div class="space-y-2">
                                 <label class="flex items-center">
+                                    <!-- fallback -->
+                                    <input type="hidden" name="is_featured" value="0">
+
                                     <input type="checkbox" name="is_featured" value="1"
-                                        {{ old('is_featured') ? 'checked' : '' }}
+                                        {{ old('is_featured', $category->is_featured) ? 'checked' : '' }}
                                         class="h-4 w-4 text-primary rounded border-gray-300 focus:ring-primary">
+
                                     <span class="ml-2 text-sm text-gray-700">Featured Category</span>
                                 </label>
+
                                 <label class="flex items-center">
+                                    <!-- fallback -->
+                                    <input type="hidden" name="show_in_nav" value="0">
+
                                     <input type="checkbox" name="show_in_nav" value="1"
-                                        {{ old('show_in_nav') ? 'checked' : '' }}
+                                        {{ old('show_in_nav', $category->show_in_nav) ? 'checked' : '' }}
                                         class="h-4 w-4 text-primary rounded border-gray-300 focus:ring-primary">
+
                                     <span class="ml-2 text-sm text-gray-700">Show in Navigation</span>
                                 </label>
                             </div>
+
 
                             <!-- Slug Field -->
                             {{-- <div>

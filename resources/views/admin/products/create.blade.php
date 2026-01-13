@@ -76,25 +76,46 @@
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                             <div class="flex items-center justify-between mb-6">
                                 <h2 class="text-lg font-semibold text-gray-900">Basic Information</h2>
-                                <span class="text-sm text-gray-500"><span class="text-primary">*</span> Required
-                                    fields</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm text-gray-500"><span class="text-primary">*</span> Required
+                                        fields</span>
+                                    <button type="submit" data-loading data-loading-text="Creating..."
+                                        class="px-4 py-1.5 border border-transparent rounded-lg text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                        Create Product
+                                    </button>
+                                </div>
+
                             </div>
 
                             <div class="space-y-6">
                                 <!-- Name & Category - 2 per row -->
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
-                                            Product Name <span class="text-primary">*</span>
+                                        <label for="name_en" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Product Name (English) <span class="text-primary">*</span>
                                         </label>
-                                        <input type="text" name="name" id="name" value="{{ old('name') }}"
-                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('name') border-red-300 @enderror"
-                                            required maxlength="255" placeholder="Enter product name">
-                                        @error('name')
+                                        <input type="text" name="name_en" id="name_en" value="{{ old('name_en') }}"
+                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('name_en') border-red-300 @enderror"
+                                            required maxlength="255" placeholder="Enter product name in English">
+                                        @error('name_en')
                                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
                                     </div>
 
+                                    <div>
+                                        <label for="name_bn" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Product Name (Bengali)
+                                        </label>
+                                        <input type="text" name="name_bn" id="name_bn" value="{{ old('name_bn') }}"
+                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('name_bn') border-red-300 @enderror"
+                                            maxlength="255" placeholder="বাংলায় পণ্যের নাম লিখুন">
+                                        @error('name_bn')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label for="category_id" class="block text-sm font-medium text-gray-700 mb-1">
                                             Category <span class="text-primary">*</span>
@@ -106,7 +127,10 @@
                                             @foreach ($categories as $category)
                                                 <option value="{{ $category->id }}"
                                                     {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                                    {{ $category->name }}
+                                                    {{ $category->name_en }}
+                                                    @if ($category->name_bn)
+                                                        ({{ $category->name_bn }})
+                                                    @endif
                                                 </option>
                                             @endforeach
                                         </select>
@@ -114,10 +138,8 @@
                                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
                                     </div>
-                                </div>
 
-                                <!-- SKU & Model - 2 per row -->
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <!-- SKU Field -->
                                     <div>
                                         <label for="sku" class="block text-sm font-medium text-gray-700 mb-1">
                                             SKU
@@ -136,7 +158,10 @@
                                         @enderror
                                         <p class="mt-1 text-xs text-gray-500">Leave empty for auto-generation</p>
                                     </div>
+                                </div>
 
+                                <!-- Model Number & Slug -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label for="model_number" class="block text-sm font-medium text-gray-700 mb-1">
                                             Model Number
@@ -149,34 +174,81 @@
                                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
                                     </div>
+
+                                    <div>
+                                        <label for="slug" class="block text-sm font-medium text-gray-700 mb-1">
+                                            Custom Slug
+                                        </label>
+                                        <input type="text" name="slug" id="slug" value="{{ old('slug') }}"
+                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('slug') border-red-300 @enderror"
+                                            maxlength="255" placeholder="Auto-generated from English name">
+                                        @error('slug')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                        <p class="mt-1 text-xs text-gray-500">Leave empty for auto-generation</p>
+                                    </div>
                                 </div>
 
                                 <!-- Descriptions -->
                                 <div class="space-y-4">
-                                    <div>
-                                        <label for="short_description"
-                                            class="block text-sm font-medium text-gray-700 mb-1">
-                                            Short Description
-                                        </label>
-                                        <textarea name="short_description" id="short_description" rows="2"
-                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('short_description') border-red-300 @enderror"
-                                            maxlength="500" placeholder="Brief product description">{{ old('short_description') }}</textarea>
-                                        @error('short_description')
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                        <p class="mt-1 text-xs text-gray-500">Maximum 500 characters</p>
+                                    <!-- Short Description -->
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label for="short_description_en"
+                                                class="block text-sm font-medium text-gray-700 mb-1">
+                                                Short Description (English)
+                                            </label>
+                                            <textarea name="short_description_en" id="short_description_en" rows="2"
+                                                class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('short_description_en') border-red-300 @enderror"
+                                                maxlength="500" placeholder="Brief product description in English">{{ old('short_description_en') }}</textarea>
+                                            @error('short_description_en')
+                                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                            <p class="mt-1 text-xs text-gray-500">Maximum 500 characters</p>
+                                        </div>
+
+                                        <div>
+                                            <label for="short_description_bn"
+                                                class="block text-sm font-medium text-gray-700 mb-1">
+                                                Short Description (Bengali)
+                                            </label>
+                                            <textarea name="short_description_bn" id="short_description_bn" rows="2"
+                                                class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('short_description_bn') border-red-300 @enderror"
+                                                maxlength="500" placeholder="বাংলায় সংক্ষিপ্ত বিবরণ">{{ old('short_description_bn') }}</textarea>
+                                            @error('short_description_bn')
+                                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                            <p class="mt-1 text-xs text-gray-500">সর্বোচ্চ ৫০০ অক্ষর</p>
+                                        </div>
                                     </div>
 
-                                    <div>
-                                        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
-                                            Description <span class="text-primary">*</span>
-                                        </label>
-                                        <textarea name="description" id="description" rows="4"
-                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('description') border-red-300 @enderror"
-                                            required placeholder="Full product description">{{ old('description') }}</textarea>
-                                        @error('description')
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
+                                    <!-- Full Description -->
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label for="description_en"
+                                                class="block text-sm font-medium text-gray-700 mb-1">
+                                                Description (English) <span class="text-primary">*</span>
+                                            </label>
+                                            <textarea name="description_en" id="description_en" rows="4"
+                                                class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('description_en') border-red-300 @enderror"
+                                                required placeholder="Full product description in English">{{ old('description_en') }}</textarea>
+                                            @error('description_en')
+                                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div>
+                                            <label for="description_bn"
+                                                class="block text-sm font-medium text-gray-700 mb-1">
+                                                Description (Bengali)
+                                            </label>
+                                            <textarea name="description_bn" id="description_bn" rows="4"
+                                                class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('description_bn') border-red-300 @enderror"
+                                                placeholder="বাংলায় সম্পূর্ণ বিবরণ">{{ old('description_bn') }}</textarea>
+                                            @error('description_bn')
+                                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            @enderror
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -240,13 +312,14 @@
                                     @enderror
                                 </div>
                             </div>
+
                         </div>
 
                         <!-- Inventory Card -->
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                             <h2 class="text-lg font-semibold text-gray-900 mb-6">Inventory</h2>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 <!-- Quantity & Status -->
                                 <div class="space-y-6">
                                     <div>
@@ -369,6 +442,91 @@
                             <p class="mt-3 text-sm text-gray-500">Add product specifications like dimensions, materials,
                                 etc.</p>
                         </div>
+
+
+                        <!-- SEO Card -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                            <h2 class="text-lg font-semibold text-gray-900 mb-6">SEO</h2>
+
+                            <div class="space-y-4">
+                                <!-- Meta Title -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label for="meta_title_en" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Meta Title (English)
+                                        </label>
+                                        <input type="text" name="meta_title_en" id="meta_title_en"
+                                            value="{{ old('meta_title_en') }}"
+                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('meta_title_en') border-red-300 @enderror"
+                                            maxlength="70" placeholder="Product page title in English">
+                                        @error('meta_title_en')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                        <p class="mt-1 text-xs text-gray-500">Maximum 70 characters</p>
+                                    </div>
+
+                                    <div>
+                                        <label for="meta_title_bn" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Meta Title (Bengali)
+                                        </label>
+                                        <input type="text" name="meta_title_bn" id="meta_title_bn"
+                                            value="{{ old('meta_title_bn') }}"
+                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('meta_title_bn') border-red-300 @enderror"
+                                            maxlength="70" placeholder="বাংলায় পৃষ্ঠার শিরোনাম">
+                                        @error('meta_title_bn')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                        <p class="mt-1 text-xs text-gray-500">সর্বোচ্চ ৭০ অক্ষর</p>
+                                    </div>
+                                </div>
+
+                                <!-- Meta Description -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label for="meta_description_en"
+                                            class="block text-sm font-medium text-gray-700 mb-2">
+                                            Meta Description (English)
+                                        </label>
+                                        <textarea name="meta_description_en" id="meta_description_en" rows="2"
+                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('meta_description_en') border-red-300 @enderror"
+                                            maxlength="160" placeholder="Product page description in English">{{ old('meta_description_en') }}</textarea>
+                                        @error('meta_description_en')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                        <p class="mt-1 text-xs text-gray-500">Maximum 160 characters</p>
+                                    </div>
+
+                                    <div>
+                                        <label for="meta_description_bn"
+                                            class="block text-sm font-medium text-gray-700 mb-2">
+                                            Meta Description (Bengali)
+                                        </label>
+                                        <textarea name="meta_description_bn" id="meta_description_bn" rows="2"
+                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('meta_description_bn') border-red-300 @enderror"
+                                            maxlength="160" placeholder="বাংলায় পৃষ্ঠার বিবরণ">{{ old('meta_description_bn') }}</textarea>
+                                        @error('meta_description_bn')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                        <p class="mt-1 text-xs text-gray-500">সর্বোচ্চ ১৬০ অক্ষর</p>
+                                    </div>
+                                </div>
+
+                                <!-- Meta Keywords -->
+                                <div>
+                                    <label for="meta_keywords" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Meta Keywords
+                                    </label>
+                                    <input type="text" name="meta_keywords" id="meta_keywords"
+                                        value="{{ old('meta_keywords') }}"
+                                        class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('meta_keywords') border-red-300 @enderror"
+                                        maxlength="255" placeholder="Keyword1, Keyword2, Keyword3">
+                                    @error('meta_keywords')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                    <p class="mt-1 text-xs text-gray-500">Comma separated keywords</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Right Column: Media, Status, etc -->
@@ -471,8 +629,7 @@
                                         </option>
                                         <option value="active"
                                             {{ old('status', 'active') == 'active' ? 'selected' : '' }}>Active</option>
-                                        <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}
-                                            selected>
+                                        <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>
                                             Inactive</option>
                                         <option value="archived" {{ old('status') == 'archived' ? 'selected' : '' }}>
                                             Archived</option>
@@ -534,24 +691,6 @@
                                             </label>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div>
-                                    <label for="discount_percentage" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Discount Percentage
-                                    </label>
-                                    <div class="relative">
-                                        <input type="number" name="discount_percentage" id="discount_percentage"
-                                            value="{{ old('discount_percentage') }}"
-                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('discount_percentage') border-red-300 @enderror"
-                                            min="0" max="100" step="0.01" placeholder="0">
-                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                            <span class="text-gray-500">%</span>
-                                        </div>
-                                    </div>
-                                    @error('discount_percentage')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -680,64 +819,16 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- SEO Card -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                            <h2 class="text-lg font-semibold text-gray-900 mb-6">SEO</h2>
-
-                            <div class="space-y-4">
-                                <div>
-                                    <label for="meta_title" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Meta Title
-                                    </label>
-                                    <input type="text" name="meta_title" id="meta_title"
-                                        value="{{ old('meta_title') }}"
-                                        class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('meta_title') border-red-300 @enderror"
-                                        maxlength="70" placeholder="Product page title">
-                                    @error('meta_title')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                    <p class="mt-1 text-xs text-gray-500">Maximum 70 characters</p>
-                                </div>
-
-                                <div>
-                                    <label for="meta_description" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Meta Description
-                                    </label>
-                                    <textarea name="meta_description" id="meta_description" rows="2"
-                                        class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('meta_description') border-red-300 @enderror"
-                                        maxlength="160" placeholder="Product page description">{{ old('meta_description') }}</textarea>
-                                    @error('meta_description')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                    <p class="mt-1 text-xs text-gray-500">Maximum 160 characters</p>
-                                </div>
-
-                                <div>
-                                    <label for="meta_keywords" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Meta Keywords
-                                    </label>
-                                    <input type="text" name="meta_keywords" id="meta_keywords"
-                                        value="{{ old('meta_keywords') }}"
-                                        class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('meta_keywords') border-red-300 @enderror"
-                                        maxlength="255" placeholder="Keyword1, Keyword2, Keyword3">
-                                    @error('meta_keywords')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                    <p class="mt-1 text-xs text-gray-500">Comma separated keywords</p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
                 <!-- Form Actions -->
                 <div class="mt-8 flex justify-end space-x-4">
-                    <a href="{{ route('admin.products.index') }}"
+                    <a href="{{ route('admin.products.index') }}" data-loading data-loading-text="Canceling..."
                         class="px-6 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         Cancel
                     </a>
-                    <button type="submit"
+                    <button type="submit" data-loading data-loading-text="Creating..."
                         class="px-6 py-3 border border-transparent rounded-lg text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         Create Product
                     </button>
@@ -763,6 +854,12 @@
 
             // Initialize drag and drop
             setupDragAndDrop();
+
+            // Initialize character counters
+            setupCharacterCounters();
+
+            // Auto-generate slug from English name
+            setupSlugGenerator();
         });
 
         // Image handling
@@ -960,10 +1057,33 @@
             });
         }
 
+        // Slug Generator
+        function setupSlugGenerator() {
+            const nameEnInput = document.getElementById('name_en');
+            const slugInput = document.getElementById('slug');
+
+            nameEnInput.addEventListener('input', function() {
+                if (!slugInput.dataset.manual) {
+                    const slug = this.value
+                        .toLowerCase()
+                        .replace(/[^\w\s-]/g, '')
+                        .replace(/\s+/g, '-')
+                        .replace(/--+/g, '-')
+                        .trim();
+                    slugInput.value = slug;
+                }
+            });
+
+            // Mark slug as manually modified
+            slugInput.addEventListener('input', function() {
+                this.dataset.manual = 'true';
+            });
+        }
+
         // Form validation
         document.getElementById('productForm').addEventListener('submit', function(e) {
             // Basic validation
-            const requiredFields = ['name', 'category_id', 'description', 'price', 'quantity', 'status',
+            const requiredFields = ['name_en', 'category_id', 'description_en', 'price', 'quantity', 'status',
                 'stock_status'
             ];
             let isValid = true;
@@ -1042,15 +1162,27 @@
         // Character counters
         function setupCharacterCounters() {
             const fields = [{
-                    id: 'short_description',
+                    id: 'short_description_en',
                     max: 500
                 },
                 {
-                    id: 'meta_title',
+                    id: 'short_description_bn',
+                    max: 500
+                },
+                {
+                    id: 'meta_title_en',
                     max: 70
                 },
                 {
-                    id: 'meta_description',
+                    id: 'meta_title_bn',
+                    max: 70
+                },
+                {
+                    id: 'meta_description_en',
+                    max: 160
+                },
+                {
+                    id: 'meta_description_bn',
                     max: 160
                 },
                 {
@@ -1080,8 +1212,5 @@
                 }
             });
         }
-
-        // Initialize character counters
-        document.addEventListener('DOMContentLoaded', setupCharacterCounters);
     </script>
 @endpush

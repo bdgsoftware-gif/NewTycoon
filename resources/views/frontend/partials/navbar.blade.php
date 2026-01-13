@@ -18,7 +18,7 @@
                             <!-- Parent link with three-level dropdown -->
                             <div class="relative group">
                                 <button
-                                    class="text-gray-700 hover:text-primary md:px-1 md:py-2 xl:px-3 rounded-md text-base md:text-sm xl:text-base font-semibold flex items-center">
+                                    class="text-gray-700 hover:text-primary md:px-1 md:py-2 xl:px-3 rounded-md text-base md:text-sm {{ app()->isLocale('bn') ? 'font-bangla' : 'xl:text-base font-inter' }} font-semibold flex items-center">
                                     {{ $item['name'] }}
                                     <svg class="md:ml-0 xl:ml-1 w-2.5 h-2.5 xl:w-5 xl:h-5 transition-transform duration-200 group-hover:rotate-180"
                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -36,7 +36,7 @@
                                                 <div class="space-y-2">
                                                     <!-- Second Level Title -->
                                                     <a href="{{ $child['url'] }}"
-                                                        class="block font-semibold text-gray-900 hover:text-primary text-base md:text-sm xl:text-base font-inter mb-3 pb-2 border-b border-gray-100">
+                                                        class="block font-semibold text-gray-900 hover:text-primary text-base md:text-sm xl:text-sm font-inter mb-3 pb-2 border-b border-gray-100">
                                                         {{ $child['name'] }}
                                                     </a>
 
@@ -45,7 +45,7 @@
                                                         <div class="space-y-2 ml-2">
                                                             @foreach ($child['children'] as $grandchild)
                                                                 <a href="{{ $grandchild['url'] }}"
-                                                                    class="block text-gray-600 hover:text-primary text-sm font-inter hover:translate-x-1 transition-transform duration-200">
+                                                                    class="block text-gray-600 hover:text-primary text-xs font-inter hover:translate-x-1 transition-transform duration-200">
                                                                     {{ $grandchild['name'] }}
                                                                 </a>
                                                             @endforeach
@@ -73,18 +73,18 @@
                         @else
                             <!-- Single link -->
                             <a href="{{ $item['url'] }}"
-                                class="text-gray-700 hover:text-primary md:px-1 md:py-2 xl:px-3 rounded-md text-base md:text-sm xl:text-base font-semibold transition-colors duration-200">
+                                class="text-gray-700 hover:text-primary md:px-1 md:py-2 xl:px-3 rounded-md text-base md:text-sm {{ app()->isLocale('bn') ? 'font-bangla' : 'xl:text-base font-inter' }} font-semibold transition-colors duration-200">
                                 {{ $item['name'] }}
                             </a>
                         @endif
                     @endforeach
                     <!-- Single link -->
                     <a href="/catalog"
-                        class="text-gray-700 hover:text-primary md:px-1 md:py-2 xl:px-3 rounded-md text-base md:text-sm xl:text-base font-semibold transition-colors duration-200">
+                        class="text-gray-700 hover:text-primary md:px-1 md:py-2 xl:px-3 rounded-md text-base md:text-sm {{ app()->isLocale('bn') ? 'font-bangla' : 'xl:text-base font-inter' }} font-semibold transition-colors duration-200">
                         {{ __('navbar.catalog') }}
                     </a>
                     <a href="{{ route('categories.index') }}"
-                        class="text-gray-700 hover:text-primary md:px-1 md:py-2 xl:px-3 rounded-md text-base md:text-sm xl:text-base font-semibold transition-colors duration-200">
+                        class="text-gray-700 hover:text-primary md:px-1 md:py-2 xl:px-3 rounded-md text-base md:text-sm {{ app()->isLocale('bn') ? 'font-bangla' : 'xl:text-base font-inter' }} font-semibold transition-colors duration-200">
                         {{ __('navbar.all-categories') }}
                     </a>
                 </div>
@@ -333,7 +333,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 6h16M4 12h16M4 18h7"></path>
                     </svg>
-                    <span>All Categories</span>
+                    <span>{{ __('navbar.all-categories') }}</span>
                     <svg class="w-4 h-4 transition-transform duration-200 group-hover:-rotate-90" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
@@ -384,7 +384,7 @@
         <!-- Search input -->
         <div class="relative">
             <form action="{{ route('search') }}" method="GET" class="relative">
-                <input type="text" name="q" placeholder="Search for products, brands, and more..."
+                <input type="text" name="q" placeholder="{{ __('navbar.search-placeholder') }}"
                     autocomplete="off"
                     class="w-full py-3 px-4 text-base md:text-sm xl:text-base bg-gray-50 border border-gray-300 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300 pr-12"
                     id="search-input">
@@ -401,12 +401,12 @@
 
         <!-- Popular searches (AJAX loaded) -->
         <div id="popular-searches" class="px-3 py-2 hidden">
-            <p class="text-xs font-medium text-gray-500 mb-2">POPULAR SEARCHES</p>
+            <p class="text-xs font-medium text-gray-500 mb-2">{{ __('navbar.popular-searches') }}</p>
 
             <!-- Loading -->
             <div id="popular-loading" class="hidden flex items-center space-x-2 px-2 py-2">
                 <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                <span class="text-sm text-gray-600">Loading popular searches...</span>
+                <span class="text-sm text-gray-600">{{ __('navbar.loading-popular-searches') }}</span>
             </div>
 
             <!-- Results -->

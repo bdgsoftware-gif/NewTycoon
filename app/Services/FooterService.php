@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Frontend;
+namespace App\Services;
 
-use App\Http\Controllers\Controller;
 use App\Models\FooterColumn;
 use App\Models\FooterSetting;
 
-class FooterController extends Controller
+class FooterService
 {
-    public function getFooterData(): array
+    public function getFooterData()
     {
         // Columns with active links
         $columns = FooterColumn::query()
