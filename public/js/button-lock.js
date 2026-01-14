@@ -1,7 +1,22 @@
 document.addEventListener("submit", function (event) {
     const form = event.target;
     if (!(form instanceof HTMLFormElement)) return;
+    if (!form.hasAttribute("data-form")) return;
 
+    // 1️⃣ Browser validation
+    if (!form.checkValidity()) {
+        event.preventDefault();
+        form.reportValidity();
+        return;
+    }
+
+    // 2️⃣ Custom validation hook (optional)
+    // if (!runCustomValidation(form)) {
+    //     event.preventDefault();
+    //     return;
+    // }
+
+    // 3️⃣ Lock submit buttons
     const buttons = form.querySelectorAll(
         'button[type="submit"][data-loading]'
     );
@@ -9,7 +24,6 @@ document.addEventListener("submit", function (event) {
     buttons.forEach((button) => {
         if (button.disabled) return;
 
-        button.dataset.originalHtml = button.innerHTML;
         button.disabled = true;
         button.setAttribute("aria-busy", "true");
         button.classList.add("opacity-70", "cursor-not-allowed");
@@ -32,14 +46,15 @@ document.addEventListener("submit", function (event) {
     });
 });
 
-document.addEventListener("keydown", function (e) {
-    if (e.key !== "Enter") return;
+/* ---------- Custom validation layer ---------- */
+// function runCustomValidation(form) {
+//     // Example: featured images
+//     const featuredInput = form.querySelector("#featured_images");
 
-    const form = e.target.closest("form");
-    if (!form) return;
+//     if (featuredInput && featuredInput.files.length === 0) {
+//         alert("Please upload at least one featured image");
+//         return false;
+//     }
 
-    const submitButton = form.querySelector('button[type="submit"][disabled]');
-    if (submitButton) {
-        e.preventDefault();
-    }
-});
+//     return true;
+// }

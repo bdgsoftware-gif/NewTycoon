@@ -16,320 +16,214 @@ use App\Http\Requests\Admin\UpdateProductRequest;
 
 class ProductController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth', 'role:admin']);
+    }
+    /* -----------------------------------------------------------------
+     | Index
+     |------------------------------------------------------------------*/
     public function index(Request $request)
     {
-        $query = Product::with(['category']);
+        $products = Product::with('category')
+            ->when($request->search, fn($q) => $q->search($request->search))
+            ->when(
+                $request->status && $request->status !== 'all',
+                fn($q) => $q->where('status', $request->status)
+            )
+            ->when(
+                $request->category_id && $request->category_id !== 'all',
+                fn($q) => $q->where('category_id', $request->category_id)
+            )
+            ->latest()
+            ->paginate(20);
 
-        // Search
-        if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                ->orWhere('sku', 'like', '%' . $request->search . '%');
-        }
-
-        // Filter by status
-        if ($request->has('status') && $request->status != 'all') {
-            $query->where('status', $request->status);
-        }
-
-        // Filter by category
-        if ($request->has('category_id') && $request->category_id != 'all') {
-            $query->where('category_id', $request->category_id);
-        }
-
-        // Filter by stock status
-        if ($request->has('stock_status') && $request->stock_status != 'all') {
-            $query->where('stock_status', $request->stock_status);
-        }
-
-        $products = $query->latest()->paginate(20);
-        $categories = Category::where('is_active', true)->get();
+        $categories = Category::where('is_active', true)->orderBy('name_en')->get();
 
         return view('admin.products.index', compact('products', 'categories'));
     }
 
+    /* -----------------------------------------------------------------
+     | Create
+     |------------------------------------------------------------------*/
     public function create()
     {
-        $categories = Category::where('is_active', true)
-            ->orderBy('name_en')
-            ->get();
+        $categories = Category::where('is_active', true)->orderBy('name_en')->get();
 
-        return view('admin.products.create', [
-            'categories' => $categories,
-        ]);
+        return view('admin.products.create', compact('categories'));
     }
 
+    /* -----------------------------------------------------------------
+     | Store
+     |------------------------------------------------------------------*/
     public function store(StoreProductRequest $request)
     {
-        DB::beginTransaction();
+        // dd($request->all());
+        DB::transaction(function () use ($request) {
+            $product = Product::create(
+                array_merge(
+                    $request->validated(),
+                    [
+                        'vendor_id' => Auth::id(),
+                        'featured_images' => $this->storeImages(
+                            $request->file('featured_images'),
+                            'products/featured',
+                            2,
+                            [Product::DEFAULT_FEATURED_IMAGE]
+                        ),
+                        'gallery_images' => $this->storeImages(
+                            $request->file('gallery_images'),
+                            'products/gallery',
+                            5
+                        ),
+                    ]
+                )
+            );
+        });
 
-        try {
-            $featuredImages = [];
-
-            if ($request->hasFile('featured_images')) {
-                foreach ($request->file('featured_images') as $image) {
-                    $filename = 'featured_' . time() . '_' . uniqid() . '.' . $image->extension();
-                    $path = $image->storeAs('products/featured', $filename, 'public');
-                    $featuredImages[] = $path;
-                }
-
-                // Ensure exactly 2 images for featured
-                if (count($featuredImages) === 1) {
-                    $featuredImages[] = $featuredImages[0];
-                }
-            } else {
-                $featuredImages = ['products/default.jpg'];
-            }
-
-            $galleryImages = [];
-
-            if ($request->hasFile('gallery_images')) {
-                foreach ($request->file('gallery_images') as $image) {
-                    $filename = 'gallery_' . time() . '_' . uniqid() . '.' . $image->extension();
-                    $path = $image->storeAs('products/gallery', $filename, 'public');
-                    $galleryImages[] = $path;
-                }
-
-                $galleryImages = array_slice($galleryImages, 0, 5);
-            }
-
-            $vendorId = Auth::id() ?? 1;
-
-            $product = Product::create([
-                // Bilingual fields
-                'name_en' => $request->validated('name_en'),
-                'name_bn' => $request->validated('name_bn'),
-                'short_description_en' => $request->validated('short_description_en'),
-                'short_description_bn' => $request->validated('short_description_bn'),
-                'description_en' => $request->validated('description_en'),
-                'description_bn' => $request->validated('description_bn'),
-
-                // SEO bilingual fields
-                'meta_title_en' => $request->validated('meta_title_en'),
-                'meta_title_bn' => $request->validated('meta_title_bn'),
-                'meta_description_en' => $request->validated('meta_description_en'),
-                'meta_description_bn' => $request->validated('meta_description_bn'),
-                'meta_keywords' => $request->validated('meta_keywords'),
-
-                // Pricing
-                'price' => $request->validated('price'),
-                'compare_price' => $request->validated('compare_price'),
-                'cost_price' => $request->validated('cost_price'),
-                'discount_percentage' => $request->validated('discount_percentage') ?? 0,
-
-                // Inventory
-                'quantity' => $request->validated('quantity'),
-                'alert_quantity' => $request->validated('alert_quantity') ?? 5,
-                'track_quantity' => $request->validated('track_quantity') ?? true,
-                'allow_backorder' => $request->validated('allow_backorder') ?? false,
-                'stock_status' => $request->validated('stock_status'),
-
-                // Product Info
-                'model_number' => $request->validated('model_number'),
-                'warranty_period' => $request->validated('warranty_period'),
-                'warranty_type' => $request->validated('warranty_type'),
-                'specifications' => $request->validated('specifications'),
-
-                // Images
-                'featured_images' => $featuredImages,
-                'gallery_images' => $galleryImages,
-
-                // Shipping
-                'weight' => $request->validated('weight'),
-                'length' => $request->validated('length'),
-                'width' => $request->validated('width'),
-                'height' => $request->validated('height'),
-
-                // Status & Flags
-                'is_featured' => $request->validated('is_featured') ?? false,
-                'is_bestsells' => $request->validated('is_bestsells') ?? false,
-                'is_new' => $request->validated('is_new') ?? true,
-                'status' => $request->validated('status'),
-
-                // Relationships
-                'category_id' => $request->validated('category_id'),
-                'vendor_id' => $vendorId,
-
-                // Auto-generated fields
-                'sku' => $request->validated('sku') ?? '',
-                'slug' => Str::slug($request->validated('name_en')) ?? '',
-            ]);
-
-            DB::commit();
-
-            flash('Product created successfully!', 'success', 3000);
-            return redirect()->route('admin.products.index');
-        } catch (\Throwable $e) {
-            DB::rollBack();
-
-            // Clean up uploaded images on error
-            if (!empty($featuredImages)) {
-                foreach ($featuredImages as $img) {
-                    if ($img !== 'products/default.jpg') {
-                        Storage::disk('public')->delete($img);
-                    }
-                }
-            }
-
-            if (!empty($galleryImages)) {
-                foreach ($galleryImages as $img) {
-                    Storage::disk('public')->delete($img);
-                }
-            }
-
-            Log::error('Product creation failed: ' . $e->getMessage(), [
-                'exception' => $e,
-                'request' => $request->all(),
-            ]);
-
-            flash('Failed to create product', 'error', 3000, 'Please try again or contact support.');
-            return back()->withInput();
-        }
+        return redirect()
+            ->route('admin.products.index')
+            ->with('success', 'Product created successfully.');
     }
 
+    /* -----------------------------------------------------------------
+     | Edit
+     |------------------------------------------------------------------*/
     public function edit(Product $product)
     {
-        $categories = Category::where('is_active', true)
-            ->orderBy('name_en')
-            ->get();
+        $categories = Category::where('is_active', true)->orderBy('name_en')->get();
 
-        return view('admin.products.edit', [
-            'product' => $product,
-            'categories' => $categories,
-        ]);
+        return view('admin.products.edit', compact('product', 'categories'));
     }
 
+    /* -----------------------------------------------------------------
+     | Update
+     |------------------------------------------------------------------*/
     public function update(UpdateProductRequest $request, Product $product)
     {
-        try {
-            // Handle featured images
-            $featuredImages = $request->existing_featured_images ?? [];
+        DB::transaction(function () use ($request, $product) {
 
+            // ---------- FEATURED IMAGES ----------
+            $featured = $request->input('existing_featured_images', $product->featured_images ?? []);
+
+            // Remove selected
+            if ($request->filled('remove_featured_images')) {
+                foreach ($request->remove_featured_images as $path) {
+                    Storage::disk('public')->delete($path);
+                    $featured = array_values(array_diff($featured, [$path]));
+                }
+            }
+
+            // Add new uploads
             if ($request->hasFile('featured_images')) {
-                // Delete old featured images that are not in existing list
-                $oldFeaturedImages = $product->featured_images ?? [];
-                foreach ($oldFeaturedImages as $oldImage) {
-                    if (!in_array($oldImage, $featuredImages) && $oldImage !== 'products/featured/default.jpg') {
-                        Storage::disk('public')->delete($oldImage);
-                    }
-                }
-
-                // Upload new featured images
                 foreach ($request->file('featured_images') as $image) {
-                    $path = $image->store('products/featured', 'public');
-                    $featuredImages[] = $path;
-                }
+                    if (count($featured) >= 2) break;
 
-                // Ensure exactly 2 images (duplicate if only 1)
-                if (count($featuredImages) === 1) {
-                    $featuredImages[] = $featuredImages[0];
+                    $featured[] = $image->store('products/featured', 'public');
                 }
-
-                // Limit to 2 images
-                $featuredImages = array_slice($featuredImages, 0, 2);
             }
 
-            // If no featured images remain, use default
-            if (empty($featuredImages)) {
-                $featuredImages = ['products/featured/default.jpg'];
-            }
+            // ---------- GALLERY IMAGES ----------
+            $gallery = $request->input('existing_gallery_images', $product->gallery_images ?? []);
 
-            // Handle gallery images
-            $galleryImages = $request->existing_gallery_images ?? [];
+            if ($request->filled('remove_gallery_images')) {
+                foreach ($request->remove_gallery_images as $path) {
+                    Storage::disk('public')->delete($path);
+                    $gallery = array_values(array_diff($gallery, [$path]));
+                }
+            }
 
             if ($request->hasFile('gallery_images')) {
-                // Delete old gallery images that are not in existing list
-                $oldGalleryImages = $product->gallery_images ?? [];
-                foreach ($oldGalleryImages as $oldImage) {
-                    if (!in_array($oldImage, $galleryImages)) {
-                        Storage::disk('public')->delete($oldImage);
-                    }
-                }
-
-                // Upload new gallery images
                 foreach ($request->file('gallery_images') as $image) {
-                    $path = $image->store('products/gallery', 'public');
-                    $galleryImages[] = $path;
-                }
+                    if (count($gallery) >= 5) break;
 
-                // Limit to 5 images
-                $galleryImages = array_slice($galleryImages, 0, 5);
+                    $gallery[] = $image->store('products/gallery', 'public');
+                }
             }
 
-            // Update the product with validated data
-            $product->update([
-                'name' => $request->validated('name'),
-                'sku' => $request->validated('sku'),
-                'slug' => $request->validated('slug'),
-                'short_description' => $request->validated('short_description'),
-                'description' => $request->validated('description'),
-                'price' => $request->validated('price'),
-                'compare_price' => $request->validated('compare_price'),
-                'cost_price' => $request->validated('cost_price'),
-                'quantity' => $request->validated('quantity'),
-                'alert_quantity' => $request->validated('alert_quantity') ?? 5,
-                'track_quantity' => $request->validated('track_quantity') ?? true,
-                'allow_backorder' => $request->validated('allow_backorder') ?? false,
-                'model_number' => $request->validated('model_number'),
-                'warranty_period' => $request->validated('warranty_period'),
-                'warranty_type' => $request->validated('warranty_type'),
-                'specifications' => $request->validated('specifications'),
-                'featured_images' => $featuredImages,
-                'gallery_images' => $galleryImages,
-                'weight' => $request->validated('weight'),
-                'length' => $request->validated('length'),
-                'width' => $request->validated('width'),
-                'height' => $request->validated('height'),
-                'meta_title' => $request->validated('meta_title'),
-                'meta_description' => $request->validated('meta_description'),
-                'meta_keywords' => $request->validated('meta_keywords'),
-                'is_featured' => $request->validated('is_featured') ?? false,
-                'is_bestsells' => $request->validated('is_bestsells') ?? false,
-                'is_new' => $request->validated('is_new') ?? true,
-                'status' => $request->validated('status'),
-                'stock_status' => $request->validated('stock_status'),
-                'category_id' => $request->validated('category_id'),
-                'discount_percentage' => $request->validated('discount_percentage') ?? 0,
-            ]);
+            // ---------- UPDATE PRODUCT ----------
+            $product->update(array_merge(
+                $request->validated(),
+                [
+                    'featured_images' => $featured,
+                    'gallery_images'  => $gallery,
+                ]
+            ));
+        });
 
-            return redirect()->route('admin.products.index')
-                ->with('success', 'Product updated successfully!');
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Failed to update product. Error: ' . $e->getMessage());
-        }
+        return redirect()
+            ->route('admin.products.index')
+            ->with('success', 'Product updated successfully.');
     }
 
+    public function show($slug)
+    {
+        $product = Product::where('slug', $slug)->firstOrFail();
+        $product->load([
+            'category',
+            'reviews' => function ($query) {
+                $query->latest()->limit(10);
+            },
+            'orderItems' => function ($query) {
+                $query->with(['order' => function ($q) {
+                    $q->select('id', 'order_number', 'created_at');
+                }])->latest()->limit(10);
+            },
+            'wishlists' => function ($query) {
+                $query->with(['user' => function ($q) {
+                    $q->select('id', 'name', 'email');
+                }])->latest()->limit(10);
+            }
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
+        return view('admin.products.show', compact('product'));
+    }
+
+    /* -----------------------------------------------------------------
+     | Destroy
+     |------------------------------------------------------------------*/
     public function destroy(Product $product)
     {
-        try {
-            // Delete featured images
-            if ($product->featured_images) {
-                foreach ($product->featured_images as $image) {
-                    if ($image !== 'products/featured/default.jpg') {
-                        Storage::disk('public')->delete($image);
-                    }
-                }
-            }
-
-            // Delete gallery images
-            if ($product->gallery_images) {
-                foreach ($product->gallery_images as $image) {
-                    Storage::disk('public')->delete($image);
-                }
-            }
+        DB::transaction(function () use ($product) {
+            $this->deleteImages($product->featured_images);
+            $this->deleteImages($product->gallery_images);
 
             $product->delete();
+        });
 
-            return redirect()->route('admin.products.index')
-                ->with('success', 'Product deleted successfully!');
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Failed to delete product. Error: ' . $e->getMessage());
+        return redirect()
+            ->route('admin.products.index')
+            ->with('success', 'Product deleted successfully.');
+    }
+
+    /* -----------------------------------------------------------------
+     | Helpers
+     |------------------------------------------------------------------*/
+    protected function storeImages(
+        ?array $files,
+        string $directory,
+        int $limit,
+        array $fallback = []
+    ): array {
+        if (empty($files)) {
+            return $fallback;
+        }
+
+        $paths = [];
+
+        foreach ($files as $file) {
+            $paths[] = $file->store($directory, 'public');
+        }
+
+        return array_slice($paths, 0, $limit);
+    }
+
+    protected function deleteImages(?array $images): void
+    {
+        foreach ($images ?? [] as $image) {
+            if ($image !== Product::DEFAULT_FEATURED_IMAGE) {
+                Storage::disk('public')->delete($image);
+            }
         }
     }
 

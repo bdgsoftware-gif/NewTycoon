@@ -82,7 +82,7 @@
                 {{-- Header --}}
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-white text-2xl font-bold font-quantico">
-                        Special Offer Products
+                        {{ $offer->products_section_title ?? __('home.special-offer-products') }}
                     </h3>
 
                     {{-- View All Button --}}

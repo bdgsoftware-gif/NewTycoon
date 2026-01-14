@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Edit Product: ' . $product->name_en)
+@section('title', 'Edit Product')
 @section('page-title', 'Edit Product')
 
 @section('breadcrumb')
@@ -18,7 +18,7 @@
                 d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
                 clip-rule="evenodd" />
         </svg>
-        <span class="text-gray-700">Edit</span>
+        <span class="text-gray-700">Edit {{ $product->name_en }}</span>
     </li>
 @endsection
 
@@ -29,9 +29,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-900">Edit Product</h1>
-                    <p class="mt-1 text-sm text-gray-600">Update product information</p>
+                    <p class="mt-1 text-sm text-gray-600">Update product details</p>
                 </div>
-                <div>
+                <div class="flex items-center space-x-3">
                     <a href="{{ route('admin.products.index') }}"
                         class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,8 +65,26 @@
                 </div>
             @endif
 
+            @if (session('success'))
+                <div class="rounded-lg bg-green-50 border border-green-200 p-4">
+                    <div class="flex">
+                        <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-green-800">Success!</h3>
+                            <div class="mt-2 text-sm text-green-700">
+                                <p>{{ session('success') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <form id="productForm" action="{{ route('admin.products.update', $product) }}" method="POST"
-                enctype="multipart/form-data" novalidate>
+                enctype="multipart/form-data" data-form novalidate>
                 @csrf
                 @method('PUT')
 
@@ -77,8 +95,14 @@
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                             <div class="flex items-center justify-between mb-6">
                                 <h2 class="text-lg font-semibold text-gray-900">Basic Information</h2>
-                                <span class="text-sm text-gray-500"><span class="text-primary">*</span> Required
-                                    fields</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm text-gray-500"><span class="text-primary">*</span> Required
+                                        fields</span>
+                                    <button type="submit" data-loading data-loading-text="Updating..."
+                                        class="px-4 py-1.5 border border-transparent rounded-lg text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                        Update Product
+                                    </button>
+                                </div>
                             </div>
 
                             <div class="space-y-6">
@@ -140,14 +164,20 @@
                                         <label for="sku" class="block text-sm font-medium text-gray-700 mb-1">
                                             SKU
                                         </label>
-                                        <input type="text" name="sku" id="sku"
-                                            value="{{ old('sku', $product->sku) }}"
-                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('sku') border-red-300 @enderror"
-                                            maxlength="50" placeholder="Product SKU">
+                                        <div class="flex gap-2">
+                                            <input type="text" name="sku" id="sku"
+                                                value="{{ old('sku', $product->sku) }}"
+                                                class="flex-1 rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('sku') border-red-300 @enderror"
+                                                maxlength="50" placeholder="Auto-generated if empty">
+                                            <button type="button" id="generateSku"
+                                                class="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                                Generate
+                                            </button>
+                                        </div>
                                         @error('sku')
                                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
-                                        <p class="mt-1 text-xs text-gray-500">Unique product identifier</p>
+                                        <p class="mt-1 text-xs text-gray-500">Leave empty for auto-generation</p>
                                     </div>
                                 </div>
 
@@ -173,7 +203,7 @@
                                         <input type="text" name="slug" id="slug"
                                             value="{{ old('slug', $product->slug) }}"
                                             class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('slug') border-red-300 @enderror"
-                                            maxlength="255" placeholder="Custom URL slug">
+                                            maxlength="255" placeholder="Auto-generated from English name">
                                         @error('slug')
                                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                         @enderror
@@ -305,32 +335,13 @@
                                     @enderror
                                 </div>
                             </div>
-
-                            <!-- Discount Percentage -->
-                            <div class="mt-6">
-                                <label for="discount_percentage" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Discount Percentage
-                                </label>
-                                <div class="relative max-w-xs">
-                                    <input type="number" name="discount_percentage" id="discount_percentage"
-                                        value="{{ old('discount_percentage', $product->discount_percentage) }}"
-                                        class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('discount_percentage') border-red-300 @enderror"
-                                        min="0" max="100" step="0.01" placeholder="0">
-                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                        <span class="text-gray-500">%</span>
-                                    </div>
-                                </div>
-                                @error('discount_percentage')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
                         </div>
 
                         <!-- Inventory Card -->
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                             <h2 class="text-lg font-semibold text-gray-900 mb-6">Inventory</h2>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 <!-- Quantity & Status -->
                                 <div class="space-y-6">
                                     <div>
@@ -355,13 +366,16 @@
                                             required>
                                             <option value="in_stock"
                                                 {{ old('stock_status', $product->stock_status) == 'in_stock' ? 'selected' : '' }}>
-                                                In Stock</option>
+                                                In
+                                                Stock</option>
                                             <option value="out_of_stock"
                                                 {{ old('stock_status', $product->stock_status) == 'out_of_stock' ? 'selected' : '' }}>
-                                                Out of Stock</option>
+                                                Out of Stock
+                                            </option>
                                             <option value="backorder"
                                                 {{ old('stock_status', $product->stock_status) == 'backorder' ? 'selected' : '' }}>
-                                                Backorder</option>
+                                                Backorder
+                                            </option>
                                         </select>
                                         @error('stock_status')
                                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -376,7 +390,7 @@
                                             Alert Quantity
                                         </label>
                                         <input type="number" name="alert_quantity" id="alert_quantity"
-                                            value="{{ old('alert_quantity', $product->alert_quantity) }}"
+                                            value="{{ old('alert_quantity', $product->alert_quantity ?? 5) }}"
                                             class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('alert_quantity') border-red-300 @enderror"
                                             min="0" max="999999">
                                         @error('alert_quantity')
@@ -427,38 +441,120 @@
 
                             <div id="specifications-container" class="space-y-3">
                                 @php
-                                    $specifications = old('specifications', $product->specifications ?? []);
-                                    if (empty($specifications)) {
-                                        $specifications = [];
-                                    }
+                                    $oldSpecs = old('specifications', $product->specifications ?? []);
                                 @endphp
-
-                                @foreach ($specifications as $index => $spec)
-                                    <div class="grid grid-cols-12 gap-3 items-start specification-row">
-                                        <div class="col-span-5">
-                                            <input type="text" name="specifications[{{ $index }}][key]"
-                                                value="{{ $spec['key'] ?? '' }}"
-                                                class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary"
-                                                placeholder="Key (e.g., Color)" maxlength="100">
+                                @if (count($oldSpecs) > 0)
+                                    @foreach ($oldSpecs as $index => $spec)
+                                        <div class="grid grid-cols-12 gap-3 items-start specification-row">
+                                            <div class="col-span-5">
+                                                <input type="text" name="specifications[{{ $index }}][key]"
+                                                    value="{{ $spec['key'] ?? '' }}"
+                                                    class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary"
+                                                    placeholder="Key (e.g., Color)" maxlength="100">
+                                            </div>
+                                            <div class="col-span-5">
+                                                <input type="text" name="specifications[{{ $index }}][value]"
+                                                    value="{{ $spec['value'] ?? '' }}"
+                                                    class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary"
+                                                    placeholder="Value (e.g., Red)" maxlength="255">
+                                            </div>
+                                            <div class="col-span-2">
+                                                <button type="button"
+                                                    class="w-full inline-flex justify-center items-center px-3 py-2 border border-red-300 text-sm font-medium rounded-lg text-red-700 bg-white hover:bg-red-50 remove-spec">
+                                                    Remove
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div class="col-span-5">
-                                            <input type="text" name="specifications[{{ $index }}][value]"
-                                                value="{{ $spec['value'] ?? '' }}"
-                                                class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary"
-                                                placeholder="Value (e.g., Red)" maxlength="255">
-                                        </div>
-                                        <div class="col-span-2">
-                                            <button type="button"
-                                                class="w-full inline-flex justify-center items-center px-3 py-2 border border-red-300 text-sm font-medium rounded-lg text-red-700 bg-white hover:bg-red-50 remove-spec">
-                                                Remove
-                                            </button>
-                                        </div>
-                                    </div>
-                                @endforeach
+                                    @endforeach
+                                @endif
                             </div>
 
                             <p class="mt-3 text-sm text-gray-500">Add product specifications like dimensions, materials,
                                 etc.</p>
+                        </div>
+
+                        <!-- SEO Card -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                            <h2 class="text-lg font-semibold text-gray-900 mb-6">SEO</h2>
+
+                            <div class="space-y-4">
+                                <!-- Meta Title -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label for="meta_title_en" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Meta Title (English)
+                                        </label>
+                                        <input type="text" name="meta_title_en" id="meta_title_en"
+                                            value="{{ old('meta_title_en', $product->meta_title_en) }}"
+                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('meta_title_en') border-red-300 @enderror"
+                                            maxlength="70" placeholder="Product page title in English">
+                                        @error('meta_title_en')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                        <p class="mt-1 text-xs text-gray-500">Maximum 70 characters</p>
+                                    </div>
+
+                                    <div>
+                                        <label for="meta_title_bn" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Meta Title (Bengali)
+                                        </label>
+                                        <input type="text" name="meta_title_bn" id="meta_title_bn"
+                                            value="{{ old('meta_title_bn', $product->meta_title_bn) }}"
+                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('meta_title_bn') border-red-300 @enderror"
+                                            maxlength="70" placeholder="বাংলায় পৃষ্ঠার শিরোনাম">
+                                        @error('meta_title_bn')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                        <p class="mt-1 text-xs text-gray-500">সর্বোচ্চ ৭০ অক্ষর</p>
+                                    </div>
+                                </div>
+
+                                <!-- Meta Description -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label for="meta_description_en"
+                                            class="block text-sm font-medium text-gray-700 mb-2">
+                                            Meta Description (English)
+                                        </label>
+                                        <textarea name="meta_description_en" id="meta_description_en" rows="2"
+                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('meta_description_en') border-red-300 @enderror"
+                                            maxlength="160" placeholder="Product page description in English">{{ old('meta_description_en', $product->meta_description_en) }}</textarea>
+                                        @error('meta_description_en')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                        <p class="mt-1 text-xs text-gray-500">Maximum 160 characters</p>
+                                    </div>
+
+                                    <div>
+                                        <label for="meta_description_bn"
+                                            class="block text-sm font-medium text-gray-700 mb-2">
+                                            Meta Description (Bengali)
+                                        </label>
+                                        <textarea name="meta_description_bn" id="meta_description_bn" rows="2"
+                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('meta_description_bn') border-red-300 @enderror"
+                                            maxlength="160" placeholder="বাংলায় পৃষ্ঠার বিবরণ">{{ old('meta_description_bn', $product->meta_description_bn) }}</textarea>
+                                        @error('meta_description_bn')
+                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                        <p class="mt-1 text-xs text-gray-500">সর্বোচ্চ ১৬০ অক্ষর</p>
+                                    </div>
+                                </div>
+
+                                <!-- Meta Keywords -->
+                                <div>
+                                    <label for="meta_keywords" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Meta Keywords
+                                    </label>
+                                    <input type="text" name="meta_keywords" id="meta_keywords"
+                                        value="{{ old('meta_keywords', $product->meta_keywords) }}"
+                                        class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('meta_keywords') border-red-300 @enderror"
+                                        maxlength="255" placeholder="Keyword1, Keyword2, Keyword3">
+                                    @error('meta_keywords')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                    <p class="mt-1 text-xs text-gray-500">Comma separated keywords</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -471,33 +567,33 @@
                             <!-- Featured Images -->
                             <div class="mb-8">
                                 <label class="block text-sm font-medium text-gray-700 mb-3">
-                                    Featured Images <span class="text-primary">*</span>
-                                    <span class="text-xs text-gray-500 font-normal">(2 images required)</span>
+                                    Featured Images
+                                    <span class="text-xs text-gray-500 font-normal">(Optional, max 2)</span>
                                 </label>
 
                                 <div class="space-y-4">
-                                    <!-- Current Featured Images -->
-                                    @if ($product->featured_images && count($product->featured_images) > 0)
-                                        <div class="mb-4">
-                                            <p class="text-sm text-gray-600 mb-2">Current Featured Images:</p>
-                                            <div class="grid grid-cols-2 gap-4">
-                                                @foreach ($product->featured_images as $index => $image)
-                                                    <div class="relative">
-                                                        <img src="{{ asset('storage/' . $image) }}"
-                                                            alt="Featured Image {{ $index + 1 }}"
-                                                            class="w-full h-32 object-cover rounded-lg">
+                                    <!-- Current Images -->
+                                    <div class="mb-4">
+                                        <p class="text-sm text-gray-600 mb-2">Current Featured Images:</p>
+                                        <div class="grid grid-cols-2 gap-4" id="currentFeaturedImages">
+                                            @foreach ($product->featured_images as $index => $image)
+                                                <div class="relative">
+                                                    <img src="{{ Storage::url($image) }}"
+                                                        alt="Featured {{ $index + 1 }}"
+                                                        class="w-full h-32 object-cover rounded-lg">
+                                                    <div class="absolute top-2 right-2 flex space-x-1">
+                                                        <input type="hidden" name="existing_featured_images[]"
+                                                            value="{{ $image }}">
                                                         <button type="button"
-                                                            onclick="removeExistingImage('featured', {{ $index }})"
-                                                            class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600">
+                                                            onclick="removeExistingImage(this, 'featured', {{ $index }})"
+                                                            class="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600">
                                                             ×
                                                         </button>
                                                     </div>
-                                                @endforeach
-                                            </div>
+                                                </div>
+                                            @endforeach
                                         </div>
-                                        <input type="hidden" name="existing_featured_images" id="existingFeaturedImages"
-                                            value="{{ json_encode($product->featured_images) }}">
-                                    @endif
+                                    </div>
 
                                     <!-- Upload Area -->
                                     <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors"
@@ -538,28 +634,28 @@
                                 </label>
 
                                 <div class="space-y-4">
-                                    <!-- Current Gallery Images -->
-                                    @if ($product->gallery_images && count($product->gallery_images) > 0)
-                                        <div class="mb-4">
-                                            <p class="text-sm text-gray-600 mb-2">Current Gallery Images:</p>
-                                            <div class="grid grid-cols-2 gap-4">
-                                                @foreach ($product->gallery_images as $index => $image)
-                                                    <div class="relative">
-                                                        <img src="{{ asset('storage/' . $image) }}"
-                                                            alt="Gallery Image {{ $index + 1 }}"
-                                                            class="w-full h-32 object-cover rounded-lg">
+                                    <!-- Current Images -->
+                                    <div class="mb-4">
+                                        <p class="text-sm text-gray-600 mb-2">Current Gallery Images:</p>
+                                        <div class="grid grid-cols-2 gap-4" id="currentGalleryImages">
+                                            @foreach ($product->gallery_images as $index => $image)
+                                                <div class="relative">
+                                                    <img src="{{ Storage::url($image) }}"
+                                                        alt="Gallery {{ $index + 1 }}"
+                                                        class="w-full h-32 object-cover rounded-lg">
+                                                    <div class="absolute top-2 right-2 flex space-x-1">
+                                                        <input type="hidden" name="existing_gallery_images[]"
+                                                            value="{{ $image }}">
                                                         <button type="button"
-                                                            onclick="removeExistingImage('gallery', {{ $index }})"
-                                                            class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600">
+                                                            onclick="removeExistingImage(this, 'gallery', {{ $index }})"
+                                                            class="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600">
                                                             ×
                                                         </button>
                                                     </div>
-                                                @endforeach
-                                            </div>
+                                                </div>
+                                            @endforeach
                                         </div>
-                                        <input type="hidden" name="existing_gallery_images" id="existingGalleryImages"
-                                            value="{{ json_encode($product->gallery_images) }}">
-                                    @endif
+                                    </div>
 
                                     <!-- Upload Area -->
                                     <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors"
@@ -769,125 +865,68 @@
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                             <h2 class="text-lg font-semibold text-gray-900 mb-6">Warranty</h2>
 
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-3 gap-4">
+                                <!-- Duration -->
                                 <div>
-                                    <label for="warranty_period" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Period
+                                    <label for="warranty_duration" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Duration
                                     </label>
-                                    <input type="number" name="warranty_period" id="warranty_period"
-                                        value="{{ old('warranty_period', $product->warranty_period) }}"
-                                        class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('warranty_period') border-red-300 @enderror"
-                                        min="0" max="99" placeholder="0">
-                                    @error('warranty_period')
+                                    <input type="number" name="warranty_duration" id="warranty_duration"
+                                        value="{{ old('warranty_duration', $product->warranty_duration) }}"
+                                        min="0" max="99"
+                                        class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('warranty_duration') border-red-300 @enderror">
+                                    @error('warranty_duration')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
 
+                                <!-- Unit -->
+                                <div>
+                                    <label for="warranty_unit" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Unit
+                                    </label>
+                                    <select name="warranty_unit" id="warranty_unit"
+                                        class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('warranty_unit') border-red-300 @enderror">
+                                        <option value="">Select</option>
+                                        <option value="days"
+                                            {{ old('warranty_unit', $product->warranty_unit) === 'days' ? 'selected' : '' }}>
+                                            Days</option>
+                                        <option value="months"
+                                            {{ old('warranty_unit', $product->warranty_unit) === 'months' ? 'selected' : '' }}>
+                                            Months</option>
+                                        <option value="years"
+                                            {{ old('warranty_unit', $product->warranty_unit) === 'years' ? 'selected' : '' }}>
+                                            Years</option>
+                                    </select>
+                                    @error('warranty_unit')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <!-- Warranty Type -->
                                 <div>
                                     <label for="warranty_type" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Type
+                                        Warranty Type
                                     </label>
                                     <select name="warranty_type" id="warranty_type"
                                         class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('warranty_type') border-red-300 @enderror">
-                                        <option value="">Select Type</option>
-                                        <option value="days"
-                                            {{ old('warranty_type', $product->warranty_type) == 'days' ? 'selected' : '' }}>
-                                            Days
+                                        <option value="">Select</option>
+                                        <option value="replacement"
+                                            {{ old('warranty_type', $product->warranty_type) === 'replacement' ? 'selected' : '' }}>
+                                            Replacement
                                         </option>
-                                        <option value="months"
-                                            {{ old('warranty_type', $product->warranty_type) == 'months' ? 'selected' : '' }}>
-                                            Months</option>
-                                        <option value="years"
-                                            {{ old('warranty_type', $product->warranty_type) == 'years' ? 'selected' : '' }}>
-                                            Years</option>
+                                        <option value="service"
+                                            {{ old('warranty_type', $product->warranty_type) === 'service' ? 'selected' : '' }}>
+                                            Service
+                                        </option>
+                                        <option value="parts"
+                                            {{ old('warranty_type', $product->warranty_type) === 'parts' ? 'selected' : '' }}>
+                                            Parts
+                                        </option>
                                     </select>
                                     @error('warranty_type')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- SEO Card -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                            <h2 class="text-lg font-semibold text-gray-900 mb-6">SEO</h2>
-
-                            <div class="space-y-4">
-                                <!-- Meta Title -->
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label for="meta_title_en" class="block text-sm font-medium text-gray-700 mb-2">
-                                            Meta Title (English)
-                                        </label>
-                                        <input type="text" name="meta_title_en" id="meta_title_en"
-                                            value="{{ old('meta_title_en', $product->meta_title_en) }}"
-                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('meta_title_en') border-red-300 @enderror"
-                                            maxlength="70" placeholder="Product page title in English">
-                                        @error('meta_title_en')
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                        <p class="mt-1 text-xs text-gray-500">Maximum 70 characters</p>
-                                    </div>
-
-                                    <div>
-                                        <label for="meta_title_bn" class="block text-sm font-medium text-gray-700 mb-2">
-                                            Meta Title (Bengali)
-                                        </label>
-                                        <input type="text" name="meta_title_bn" id="meta_title_bn"
-                                            value="{{ old('meta_title_bn', $product->meta_title_bn) }}"
-                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('meta_title_bn') border-red-300 @enderror"
-                                            maxlength="70" placeholder="বাংলায় পৃষ্ঠার শিরোনাম">
-                                        @error('meta_title_bn')
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                        <p class="mt-1 text-xs text-gray-500">সর্বোচ্চ ৭০ অক্ষর</p>
-                                    </div>
-                                </div>
-
-                                <!-- Meta Description -->
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label for="meta_description_en"
-                                            class="block text-sm font-medium text-gray-700 mb-2">
-                                            Meta Description (English)
-                                        </label>
-                                        <textarea name="meta_description_en" id="meta_description_en" rows="2"
-                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('meta_description_en') border-red-300 @enderror"
-                                            maxlength="160" placeholder="Product page description in English">{{ old('meta_description_en', $product->meta_description_en) }}</textarea>
-                                        @error('meta_description_en')
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                        <p class="mt-1 text-xs text-gray-500">Maximum 160 characters</p>
-                                    </div>
-
-                                    <div>
-                                        <label for="meta_description_bn"
-                                            class="block text-sm font-medium text-gray-700 mb-2">
-                                            Meta Description (Bengali)
-                                        </label>
-                                        <textarea name="meta_description_bn" id="meta_description_bn" rows="2"
-                                            class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('meta_description_bn') border-red-300 @enderror"
-                                            maxlength="160" placeholder="বাংলায় পৃষ্ঠার বিবরণ">{{ old('meta_description_bn', $product->meta_description_bn) }}</textarea>
-                                        @error('meta_description_bn')
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                        <p class="mt-1 text-xs text-gray-500">সর্বোচ্চ ১৬০ অক্ষর</p>
-                                    </div>
-                                </div>
-
-                                <!-- Meta Keywords -->
-                                <div>
-                                    <label for="meta_keywords" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Meta Keywords
-                                    </label>
-                                    <input type="text" name="meta_keywords" id="meta_keywords"
-                                        value="{{ old('meta_keywords', $product->meta_keywords) }}"
-                                        class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('meta_keywords') border-red-300 @enderror"
-                                        maxlength="255" placeholder="Keyword1, Keyword2, Keyword3">
-                                    @error('meta_keywords')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                    <p class="mt-1 text-xs text-gray-500">Comma separated keywords</p>
                                 </div>
                             </div>
                         </div>
@@ -896,11 +935,11 @@
 
                 <!-- Form Actions -->
                 <div class="mt-8 flex justify-end space-x-4">
-                    <a href="{{ route('admin.products.index') }}"
+                    <a href="{{ route('admin.products.index') }}" data-loading data-loading-text="Canceling..."
                         class="px-6 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         Cancel
                     </a>
-                    <button type="submit"
+                    <button type="submit" data-loading data-loading-text="Updating..."
                         class="px-6 py-3 border border-transparent rounded-lg text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                         Update Product
                     </button>
@@ -920,6 +959,9 @@
 
             // Initialize specifications
             setupSpecifications();
+
+            // Initialize SKU generator
+            setupSkuGenerator();
 
             // Initialize drag and drop
             setupDragAndDrop();
@@ -953,8 +995,8 @@
         function handleImageUpload(input, previewContainer, maxFiles, isFeatured) {
             const files = Array.from(input.files);
 
-            // Don't clear preview if there are existing images
-            if (files.length === 0) return;
+            // Clear previous new image previews
+            previewContainer.innerHTML = '';
 
             // Limit to max files
             const validFiles = files.slice(0, maxFiles);
@@ -976,13 +1018,13 @@
                     const div = document.createElement('div');
                     div.className = 'relative';
                     div.innerHTML = `
-                <img src="${e.target.result}" alt="Preview" class="w-full h-32 object-cover rounded-lg">
-                <button type="button" 
-                        onclick="removeNewImage(this, ${index}, ${isFeatured})"
-                        class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600">
-                    ×
-                </button>
-            `;
+                        <img src="${e.target.result}" alt="Preview" class="w-full h-32 object-cover rounded-lg">
+                        <button type="button" 
+                                onclick="removeNewImage(this, ${index}, ${isFeatured})"
+                                class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600">
+                            ×
+                        </button>
+                    `;
                     previewContainer.appendChild(div);
                 };
                 reader.readAsDataURL(file);
@@ -999,42 +1041,28 @@
             files.forEach(file => dt.items.add(file));
             input.files = dt.files;
 
-            // Remove the preview
-            button.closest('.relative').remove();
+            // Trigger change event to update preview
+            const event = new Event('change');
+            input.dispatchEvent(event);
         }
 
-        function removeExistingImage(type, index) {
-            let existingImagesInput;
-            let imagesArray = [];
+        function removeExistingImage(button, type, index) {
+            const containerId = type === 'featured' ? 'currentFeaturedImages' : 'currentGalleryImages';
+            const container = document.getElementById(containerId);
+            const imageDiv = button.closest('.relative');
 
-            if (type === 'featured') {
-                existingImagesInput = document.getElementById('existingFeaturedImages');
-                // Create a hidden field to track removed images
-                const removedInput = document.createElement('input');
-                removedInput.type = 'hidden';
-                removedInput.name = `removed_featured_images[]`;
-                removedInput.value = index;
-                document.getElementById('productForm').appendChild(removedInput);
-            } else {
-                existingImagesInput = document.getElementById('existingGalleryImages');
-                // Create a hidden field to track removed images
-                const removedInput = document.createElement('input');
-                removedInput.type = 'hidden';
-                removedInput.name = `removed_gallery_images[]`;
-                removedInput.value = index;
-                document.getElementById('productForm').appendChild(removedInput);
-            }
+            // Remove the image div
+            imageDiv.remove();
 
-            // Parse existing images
-            if (existingImagesInput && existingImagesInput.value) {
-                imagesArray = JSON.parse(existingImagesInput.value);
-            }
+            // Add a hidden input to mark this image for removal
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = type === 'featured' ? 'remove_featured_images[]' : 'remove_gallery_images[]';
+            hiddenInput.value = button.previousElementSibling.value; // Get value from existing hidden input
 
-            // Remove the image from display (visual feedback)
-            const imageElement = document.querySelector(`button[onclick="removeExistingImage('${type}', ${index})"]`);
-            if (imageElement) {
-                imageElement.closest('.relative').remove();
-            }
+            // Find the form and append the hidden input
+            const form = document.getElementById('productForm');
+            form.appendChild(hiddenInput);
         }
 
         // Drag and drop
@@ -1075,7 +1103,16 @@
                 function handleDrop(e) {
                     const dt = e.dataTransfer;
                     const files = dt.files;
-                    input.files = files;
+
+                    // Get existing files
+                    const existingFiles = Array.from(input.files);
+                    const allFiles = [...existingFiles, ...Array.from(files)];
+
+                    // Create new DataTransfer with all files
+                    const newDt = new DataTransfer();
+                    allFiles.slice(0, isFeatured ? 2 : 5).forEach(file => newDt.items.add(file));
+
+                    input.files = newDt.files;
 
                     const event = new Event('change');
                     input.dispatchEvent(event);
@@ -1098,29 +1135,61 @@
                 const row = document.createElement('div');
                 row.className = 'grid grid-cols-12 gap-3 items-start specification-row';
                 row.innerHTML = `
-            <div class="col-span-5">
-                <input type="text" 
-                       name="specifications[${index}][key]" 
-                       class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary"
-                       placeholder="Key"
-                       maxlength="100">
-            </div>
-            <div class="col-span-5">
-                <input type="text" 
-                       name="specifications[${index}][value]" 
-                       class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary"
-                       placeholder="Value"
-                       maxlength="255">
-            </div>
-            <div class="col-span-2">
-                <button type="button" 
-                        onclick="this.closest('.specification-row').remove()"
-                        class="w-full inline-flex justify-center items-center px-3 py-2 border border-red-300 text-sm font-medium rounded-lg text-red-700 bg-white hover:bg-red-50">
-                    Remove
-                </button>
-            </div>
-        `;
+                    <div class="col-span-5">
+                        <input type="text" 
+                               name="specifications[${index}][key]" 
+                               class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary"
+                               placeholder="Key"
+                               maxlength="100">
+                    </div>
+                    <div class="col-span-5">
+                        <input type="text" 
+                               name="specifications[${index}][value]" 
+                               class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary"
+                               placeholder="Value"
+                               maxlength="255">
+                    </div>
+                    <div class="col-span-2">
+                        <button type="button" 
+                                onclick="this.closest('.specification-row').remove()"
+                                class="w-full inline-flex justify-center items-center px-3 py-2 border border-red-300 text-sm font-medium rounded-lg text-red-700 bg-white hover:bg-red-50">
+                            Remove
+                        </button>
+                    </div>
+                `;
                 container.appendChild(row);
+            });
+
+            // Add remove functionality to existing specification rows
+            document.querySelectorAll('.remove-spec').forEach(button => {
+                button.addEventListener('click', function() {
+                    this.closest('.specification-row').remove();
+                });
+            });
+        }
+
+        // SKU Generator
+        function setupSkuGenerator() {
+            document.getElementById('generateSku').addEventListener('click', function() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let sku = 'SKU-';
+
+                // Generate 3 random characters
+                for (let i = 0; i < 3; i++) {
+                    sku += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+
+                // Add date
+                const date = new Date();
+                const dateStr = date.getFullYear().toString().slice(2) +
+                    (date.getMonth() + 1).toString().padStart(2, '0') +
+                    date.getDate().toString().padStart(2, '0');
+                sku += '-' + dateStr;
+
+                // Add random number
+                sku += '-' + Math.floor(100 + Math.random() * 900);
+
+                document.getElementById('sku').value = sku;
             });
         }
 
@@ -1170,27 +1239,6 @@
                 }
             });
 
-            // Check if we have any featured images (either existing or new)
-            const existingFeaturedInput = document.getElementById('existingFeaturedImages');
-            const featuredInput = document.getElementById('featured_images');
-            const removedFeaturedInputs = document.querySelectorAll('input[name="removed_featured_images[]"]');
-
-            let totalFeaturedImages = 0;
-
-            // Count existing images that aren't removed
-            if (existingFeaturedInput && existingFeaturedInput.value) {
-                const existingImages = JSON.parse(existingFeaturedInput.value);
-                totalFeaturedImages += existingImages.length - removedFeaturedInputs.length;
-            }
-
-            // Count new images
-            totalFeaturedImages += featuredInput.files.length;
-
-            if (totalFeaturedImages === 0) {
-                isValid = false;
-                alert('Please upload at least one featured image or keep existing ones');
-            }
-
             // Check compare price
             const price = parseFloat(document.getElementById('price').value) || 0;
             const comparePrice = parseFloat(document.getElementById('compare_price').value) || 0;
@@ -1199,6 +1247,26 @@
                 isValid = false;
                 alert('Compare price must be greater than regular price');
                 document.getElementById('compare_price').focus();
+            }
+
+            // Validate total featured images (existing + new)
+            const existingFeaturedCount = document.querySelectorAll('#currentFeaturedImages .relative').length;
+            const featuredInput = document.getElementById('featured_images');
+            const newFeaturedCount = featuredInput.files.length;
+
+            if (existingFeaturedCount + newFeaturedCount > 2) {
+                isValid = false;
+                alert('Maximum 2 featured images allowed (including existing ones)');
+            }
+
+            // Validate total gallery images (existing + new)
+            const existingGalleryCount = document.querySelectorAll('#currentGalleryImages .relative').length;
+            const galleryInput = document.getElementById('gallery_images');
+            const newGalleryCount = galleryInput.files.length;
+
+            if (existingGalleryCount + newGalleryCount > 5) {
+                isValid = false;
+                alert('Maximum 5 gallery images allowed (including existing ones)');
             }
 
             if (!isValid) {

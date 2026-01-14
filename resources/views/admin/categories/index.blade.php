@@ -162,41 +162,50 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead>
                             <tr class="bg-gray-50">
-                                <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                    <input type="checkbox" id="selectAll" class="rounded border-gray-300 text-primary focus:ring-primary">
+                                <th scope="col"
+                                    class="pl-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                    <input type="checkbox" id="selectAll"
+                                        class="rounded border-gray-300 text-primary focus:ring-primary">
                                 </th>
-                                <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <th scope="col"
+                                    class="pl-3 pr-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     Category
                                 </th>
-                                <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <th scope="col"
+                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     Parent
                                 </th>
-                                <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <th scope="col"
+                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     Products
                                 </th>
-                                <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <th scope="col"
+                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     Status
                                 </th>
-                                <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <th scope="col"
+                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     Featured
                                 </th>
-                                <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <th scope="col"
+                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     Order
                                 </th>
-                                <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <th scope="col"
+                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     Actions
                                 </th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach($categories as $category)
+                            @foreach ($categories as $category)
                                 <!-- Level 1: Parent Categories -->
                                 <tr class="hover:bg-gray-50/80 transition-colors">
-                                    <td class="px-6 py-4">
-                                        <input type="checkbox" name="selected_categories[]" value="{{ $category->id }}" 
+                                    <td class="pl-4 py-4">
+                                        <input type="checkbox" name="selected_categories[]" value="{{ $category->id }}"
                                             class="category-checkbox rounded border-gray-300 text-primary focus:ring-primary">
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="pl-3 pr-6 py-4">
                                         <div class="flex items-center">
                                             @if ($category->image)
                                                 <div class="h-10 w-10 flex-shrink-0 mr-3">
@@ -205,54 +214,69 @@
                                                         alt="{{ $category->name_en }}">
                                                 </div>
                                             @else
-                                                <div class="h-10 w-10 flex-shrink-0 mr-3 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
-                                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>
+                                                <div
+                                                    class="h-10 w-10 flex-shrink-0 mr-3 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
+                                                    <svg class="h-5 w-5 text-gray-400" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
                                                     </svg>
                                                 </div>
                                             @endif
                                             <div>
-                                                <div class="text-sm font-medium text-gray-900">{{ $category->name_en }}</div>
+                                                <div class="text-sm font-medium text-gray-900">{{ $category->name_en }}
+                                                </div>
                                                 @if ($category->name_bn)
-                                                    <div class="text-xs text-gray-500">{{ $category->name_bn }}</div>
+                                                    <div class="font-bengali text-xs text-gray-500">
+                                                        {{ $category->name_bn }}</div>
                                                 @endif
                                                 <div class="text-xs text-gray-400">{{ $category->slug }}</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="text-sm text-gray-500 italic">Root</span>
+                                        <span class="text-sm text-primary-dark italic">Root</span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                             {{ $category->products_count ?? 0 }} products
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <select onchange="changeStatus(this, {{ $category->id }})"
                                             class="text-xs rounded-lg {{ $category->is_active ? 'border-green-300' : 'border-red-300' }} focus:ring-primary focus:border-primary">
-                                            <option value="1" {{ $category->is_active ? 'selected' : '' }}>Active</option>
-                                            <option value="0" {{ !$category->is_active ? 'selected' : '' }}>Inactive</option>
+                                            <option value="1" {{ $category->is_active ? 'selected' : '' }}>Active
+                                            </option>
+                                            <option value="0" {{ !$category->is_active ? 'selected' : '' }}>Inactive
+                                            </option>
                                         </select>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <button data-feature-toggle onclick="toggleFeatured(this, {{ $category->id }})"
                                             class="relative inline-flex h-5 w-9 rounded-full transition-colors items-center {{ $category->is_featured ? 'bg-primary' : 'bg-gray-200' }}">
-                                            <span class="inline-block h-4 w-4 {{ $category->is_featured ? 'bg-white' : 'bg-primary' }} rounded-full transform transition {{ $category->is_featured ? 'translate-x-4' : 'translate-x-0' }}">
+                                            <span
+                                                class="inline-block h-4 w-4 {{ $category->is_featured ? 'translate-x-4 bg-white' : 'translate-x-0 bg-primary' }} rounded-full transform transition">
                                             </span>
                                         </button>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center space-x-2">
-                                            <button onclick="moveOrder(this, {{ $category->id }}, 'up')" class="p-1 text-gray-400 hover:text-gray-600">
-                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                                            <button onclick="moveOrder(this, {{ $category->id }}, 'up')"
+                                                class="p-1 text-gray-400 hover:text-gray-600">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M5 10l7-7m0 0l7 7m-7-7v18" />
                                                 </svg>
                                             </button>
                                             <span class="text-sm text-gray-900">{{ $category->order }}</span>
-                                            <button onclick="moveOrder(this, {{ $category->id }}, 'down')" class="p-1 text-gray-400 hover:text-gray-600">
-                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                                            <button onclick="moveOrder(this, {{ $category->id }}, 'down')"
+                                                class="p-1 text-gray-400 hover:text-gray-600">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                                                 </svg>
                                             </button>
                                         </div>
@@ -261,15 +285,20 @@
                                         <div class="flex items-center space-x-2">
                                             <a href="{{ route('admin.categories.edit', $category) }}"
                                                 class="inline-flex items-center px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg text-sm font-medium transition-colors">
-                                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                 </svg>
                                                 Edit
                                             </a>
-                                            <button onclick="deleteCategory({{ $category->id }}, '{{ addslashes($category->name_en) }}')"
+                                            <button
+                                                onclick="deleteCategory({{ $category->id }}, '{{ addslashes($category->name_en) }}')"
                                                 class="inline-flex items-center px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-sm font-medium transition-colors">
-                                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
                                                 Delete
                                             </button>
@@ -278,10 +307,11 @@
                                 </tr>
 
                                 <!-- Level 2: Child Categories -->
-                                @foreach($category->children as $child)
+                                @foreach ($category->children as $child)
                                     <tr class="hover:bg-gray-50/80 transition-colors">
                                         <td class="px-6 py-4">
-                                            <input type="checkbox" name="selected_categories[]" value="{{ $child->id }}" 
+                                            <input type="checkbox" name="selected_categories[]"
+                                                value="{{ $child->id }}"
                                                 class="category-checkbox rounded border-gray-300 text-primary focus:ring-primary">
                                         </td>
                                         <td class="px-6 py-4">
@@ -294,9 +324,11 @@
                                                     </div>
                                                 @endif
                                                 <div>
-                                                    <div class="text-sm font-medium text-gray-900">{{ $child->name_en }}</div>
+                                                    <div class="text-sm font-medium text-gray-900">{{ $child->name_en }}
+                                                    </div>
                                                     @if ($child->name_bn)
-                                                        <div class="text-xs text-gray-500">{{ $child->name_bn }}</div>
+                                                        <div class="font-bengali text-xs text-gray-500">
+                                                            {{ $child->name_bn }}</div>
                                                     @endif
                                                     <div class="text-xs text-gray-400">{{ $child->slug }}</div>
                                                 </div>
@@ -305,39 +337,50 @@
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm text-gray-900">{{ $category->name_en }}</div>
                                             @if ($category->name_bn)
-                                                <div class="text-xs text-gray-500">{{ $category->name_bn }}</div>
+                                                <div class="font-bengali text-xs text-gray-500">{{ $category->name_bn }}
+                                                </div>
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                                 {{ $child->products_count ?? 0 }} products
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <select onchange="changeStatus(this, {{ $child->id }})"
                                                 class="text-xs rounded-lg {{ $child->is_active ? 'border-green-300' : 'border-red-300' }} focus:ring-primary focus:border-primary">
-                                                <option value="1" {{ $child->is_active ? 'selected' : '' }}>Active</option>
-                                                <option value="0" {{ !$child->is_active ? 'selected' : '' }}>Inactive</option>
+                                                <option value="1" {{ $child->is_active ? 'selected' : '' }}>Active
+                                                </option>
+                                                <option value="0" {{ !$child->is_active ? 'selected' : '' }}>Inactive
+                                                </option>
                                             </select>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <button onclick="toggleFeatured(this, {{ $child->id }})"
                                                 class="relative inline-flex h-5 w-9 rounded-full transition-colors items-center {{ $child->is_featured ? 'bg-primary' : 'bg-gray-200' }}">
-                                                <span class="inline-block h-4 w-4 {{ $child->is_featured ? 'bg-white' : 'bg-primary' }} rounded-full transform transition {{ $child->is_featured ? 'translate-x-4' : 'translate-x-0' }}">
+                                                <span
+                                                    class="inline-block h-4 w-4 {{ $child->is_featured ? 'translate-x-4 bg-white' : 'bg-primary translate-x-0' }} rounded-full transform transition">
                                                 </span>
                                             </button>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center space-x-2">
-                                                <button onclick="moveOrder(this, {{ $child->id }}, 'up')" class="p-1 text-gray-400 hover:text-gray-600">
-                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                                                <button onclick="moveOrder(this, {{ $child->id }}, 'up')"
+                                                    class="p-1 text-gray-400 hover:text-gray-600">
+                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
                                                     </svg>
                                                 </button>
                                                 <span class="text-sm text-gray-900">{{ $child->order }}</span>
-                                                <button onclick="moveOrder(this, {{ $child->id }}, 'down')" class="p-1 text-gray-400 hover:text-gray-600">
-                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                                                <button onclick="moveOrder(this, {{ $child->id }}, 'down')"
+                                                    class="p-1 text-gray-400 hover:text-gray-600">
+                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                                                     </svg>
                                                 </button>
                                             </div>
@@ -346,15 +389,22 @@
                                             <div class="flex items-center space-x-2">
                                                 <a href="{{ route('admin.categories.edit', $child) }}"
                                                     class="inline-flex items-center px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg text-sm font-medium transition-colors">
-                                                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                     </svg>
                                                     Edit
                                                 </a>
-                                                <button onclick="deleteCategory({{ $child->id }}, '{{ addslashes($child->name_en) }}')"
+                                                <button
+                                                    onclick="deleteCategory({{ $child->id }}, '{{ addslashes($child->name_en) }}')"
                                                     class="inline-flex items-center px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-sm font-medium transition-colors">
-                                                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg>
                                                     Delete
                                                 </button>
@@ -363,10 +413,11 @@
                                     </tr>
 
                                     <!-- Level 3: Grandchild Categories -->
-                                    @foreach($child->children as $grandchild)
+                                    @foreach ($child->children as $grandchild)
                                         <tr class="hover:bg-gray-50/80 transition-colors">
                                             <td class="px-6 py-4">
-                                                <input type="checkbox" name="selected_categories[]" value="{{ $grandchild->id }}" 
+                                                <input type="checkbox" name="selected_categories[]"
+                                                    value="{{ $grandchild->id }}"
                                                     class="category-checkbox rounded border-gray-300 text-primary focus:ring-primary">
                                             </td>
                                             <td class="px-6 py-4">
@@ -379,9 +430,12 @@
                                                         </div>
                                                     @endif
                                                     <div>
-                                                        <div class="text-sm font-medium text-gray-900">{{ $grandchild->name_en }}</div>
+                                                        <div class="text-sm font-medium text-gray-900">
+                                                            {{ $grandchild->name_en }}</div>
                                                         @if ($grandchild->name_bn)
-                                                            <div class="text-xs text-gray-500">{{ $grandchild->name_bn }}</div>
+                                                            <div class="font-bengali text-xs text-gray-500">
+                                                                {{ $grandchild->name_bn }}
+                                                            </div>
                                                         @endif
                                                         <div class="text-xs text-gray-400">{{ $grandchild->slug }}</div>
                                                     </div>
@@ -390,39 +444,50 @@
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm text-gray-900">{{ $child->name_en }}</div>
                                                 @if ($child->name_bn)
-                                                    <div class="text-xs text-gray-500">{{ $child->name_bn }}</div>
+                                                    <div class="font-bengali text-xs text-gray-500">{{ $child->name_bn }}
+                                                    </div>
                                                 @endif
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                <span
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                                     {{ $grandchild->products_count ?? 0 }} products
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <select onchange="changeStatus(this, {{ $grandchild->id }})"
                                                     class="text-xs rounded-lg {{ $grandchild->is_active ? 'border-green-300' : 'border-red-300' }} focus:ring-primary focus:border-primary">
-                                                    <option value="1" {{ $grandchild->is_active ? 'selected' : '' }}>Active</option>
-                                                    <option value="0" {{ !$grandchild->is_active ? 'selected' : '' }}>Inactive</option>
+                                                    <option value="1" {{ $grandchild->is_active ? 'selected' : '' }}>
+                                                        Active</option>
+                                                    <option value="0"
+                                                        {{ !$grandchild->is_active ? 'selected' : '' }}>Inactive</option>
                                                 </select>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <button onclick="toggleFeatured(this, {{ $grandchild->id }})"
                                                     class="relative inline-flex h-5 w-9 rounded-full transition-colors items-center {{ $grandchild->is_featured ? 'bg-primary' : 'bg-gray-200' }}">
-                                                    <span class="inline-block h-4 w-4 {{ $grandchild->is_featured ? 'bg-white' : 'bg-primary' }} rounded-full transform transition {{ $grandchild->is_featured ? 'translate-x-4' : 'translate-x-0' }}">
+                                                    <span
+                                                        class="inline-block h-4 w-4 {{ $grandchild->is_featured ? 'bg-white translate-x-4' : 'bg-primary translate-x-0' }} rounded-full transform transition">
                                                     </span>
                                                 </button>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="flex items-center space-x-2">
-                                                    <button onclick="moveOrder(this, {{ $grandchild->id }}, 'up')" class="p-1 text-gray-400 hover:text-gray-600">
-                                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                                                    <button onclick="moveOrder(this, {{ $grandchild->id }}, 'up')"
+                                                        class="p-1 text-gray-400 hover:text-gray-600">
+                                                        <svg class="h-4 w-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
                                                         </svg>
                                                     </button>
                                                     <span class="text-sm text-gray-900">{{ $grandchild->order }}</span>
-                                                    <button onclick="moveOrder(this, {{ $grandchild->id }}, 'down')" class="p-1 text-gray-400 hover:text-gray-600">
-                                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                                                    <button onclick="moveOrder(this, {{ $grandchild->id }}, 'down')"
+                                                        class="p-1 text-gray-400 hover:text-gray-600">
+                                                        <svg class="h-4 w-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                                                         </svg>
                                                     </button>
                                                 </div>
@@ -431,15 +496,22 @@
                                                 <div class="flex items-center space-x-2">
                                                     <a href="{{ route('admin.categories.edit', $grandchild) }}"
                                                         class="inline-flex items-center px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg text-sm font-medium transition-colors">
-                                                        <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                        <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                         </svg>
                                                         Edit
                                                     </a>
-                                                    <button onclick="deleteCategory({{ $grandchild->id }}, '{{ addslashes($grandchild->name_en) }}')"
+                                                    <button
+                                                        onclick="deleteCategory({{ $grandchild->id }}, '{{ addslashes($grandchild->name_en) }}')"
                                                         class="inline-flex items-center px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-sm font-medium transition-colors">
-                                                        <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                        <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                         </svg>
                                                         Delete
                                                     </button>
@@ -450,21 +522,26 @@
                                 @endforeach
                             @endforeach
 
-                            @if($categories->count() === 0)
+                            @if ($categories->count() === 0)
                                 <tr>
                                     <td colspan="8" class="px-6 py-12 text-center">
                                         <div class="flex flex-col items-center justify-center">
-                                            <div class="h-16 w-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-4">
-                                                <svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>
+                                            <div
+                                                class="h-16 w-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-4">
+                                                <svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
                                                 </svg>
                                             </div>
                                             <h3 class="text-lg font-medium text-gray-900 mb-2">No categories found</h3>
                                             <p class="text-gray-600 mb-6">Get started by creating your first category</p>
                                             <a href="{{ route('admin.categories.create') }}"
                                                 class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-primary to-primary/80 text-white font-medium rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
-                                                <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                                <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                                 </svg>
                                                 Create Category
                                             </a>
@@ -538,7 +615,7 @@
 @push('scripts')
     <script>
         const csrfToken = '{{ csrf_token() }}';
-        
+
         /* ---------- SELECT ALL CHECKBOX ---------- */
         document.getElementById('selectAll').addEventListener('change', function() {
             const checkboxes = document.querySelectorAll('.category-checkbox');
@@ -559,8 +636,8 @@
             }
 
             let endpoint, confirmMsg;
-            
-            switch(action) {
+
+            switch (action) {
                 case 'activate':
                     endpoint = '/admin/categories/bulk/activate';
                     confirmMsg = `Activate ${selectedIds.length} category(ies)?`;
@@ -579,26 +656,28 @@
 
             if (confirm(confirmMsg)) {
                 fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ ids: selectedIds })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        flash(data.message, 'success', 5000);
-                        setTimeout(() => location.reload(), 1000);
-                    } else {
-                        flash(data.message, 'error', 5000);
-                    }
-                })
-                .catch(error => {
-                    flash('An error occurred', 'error', 5000);
-                    console.error(error);
-                });
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            ids: selectedIds
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            flash(data.message, 'success', 5000);
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            flash(data.message, 'error', 5000);
+                        }
+                    })
+                    .catch(error => {
+                        flash('An error occurred', 'error', 5000);
+                        console.error(error);
+                    });
             }
         });
 
@@ -614,13 +693,13 @@
         function filterTable() {
             const statusFilter = document.getElementById('statusFilter').value;
             const parentFilter = document.getElementById('parentFilter').value;
-            
+
             // This is a simple frontend filter. For production, you may want to implement server-side filtering
             const rows = document.querySelectorAll('tbody tr');
-            
+
             rows.forEach(row => {
                 let show = true;
-                
+
                 // Status filter
                 if (statusFilter) {
                     const statusSelect = row.querySelector('select');
@@ -632,7 +711,7 @@
                         }
                     }
                 }
-                
+
                 // Parent filter
                 if (parentFilter) {
                     const parentCell = row.querySelector('td:nth-child(3)');
@@ -647,7 +726,7 @@
                         }
                     }
                 }
-                
+
                 row.style.display = show ? '' : 'none';
             });
         }
@@ -680,13 +759,18 @@
                 .then(res => res.json())
                 .then(data => {
                     if (!data.success) return;
-
+                    // Update button background
                     button.classList.toggle('bg-primary', data.is_featured);
                     button.classList.toggle('bg-gray-200', !data.is_featured);
-                    
+
+                    // Update knob position and background
                     const knob = button.querySelector('span');
                     knob.classList.toggle('translate-x-4', data.is_featured);
                     knob.classList.toggle('translate-x-0', !data.is_featured);
+
+                    // Update knob background color
+                    knob.classList.toggle('bg-white', data.is_featured);
+                    knob.classList.toggle('bg-primary', !data.is_featured);
                 })
                 .finally(() => {
                     button.dataset.loading = '0';
@@ -715,7 +799,7 @@
                 .then(res => res.json())
                 .then(data => {
                     if (!data.success) return;
-                    
+
                     // Update select border color
                     select.classList.toggle('border-green-300', data.is_active);
                     select.classList.toggle('border-red-300', !data.is_active);

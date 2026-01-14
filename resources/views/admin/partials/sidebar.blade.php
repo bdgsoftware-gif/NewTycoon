@@ -7,8 +7,10 @@
             @if (request()->routeIs('admin.users.*')) this.activeGroup = 'users';
             @elseif(request()->routeIs('admin.products.*'))
                 this.activeGroup = 'products';
-            @elseif(request()->routeIs('admin.categories.*') || request()->routeIs('admin.hero-slides.*'))
-                this.activeGroup = 'content';
+            @elseif(request()->routeIs('admin.categories.*'))
+                this.activeGroup = 'categories';
+            {{-- @elseif(request()->routeIs('admin.categories.*') || request()->routeIs('admin.hero-slides.*'))
+                this.activeGroup = 'content'; --}}
             @elseif(request()->routeIs('admin.orders.*'))
                 this.activeGroup = 'orders';
             @elseif(request()->routeIs('admin.settings.*'))
@@ -124,7 +126,7 @@
         @endif
 
         <!-- Brands -->
-        @if (auth()->user()->hasPermission('manage_products'))
+        @if (auth()->user()->hasPermission('manage_brands'))
             {{-- {{ route('admin.brands.index') }} --}}
             <a href="javascript:void(0);"
                 class="group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.brands.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
@@ -137,12 +139,53 @@
             </a>
         @endif
 
+        <!-- Categories -->
+        @if (auth()->user()->hasPermission('manage_products'))
+            <div x-data="{ open: activeGroup === 'categories' }">
+                <button @click="open = !open; activeGroup = open ? 'categories' : null"
+                    class="w-full group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.categories.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
+                    <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('admin.categories.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                    <span class="ml-3 font-inter flex-1 text-left">Categories</span>
+                    <svg :class="{ 'transform rotate-90': open }"
+                        class="ml-2 h-4 w-4 text-gray-400 transition-transform duration-200 flex-shrink-0"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+
+                <div x-show="open" x-collapse class="ml-8 mt-1 space-y-1">
+                    <a href="{{ route('admin.categories.index') }}"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.categories.index') ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:text-white hover:bg-gray-700/30' }}">
+                        <svg class="mr-3 h-4 w-4 {{ request()->routeIs('admin.categories.index') ? 'text-primary' : 'text-gray-500 group-hover:text-primary' }}"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        All Categories
+                    </a>
+                    <a href="{{ route('admin.categories.create') }}"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.categories.create') ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:text-white hover:bg-gray-700/30' }}">
+                        <svg class="mr-3 h-4 w-4 {{ request()->routeIs('admin.categories.create') ? 'text-primary' : 'text-gray-500 group-hover:text-primary' }}"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Add Category
+                    </a>
+                </div>
+            </div>
+        @endif
+
         <!-- Content -->
         @if (auth()->user()->hasPermission('manage_content'))
             <div x-data="{ open: activeGroup === 'content' }">
                 <button @click="open = !open; activeGroup = open ? 'content' : null"
-                    class="w-full group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.content.*', 'admin.categories.*', 'admin.hero-slides.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
-                    <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('admin.content.*', 'admin.categories.*', 'admin.hero-slides.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}"
+                    class="w-full group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.content.*', 'admin.hero-slides.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
+                    <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('admin.content.*', 'admin.hero-slides.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
@@ -156,17 +199,6 @@
                 </button>
 
                 <div x-show="open" x-collapse class="ml-8 mt-1 space-y-1">
-                    <!-- Categories -->
-                    <a href="{{ route('admin.categories.index') }}"
-                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.categories.*') ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:text-white hover:bg-gray-700/30' }}">
-                        <svg class="mr-3 h-4 w-4 {{ request()->routeIs('admin.categories.*') ? 'text-primary' : 'text-gray-500 group-hover:text-primary' }}"
-                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                        Categories
-                    </a>
-
                     <!-- Hero Slides -->
                     <a href="{{ route('admin.hero-slides.index') }}"
                         class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.hero-slides.*') ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:text-white hover:bg-gray-700/30' }}">
@@ -193,7 +225,7 @@
         @endif
 
         <!-- Orders -->
-        @if (auth()->user()->hasPermission('view_orders'))
+        @if (auth()->user()->hasPermission('no_permissions'))
             <div x-data="{ open: activeGroup === 'orders' }">
                 <button @click="open = !open; activeGroup = open ? 'orders' : null"
                     class="w-full group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.orders.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
@@ -234,7 +266,7 @@
         @endif
 
         <!-- Analytics -->
-        @if (auth()->user()->hasPermission('view_reports'))
+        @if (auth()->user()->hasPermission('no_permissions'))
             <a href="{{ route('admin.analytics.index') }}"
                 class="group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.analytics.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">
                 <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('admin.analytics.*') ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}"
@@ -247,7 +279,7 @@
         @endif
 
         <!-- Settings -->
-        @if (auth()->user()->hasPermission('manage_settings'))
+        @if (auth()->user()->hasPermission('no_permissions'))
             <div x-data="{ open: activeGroup === 'settings' }">
                 <button @click="open = !open; activeGroup = open ? 'settings' : null"
                     class="w-full group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-300 {{ request()->routeIs('admin.settings.*') ? 'bg-primary/20 text-white border-l-4 border-primary' : 'text-gray-300 hover:text-white hover:bg-gray-700/50' }}">

@@ -15,6 +15,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'create_users', 'display_name' => 'Create Users'],
             ['name' => 'edit_users', 'display_name' => 'Edit Users'],
             ['name' => 'delete_users', 'display_name' => 'Delete Users'],
+            ['name' => 'manage_users', 'display_name' => 'Manage Users'],
 
             // Product Management
             ['name' => 'view_products', 'display_name' => 'View Products'],

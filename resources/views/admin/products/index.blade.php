@@ -68,7 +68,7 @@
                             @foreach ($categories as $category)
                                 <option value="{{ $category->id }}"
                                     {{ request('category_id') == $category->id ? 'selected' : '' }}>
-                                    {{ $category->name }}
+                                    {{ $category->name_en }}
                                 </option>
                             @endforeach
                         </select>
@@ -129,11 +129,12 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th class="pl-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     <input type="checkbox" id="selectAll"
                                         class="rounded border-gray-300 text-primary focus:ring-primary">
                                 </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th
+                                    class="pl-3 pr-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Product
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -159,21 +160,26 @@
                         <tbody class="bg-white divide-y divide-gray-200">
                             @forelse($products as $product)
                                 <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="pl-4 py-4 whitespace-nowrap">
                                         <input type="checkbox" value="{{ $product->id }}"
                                             class="product-checkbox rounded border-gray-300 text-primary focus:ring-primary">
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="pl-3 pr-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
                                             <div class="h-10 w-10 flex-shrink-0">
                                                 <img class="h-10 w-10 rounded-lg object-cover"
-                                                    src="{{ $product->featured_image_url }}" alt="{{ $product->name }}">
+                                                    src="{{ $product->featured_image_url }}"
+                                                    alt="{{ $product->name_en }}">
                                             </div>
                                             <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900">
-                                                    {{ $product->name }}
-                                                </div>
-                                                <div class="text-sm text-gray-500 truncate max-w-xs">
+                                                <a href="{{ route('admin.products.show', $product) }}">
+                                                    <div class="text-sm font-medium text-gray-900"
+                                                        title="{{ $product->name_en }}">
+                                                        {{ $product->name_en }}
+                                                    </div>
+                                                </a>
+                                                <div class="text-sm text-gray-500 truncate max-w-xs"
+                                                    title="{{ $product->short_description }}">
                                                     {{ $product->short_description }}
                                                 </div>
                                             </div>
@@ -183,7 +189,7 @@
                                         {{ $product->sku }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ $product->category->name ?? 'Uncategorized' }}
+                                        {{ $product->category->name_en ?? 'Uncategorized' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         <div class="font-medium text-gray-900">
@@ -228,6 +234,16 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex items-center space-x-2">
+                                            <a href="{{ route('admin.products.show', $product->slug) }}"
+                                                class="text-purple-600 hover:text-purple-900"
+                                                title="View Analytics & Details">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                                </svg>
+                                            </a>
+
                                             <a href="{{ route('product.show', $product->slug) }}" target="_blank"
                                                 class="text-blue-600 hover:text-blue-900" title="View">
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor"
@@ -246,21 +262,15 @@
                                                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                 </svg>
                                             </a>
-                                            <form action="{{ route('admin.products.destroy', $product) }}" method="POST"
-                                                class="inline"
-                                                onsubmit="return confirm('Are you sure you want to delete this product?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900"
-                                                    title="Delete">
-                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                </button>
-                                            </form>
+                                            <button
+                                                onclick="deleteProduct({{ $product->id }}, '{{ addslashes($product->name_en) }}')"
+                                                class="text-red-600 hover:text-red-900" title="Delete">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -295,11 +305,82 @@
                 @endif
             </div>
         </div>
+
+        <!-- Delete Modal -->
+        <div id="deleteModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity hidden z-50">
+            <div class="fixed inset-0 z-10 overflow-y-auto">
+                <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                    <div
+                        class="relative transform overflow-hidden rounded-2xl bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                        <div class="sm:flex sm:items-start">
+                            <div
+                                class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.98-.833-2.732 0L4.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                </svg>
+                            </div>
+                            <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                                <h3 class="text-lg font-semibold leading-6 text-gray-900" id="modal-title">
+                                    Delete Product
+                                </h3>
+                                <div class="mt-2">
+                                    <p class="text-sm text-gray-500">
+                                        Are you sure you want to delete the product "<span id="productName"
+                                            class="font-medium"></span>"?
+                                        This action cannot be undone.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                            <form id="deleteForm" method="POST" class="inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" data-loading data-loading-text="Deleting..."
+                                    class="inline-flex w-full justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">
+                                    Delete
+                                </button>
+                            </form>
+                            <button type="button" onclick="closeDeleteModal()"
+                                class="mt-3 inline-flex w-full justify-center rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
 @push('scripts')
     <script>
+        /* ---------- SINGLE DELETE ---------- */
+        function deleteProduct(id, name) {
+            document.getElementById('productName').textContent = name;
+            document.getElementById('deleteForm').action = `/admin/products/${id}`;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+
+        /* ---------- MODAL HANDLING ---------- */
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDeleteModal();
+            }
+        });
+
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target.id === 'deleteModal') {
+                closeDeleteModal();
+            }
+        });
+
         // Bulk selection functionality
         document.addEventListener('DOMContentLoaded', function() {
             const selectAll = document.getElementById('selectAll');
@@ -377,14 +458,6 @@
 
             document.body.appendChild(form);
             form.submit();
-        }
-
-        // Format currency helper (if not already defined)
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD'
-            }).format(amount);
         }
     </script>
 @endpush

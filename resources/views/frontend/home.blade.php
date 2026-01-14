@@ -10,11 +10,11 @@
     {{-- @include('frontend.partials.ads-banner') --}}
     <x-ads-banner :adsBanners="$adsBanners ?? []" />
     <!-- New Arrivals -->
-    <x-product-slider :slidingProducts="$newArrivals ?? []" title="New Arrivals" sliderId="newArrival" :slidesPerView="5" :autoPlay="false"
-        :showNavigation="true" :showPagination="false" cardStyle="minimal" />
+    <x-product-slider :slidingProducts="$newArrivals ?? []" title="{{ __('home.new-arrivals') }}" sliderId="newArrival" :slidesPerView="5"
+        :autoPlay="false" :showNavigation="true" :showPagination="false" cardStyle="minimal" />
     <!-- Recommended for you -->
     <x-ads-banner :adsBanners="$adsAnotherBanners ?? []" />
-    <x-product-slider :slidingProducts="$recommendedProducts ?? []" title="Recommended for you" sliderId="recommendedSlider" :slidesPerView="5"
+    <x-product-slider :slidingProducts="$recommendedProducts ?? []" title="{{ __('home.recommended') }}" sliderId="recommendedSlider" :slidesPerView="5"
         :autoPlay="true" :showNavigation="true" :showPagination="false" cardStyle="minimal" />
     <!-- Ad card with Products -->
     <x-product-slider :slidingProducts="$bestsells ?? []" :adsImages="[
@@ -26,8 +26,8 @@
             'image' => asset('images/ads/addss.png'),
             'link' => '/category/gaming',
         ],
-    ]" title="Best Sells" sliderId="featured-slider" :slidesPerView="3"
-        :autoPlay="true" :showNavigation="true" :showPagination="false" cardStyle="modern" />
+    ]" title="{{ __('home.best-sellers') }}" sliderId="featured-slider"
+        :slidesPerView="3" :autoPlay="true" :showNavigation="true" :showPagination="false" cardStyle="modern" />
     <!--  -->
 
     <!-- User Video Stories Section -->

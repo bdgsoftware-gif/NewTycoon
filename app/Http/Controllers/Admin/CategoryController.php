@@ -24,7 +24,7 @@ class CategoryController extends Controller
         $categories = Category::with(['parent', 'children'])
             ->withCount('products')
             ->latest()
-            ->paginate(20);
+            ->paginate(30);
 
         $rootCategories = Category::whereNull('parent_id')->get();
 

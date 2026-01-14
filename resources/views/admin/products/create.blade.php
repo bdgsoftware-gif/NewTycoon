@@ -66,7 +66,7 @@
             @endif
 
             <form id="productForm" action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data"
-                novalidate>
+                data-form novalidate>
                 @csrf
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -547,7 +547,7 @@
                                     <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors"
                                         id="featuredUploadArea">
                                         <input type="file" name="featured_images[]" id="featured_images"
-                                            class="hidden" accept="image/*" multiple>
+                                            class="hidden" accept="image/*" multiple required>
                                         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -785,33 +785,59 @@
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                             <h2 class="text-lg font-semibold text-gray-900 mb-6">Warranty</h2>
 
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-3 gap-4">
+                                <!-- Duration -->
                                 <div>
-                                    <label for="warranty_period" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Period
+                                    <label for="warranty_duration" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Duration
                                     </label>
-                                    <input type="number" name="warranty_period" id="warranty_period"
-                                        value="{{ old('warranty_period') }}"
-                                        class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('warranty_period') border-red-300 @enderror"
-                                        min="0" max="99" placeholder="0">
-                                    @error('warranty_period')
+                                    <input type="number" name="warranty_duration" id="warranty_duration"
+                                        value="{{ old('warranty_duration') }}" min="0" max="99"
+                                        class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('warranty_duration') border-red-300 @enderror">
+                                    @error('warranty_duration')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
 
+                                <!-- Unit -->
+                                <div>
+                                    <label for="warranty_unit" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Unit
+                                    </label>
+                                    <select name="warranty_unit" id="warranty_unit"
+                                        class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('warranty_unit') border-red-300 @enderror">
+                                        <option value="">Select</option>
+                                        <option value="days" {{ old('warranty_unit') === 'days' ? 'selected' : '' }}>
+                                            Days</option>
+                                        <option value="months" {{ old('warranty_unit') === 'months' ? 'selected' : '' }}>
+                                            Months</option>
+                                        <option value="years" {{ old('warranty_unit') === 'years' ? 'selected' : '' }}>
+                                            Years</option>
+                                    </select>
+                                    @error('warranty_unit')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <!-- Warranty Type -->
                                 <div>
                                     <label for="warranty_type" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Type
+                                        Warranty Type
                                     </label>
                                     <select name="warranty_type" id="warranty_type"
                                         class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary @error('warranty_type') border-red-300 @enderror">
-                                        <option value="">Select Type</option>
-                                        <option value="days" {{ old('warranty_type') == 'days' ? 'selected' : '' }}>Days
+                                        <option value="">Select</option>
+                                        <option value="replacement"
+                                            {{ old('warranty_type') === 'replacement' ? 'selected' : '' }}>
+                                            Replacement
                                         </option>
-                                        <option value="months" {{ old('warranty_type') == 'months' ? 'selected' : '' }}>
-                                            Months</option>
-                                        <option value="years" {{ old('warranty_type') == 'years' ? 'selected' : '' }}>
-                                            Years</option>
+                                        <option value="service"
+                                            {{ old('warranty_type') === 'service' ? 'selected' : '' }}>
+                                            Service
+                                        </option>
+                                        <option value="parts" {{ old('warranty_type') === 'parts' ? 'selected' : '' }}>
+                                            Parts
+                                        </option>
                                     </select>
                                     @error('warranty_type')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -819,6 +845,7 @@
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
 

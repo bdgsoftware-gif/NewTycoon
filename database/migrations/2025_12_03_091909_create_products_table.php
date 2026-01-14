@@ -27,8 +27,10 @@ return new class extends Migration
             $table->boolean('track_quantity')->default(true);
             $table->boolean('allow_backorder')->default(false);
             $table->string('model_number')->nullable()->index();
-            $table->string('warranty_period')->nullable(); // e.g. "1 Year"
+            $table->unsignedSmallInteger('warranty_duration')->nullable(); // numeric value
+            $table->enum('warranty_unit', ['days', 'months', 'years'])->nullable();
             $table->enum('warranty_type', ['replacement', 'service', 'parts'])->nullable();
+
             $table->json('specifications')->nullable();
 
             // Media

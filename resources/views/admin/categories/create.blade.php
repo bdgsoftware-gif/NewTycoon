@@ -22,7 +22,7 @@
 
 @section('content')
     <div class="max-w-5xl mx-auto">
-        <form action="{{ route('admin.categories.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.categories.store') }}" method="POST" data-form enctype="multipart/form-data">
             @csrf
 
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
@@ -190,7 +190,7 @@
                                     <input type="hidden" name="is_featured" value="0">
 
                                     <input type="checkbox" name="is_featured" value="1"
-                                        {{ old('is_featured', $category->is_featured) ? 'checked' : '' }}
+                                        {{ old('is_featured') ? 'checked' : '' }}
                                         class="h-4 w-4 text-primary rounded border-gray-300 focus:ring-primary">
 
                                     <span class="ml-2 text-sm text-gray-700">Featured Category</span>
@@ -201,7 +201,7 @@
                                     <input type="hidden" name="show_in_nav" value="0">
 
                                     <input type="checkbox" name="show_in_nav" value="1"
-                                        {{ old('show_in_nav', $category->show_in_nav) ? 'checked' : '' }}
+                                        {{ old('show_in_nav') ? 'checked' : '' }}
                                         class="h-4 w-4 text-primary rounded border-gray-300 focus:ring-primary">
 
                                     <span class="ml-2 text-sm text-gray-700">Show in Navigation</span>
