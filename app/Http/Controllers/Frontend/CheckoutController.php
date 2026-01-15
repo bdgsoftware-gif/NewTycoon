@@ -38,8 +38,9 @@ class CheckoutController extends Controller
 
         $user = Auth::user();
         $addresses = $user ? $user->addresses : collect();
+        $isGuest = !Auth::check();
 
-        return view('frontend.checkout.index', compact('cart', 'user', 'addresses'));
+        return view('frontend.checkout.index', compact('cart', 'user', 'addresses', 'isGuest'));
     }
 
     /**
@@ -83,20 +84,47 @@ class CheckoutController extends Controller
             // Create order
             $order = Order::create([
                 'order_number' => $this->generateOrderNumber(),
+
+                // USER OR GUEST
                 'user_id' => Auth::id(),
+
+                // CUSTOMER SNAPSHOT
+                'customer_name'  => $request->customer_name,
+                'customer_email' => $request->customer_email,
+                'customer_phone' => $request->customer_phone,
+
+                // SHIPPING SNAPSHOT
+                'shipping_name' => $request->shipping_name,
+                'shipping_email' => $request->shipping_email,
+                'shipping_phone' => $request->shipping_phone,
+                'shipping_address_line1' => $request->shipping_address_1,
+                'shipping_address_line2' => $request->shipping_address_2,
+                'shipping_city' => $request->shipping_city,
+                'shipping_state' => $request->shipping_state,
+                'shipping_country' => $request->shipping_country,
+                'shipping_zip_code' => $request->shipping_postal_code,
+
+                // BILLING
+                'billing_same_as_shipping' => $request->same_as_shipping,
+
+                // TOTALS
                 'subtotal' => $cart->subtotal,
-                'shipping_amount' => 0, // Calculate based on shipping method
-                'tax_amount' => 0, // Calculate tax
-                'discount_amount' => 0, // Apply discounts
+                'shipping_cost' => 0,
+                'tax_amount' => 0,
+                'discount_amount' => 0,
                 'total_amount' => $cart->subtotal,
+
+                // STATUS
                 'status' => 'pending',
                 'payment_status' => 'pending',
+
+                // META
                 'shipping_method' => $request->shipping_method,
                 'payment_method' => $request->payment_method,
-                'notes' => $request->notes,
-                'shipping_address_id' => $this->getShippingAddressId($request),
-                'billing_address_id' => $this->getBillingAddressId($request),
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
             ]);
+
 
             // Create order items
             foreach ($cart->items as $item) {
@@ -150,14 +178,7 @@ class CheckoutController extends Controller
     public function success($orderNumber)
     {
         $order = Order::where('order_number', $orderNumber)
-            ->where(function ($query) {
-                if (Auth::check()) {
-                    $query->where('user_id', Auth::id());
-                } else {
-                    // For guest orders, you might want to verify via email or session
-                    $query->where('session_id', session()->getId());
-                }
-            })
+            ->when(Auth::check(), fn($q) => $q->where('user_id', Auth::id()))
             ->firstOrFail();
 
         return view('frontend.checkout.success', compact('order'));
@@ -258,21 +279,22 @@ class CheckoutController extends Controller
         }
 
         // Create new shipping address
-        $address = Address::create([
-            'user_id' => Auth::id(),
-            'type' => 'shipping',
-            'first_name' => $request->shipping_first_name,
-            'last_name' => $request->shipping_last_name,
-            'email' => $request->shipping_email,
-            'phone' => $request->shipping_phone,
-            'address_line_1' => $request->shipping_address_1,
-            'address_line_2' => $request->shipping_address_2,
-            'city' => $request->shipping_city,
-            'state' => $request->shipping_state,
-            'postal_code' => $request->shipping_postal_code,
-            'country' => $request->shipping_country,
-        ]);
-
+        if (Auth::check() && $request->save_address) {
+            $address = Address::create([
+                'user_id' => Auth::id(),
+                'type' => 'shipping',
+                'first_name' => $request->shipping_first_name,
+                'last_name' => $request->shipping_last_name,
+                'email' => $request->shipping_email,
+                'phone' => $request->shipping_phone,
+                'address_line_1' => $request->shipping_address_1,
+                'address_line_2' => $request->shipping_address_2,
+                'city' => $request->shipping_city,
+                'state' => $request->shipping_state,
+                'postal_code' => $request->shipping_postal_code,
+                'country' => $request->shipping_country,
+            ]);
+        }
         return $address->id;
     }
 
