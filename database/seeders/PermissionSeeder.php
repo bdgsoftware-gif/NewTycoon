@@ -68,6 +68,17 @@ class PermissionSeeder extends Seeder
             // Media Management
             ['name' => 'upload_media', 'display_name' => 'Upload Media'],
             ['name' => 'manage_media', 'display_name' => 'Manage Media'],
+
+            // Promotional Tools
+            ['name' => 'manage_coupons', 'display_name' => 'Manage Coupons'],
+            ['name' => 'manage_discounts', 'display_name' => 'Manage Discounts'],
+
+            // Shipping & Tax
+            ['name' => 'manage_shipping', 'display_name' => 'Manage Shipping'],
+            ['name' => 'manage_tax', 'display_name' => 'Manage Tax'],
+
+            ['name' => 'no_permissions', 'display_name' => 'No Permission'],
+
         ];
 
         foreach ($permissions as $permission) {

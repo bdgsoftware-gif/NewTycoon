@@ -12,7 +12,7 @@
         </div>
 
         @if ($cart && $cart->items->count() > 0)
-            <div class="flex flex-col lg:flex-row gap-8">
+            <div class="flex flex-col lg:flex-row gap-8 cart-container">
                 <!-- Cart Items -->
                 <div class="lg:w-2/3">
                     <!-- Desktop Cart Table -->
@@ -45,7 +45,9 @@
                                 @endphp
 
                                 <div class="cart-item grid grid-cols-12 gap-4 p-6 items-center"
-                                    data-product-id="{{ $product->id }}">
+                                    data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}"
+                                    data-product-price="{{ $item->price }}" data-product-stock="{{ $product->quantity }}"
+                                    data-product-in-stock="{{ $product->in_stock ? 'true' : 'false' }}">
                                     <!-- Product Info -->
                                     <div class="col-span-6">
                                         <div class="flex items-center space-x-4">
@@ -125,9 +127,10 @@
                                                     </button>
 
                                                     <input type="number" name="quantity" value="{{ $item->quantity }}"
-                                                        min="1" max="{{ $maxQuantity }}"
+                                                        data-previous-value="{{ $item->quantity }}" min="1"
+                                                        max="{{ $maxQuantity }}"
                                                         class="quantity-input w-16 text-center border-0 focus:ring-0 focus:outline-none font-inter [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                                                        data-product-id="{{ $product->id }}">
+                                                        data-product-id="{{ $product->id }}" readonly>
 
                                                     <button type="button"
                                                         class="quantity-increment px-3 py-2 text-gray-600 hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
@@ -246,6 +249,7 @@
 
                                                     <input type="number" name="quantity" value="{{ $item->quantity }}"
                                                         min="1" max="{{ $maxQuantity }}"
+                                                        data-previous-value="{{ $item->quantity }}"
                                                         class="quantity-input w-16 text-center border-0 focus:ring-0 focus:outline-none font-inter [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                                                         data-product-id="{{ $product->id }}">
 
@@ -287,15 +291,16 @@
                         </a>
 
                         <div class="flex gap-3">
-                            <button id="clear-cart-btn"
+                            <button id="clear-cart-btn" data-url="{{ route('cart.clear') }}"
                                 class="px-6 py-3 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg font-medium font-inter transition-colors duration-200">
                                 Clear Cart
                             </button>
-
-                            <a href="{{ route('checkout.index') }}"
-                                class="px-6 py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition-colors duration-200 font-quantico">
-                                Proceed to Checkout
-                            </a>
+                            @if ($cart->total_items > 0)
+                                <a href="{{ route('checkout.index') }}"
+                                    class="checkout-btn px-6 py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition-colors duration-200 font-quantico">
+                                    Proceed to Checkout
+                                </a>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -309,22 +314,25 @@
                         <div class="space-y-4">
                             <!-- Items Count -->
                             <div class="flex justify-between items-center">
-                                <span class="text-gray-600 font-inter">Items ({{ $cart->total_items }})</span>
-                                <span class="text-gray-900 font-semibold font-quantico"><span
+                                <span class="cart-count-text text-gray-600 font-inter">
+                                    Items (<span class="cart-count-number">{{ $cart->total_items }}</span>)
+                                </span>
+                                <span id="cart-subtotal" class="text-gray-900 font-semibold font-quantico"><span
                                         class="font-bengali">৳</span>{{ number_format($cart->subtotal, 2) }}</span>
                             </div>
 
                             <!-- Shipping -->
                             <div class="flex justify-between items-center">
                                 <span class="text-gray-600 font-inter">Shipping</span>
-                                <span class="text-gray-900 font-semibold font-quantico">TK0.00</span>
+                                <span class="text-gray-900 font-semibold font-quantico"><span
+                                        class="font-bengali">৳</span>0.00</span>
                             </div>
 
                             <!-- Tax -->
-                            <div class="flex justify-between items-center">
+                            {{-- <div class="flex justify-between items-center">
                                 <span class="text-gray-600 font-inter">Tax</span>
                                 <span class="text-gray-900 font-semibold font-quantico">TK0.00</span>
-                            </div>
+                            </div> --}}
 
                             <!-- Divider -->
                             <div class="border-t border-gray-200 pt-4">
@@ -343,11 +351,12 @@
                         </div>
 
                         <!-- Checkout Button -->
-                        <a href="{{ route('checkout.index') }}"
-                            class="mt-6 w-full bg-primary hover:bg-primary-dark text-white font-semibold py-4 px-6 rounded-lg transition-colors duration-200 text-center block font-quantico">
-                            Proceed to Checkout
-                        </a>
-
+                        @if ($cart->total_items > 0)
+                            <a href="{{ route('checkout.index') }}"
+                                class="checkout-btn mt-6 w-full bg-primary hover:bg-primary-dark text-white font-semibold py-4 px-6 rounded-lg transition-colors duration-200 text-center block font-quantico">
+                                Proceed to Checkout
+                            </a>
+                        @endif
                         <!-- Security Badge -->
                         <div class="mt-6 pt-6 border-t border-gray-200">
                             <div class="flex items-center text-gray-600">
@@ -403,20 +412,3 @@
     </div>
 @endsection
 
-@push('styles')
-    <style>
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-    </style>
-@endpush

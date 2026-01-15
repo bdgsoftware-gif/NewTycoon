@@ -7,6 +7,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 
 class CartController extends Controller
 {
@@ -24,14 +25,29 @@ class CartController extends Controller
      */
     public function add(Request $request, Product $product)
     {
-        $validated = $request->validate([
+        // dd($product);
+        if (!$product->is_active || !$product->in_stock) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This product is currently unavailable.',
+            ], 422);
+        }
+
+        $validator = Validator::make($request->all(), [
             'quantity' => 'required|integer|min:1|max:100',
         ]);
 
-        $quantity = (int) $validated['quantity'];
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
 
+        $quantity = (int) $validator->validated()['quantity'];
+
+        $cart = Cart::getCurrentCart();
         try {
-            $cart = Cart::getCurrentCart();
             $cart->addItem($product->id, $quantity);
             $cart->refresh();
 
@@ -39,12 +55,15 @@ class CartController extends Controller
                 'success' => true,
                 'message' => "{$product->name} added to cart",
                 'cart_count' => $cart->total_items,
-                'cart_subtotal' => format_currency($cart->subtotal),
+                'cart_total' => $cart->subtotal,
+                'cart_subtotal' => $cart->subtotal,
+                'item_total' => $cart->getItemTotal($product->id) ?? 0,
             ];
 
-            if ($request->expectsJson()) {
+            if ($request->ajax() || $request->wantsJson()) {
                 return response()->json($response);
             }
+
 
             flash(
                 $response['message'],
@@ -64,12 +83,13 @@ class CartController extends Controller
             $errorResponse = [
                 'success' => false,
                 'message' => 'Unable to add product to cart. Please try again.',
-                'cart_count' => Cart::getCurrentCart()->total_items ?? 0,
+                'cart_count' => $cart->total_items ?? 0,
             ];
 
-            if ($request->expectsJson()) {
+            if ($request->ajax() || $request->wantsJson()) {
                 return response()->json($errorResponse, 422);
             }
+
 
             flash($errorResponse['message'], 'error', 3000);
             return redirect()->back();
@@ -81,18 +101,25 @@ class CartController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        $validated = $request->validate([
-            'quantity' => 'required|integer|min:0|max:100',
+        $validator = Validator::make($request->all(), [
+            'quantity' => 'required|integer|min:1|max:100',
         ]);
 
-        $quantity = (int) $validated['quantity'];
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
 
+        $quantity = (int) $validator->validated()['quantity'];
+
+
+        $cart = Cart::getCurrentCart();
         try {
-            $cart = Cart::getCurrentCart();
 
-            // Quantity 0 means remove
-            if ($quantity === 0) {
-                $cart->removeItem($product->id);
+            if (!$cart->hasItem($product->id)) {
+                $cart->addItem($product->id, $quantity);
             } else {
                 $cart->updateItem($product->id, $quantity);
             }
@@ -103,11 +130,13 @@ class CartController extends Controller
                 'success' => true,
                 'message' => 'Cart updated successfully',
                 'cart_count' => $cart->total_items,
-                'cart_subtotal' => format_currency($cart->subtotal),
+                'cart_total' => $cart->subtotal,
+                'cart_subtotal' => $cart->subtotal,
                 'item_quantity' => $quantity,
+                'item_total' => $cart->getItemTotal($product->id) ?? 0,
             ];
 
-            if ($request->expectsJson()) {
+            if ($request->ajax() || $request->wantsJson()) {
                 return response()->json($response);
             }
 
@@ -117,18 +146,20 @@ class CartController extends Controller
             Log::error('Cart update failed', [
                 'product_id' => $product->id,
                 'quantity' => $quantity,
+                'cart_items' => $cart->items,
                 'error' => $e->getMessage(),
             ]);
 
             $errorResponse = [
                 'success' => false,
                 'message' => 'Unable to update cart. Please try again.',
-                'cart_count' => Cart::getCurrentCart()->total_items ?? 0,
+                'cart_count' => $cart->total_items ?? 0,
             ];
 
-            if ($request->expectsJson()) {
+            if ($request->ajax() || $request->wantsJson()) {
                 return response()->json($errorResponse, 422);
             }
+
 
             flash($errorResponse['message'], 'error', 3000);
             return redirect()->back();
@@ -149,10 +180,11 @@ class CartController extends Controller
                 'success' => true,
                 'message' => 'Item removed from cart',
                 'cart_count' => $cart->total_items,
-                'cart_subtotal' => format_currency($cart->subtotal),
+                'cart_total' => $cart->subtotal,
+                'cart_subtotal' => $cart->subtotal,
             ];
 
-            if ($request->expectsJson()) {
+            if ($request->ajax() || $request->wantsJson()) {
                 return response()->json($response);
             }
 
@@ -169,9 +201,10 @@ class CartController extends Controller
                 'message' => 'Unable to remove item. Please try again.',
             ];
 
-            if ($request->expectsJson()) {
+            if ($request->ajax() || $request->wantsJson()) {
                 return response()->json($errorResponse, 422);
             }
+
 
             flash($errorResponse['message'], 'error', 3000);
             return redirect()->back();
@@ -191,10 +224,10 @@ class CartController extends Controller
                 'success' => true,
                 'message' => 'Cart cleared successfully',
                 'cart_count' => 0,
-                'cart_subtotal' => format_currency(0),
+                'cart_subtotal' => 0,
             ];
 
-            if ($request->expectsJson()) {
+            if ($request->ajax() || $request->wantsJson()) {
                 return response()->json($response);
             }
 
@@ -210,9 +243,10 @@ class CartController extends Controller
                 'message' => 'Unable to clear cart. Please try again.',
             ];
 
-            if ($request->expectsJson()) {
+            if ($request->ajax() || $request->wantsJson()) {
                 return response()->json($errorResponse, 422);
             }
+
 
             flash($errorResponse['message'], 'error', 3000);
             return redirect()->back();
@@ -225,24 +259,16 @@ class CartController extends Controller
      */
     public function count(Request $request)
     {
-        if (!$request->expectsJson()) {
+        if (!($request->ajax() || $request->wantsJson())) {
             abort(404);
         }
 
-        try {
-            $cart = Cart::getCurrentCart();
+        $cart = Cart::getCurrentCart();
 
-            return response()->json([
-                'success' => true,
-                'count' => $cart->total_items,
-                'total' => format_currency($cart->subtotal)
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to get cart count',
-                'count' => 0
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'count' => $cart->total_items,
+            'total' => $cart->subtotal,
+        ]);
     }
 }

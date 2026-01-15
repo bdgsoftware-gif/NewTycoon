@@ -14,6 +14,11 @@ class Cart extends Model
 
     protected $fillable = ['user_id', 'session_id'];
 
+    public function hasItem(int $productId): bool
+    {
+        return $this->items->contains('product_id', $productId);
+    }
+
     /**
      * Get the cart for the current user/session
      */
@@ -91,7 +96,11 @@ class Cart extends Model
             return $item->quantity * $item->price;
         });
     }
-
+    public function getItemTotal(int $productId): float
+    {
+        $item = $this->items->firstWhere('product_id', $productId);
+        return $item ? ($item->quantity * $item->price) : 0;
+    }
     /**
      * Clear cart
      */
@@ -156,9 +165,9 @@ class Cart extends Model
     /**
      * Remove item from cart
      */
-    public function removeItem($productId)
+    public function removeItem($productId): bool
     {
-        $this->items()
+        return (bool) $this->items()
             ->where('product_id', $productId)
             ->delete();
     }

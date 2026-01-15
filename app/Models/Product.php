@@ -242,6 +242,10 @@ class Product extends Model
     {
         return $this->stock_status === 'in_stock';
     }
+    public function getIsActiveAttribute(): bool
+    {
+        return $this->status === 'active';
+    }
 
     public function scopeOfferAbove($query, float $minDiscount = 10)
     {

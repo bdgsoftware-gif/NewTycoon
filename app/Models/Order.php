@@ -129,7 +129,15 @@ class Order extends Model
     {
         return $this->hasMany(Transaction::class);
     }
+    public function shippingAddress()
+    {
+        return $this->belongsTo(Address::class, 'shipping_address_id');
+    }
 
+    public function billingAddress()
+    {
+        return $this->belongsTo(Address::class, 'billing_address_id');
+    }
     /**
      * Get the order's shipping address.
      */

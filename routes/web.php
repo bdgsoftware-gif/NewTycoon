@@ -70,13 +70,14 @@ Route::middleware('auth')->prefix('wishlist')->name('wishlist.')->group(function
     Route::post('/move-to-cart/{product}', [WishlistController::class, 'moveToCart'])->name('moveToCart');
 });
 
-// Checkout
-Route::middleware('auth')->prefix('checkout')->name('checkout.')->group(function () {
+// Checkout (guest + user)
+Route::prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/', [CheckoutController::class, 'index'])->name('index');
     Route::post('/process', [CheckoutController::class, 'process'])->name('process');
     Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');
     Route::get('/cancel', [CheckoutController::class, 'cancel'])->name('cancel');
 });
+
 
 // Order Tracking (public)
 Route::prefix('orders')->name('orders.')->group(function () {

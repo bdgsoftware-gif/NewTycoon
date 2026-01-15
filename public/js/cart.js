@@ -1,13 +1,39 @@
 class CartManager {
     constructor() {
+        this.sessionKey = "cart_last_update";
+        this.debounceTimeout = null;
+        this.debounceDelay = 250;
         this.init();
     }
 
     init() {
+        this.checkCartStale();
         this.initAddToCartForms();
-        this.initCartUpdates();
+        // this.initCartUpdates();
         this.initCartPageHandlers();
         this.setupQuantityHandlers();
+        document.querySelectorAll(".cart-item-form").forEach((form) => {
+            this.updateQuantityButtons(form);
+        });
+        const initialCount =
+            Number(document.querySelector(".cart-count-number")?.textContent) ||
+            0;
+        this.updateCheckoutButton(initialCount);
+    }
+
+    checkCartStale() {
+        const lastUpdate = localStorage.getItem(this.sessionKey);
+        if (lastUpdate) {
+            const hoursSinceUpdate =
+                (Date.now() - lastUpdate) / (1000 * 60 * 60);
+            if (hoursSinceUpdate > 24) {
+                // 24 hours
+                this.showFlash(
+                    "Your cart may be outdated. Please refresh.",
+                    "warning"
+                );
+            }
+        }
     }
 
     initAddToCartForms() {
@@ -121,33 +147,38 @@ class CartManager {
     }
 
     updateCartCount(count) {
-        // Update all cart count elements
-        const elements = document.querySelectorAll(".cart-count, #cart-count");
+        count = Number(count) || 0;
 
-        elements.forEach((element) => {
-            const oldCount = parseInt(element.textContent) || 0;
-            element.textContent = count;
+        // Navbar / badge update
+        document.querySelectorAll(".cart-badge").forEach((badge) => {
+            const oldCount = Number(badge.textContent) || 0;
+            badge.textContent = count;
 
-            // Show/hide logic
             if (count > 0) {
-                element.classList.remove("hidden");
+                badge.classList.remove("hidden");
 
-                // Add bounce animation for count increase
                 if (count > oldCount) {
-                    element.classList.add("animate-bounce");
+                    badge.classList.add("animate-bounce");
                     setTimeout(
-                        () => element.classList.remove("animate-bounce"),
-                        1000
+                        () => badge.classList.remove("animate-bounce"),
+                        800
                     );
                 }
-
-                // Add ping animation
-                element.classList.add("animate-ping");
-                setTimeout(() => element.classList.remove("animate-ping"), 600);
             } else {
-                element.classList.add("hidden");
+                badge.classList.add("hidden");
             }
         });
+
+        // Cart page count update
+        document.querySelectorAll(".cart-count-number").forEach((el) => {
+            el.textContent = count;
+        });
+
+        // toggle checkout button
+        this.updateCheckoutButton(count);
+
+        // Update last cart update time
+        localStorage.setItem(this.sessionKey, Date.now());
     }
 
     showFlash(message, type = "success", duration = 3000, description = "") {
@@ -158,23 +189,23 @@ class CartManager {
         }
     }
 
-    initCartUpdates() {
-        // Quantity updates
-        document.querySelectorAll(".cart-update-quantity").forEach((button) => {
-            button.addEventListener("click", async (e) => {
-                e.preventDefault();
-                await this.handleCartUpdate(button);
-            });
-        });
+    // initCartUpdates() {
+    //     // Quantity updates
+    //     document.querySelectorAll(".cart-update-quantity").forEach((button) => {
+    //         button.addEventListener("click", async (e) => {
+    //             e.preventDefault();
+    //             await this.handleCartUpdate(button);
+    //         });
+    //     });
 
-        // Remove items
-        document.querySelectorAll(".cart-remove-item").forEach((button) => {
-            button.addEventListener("click", async (e) => {
-                e.preventDefault();
-                await this.handleCartRemove(button);
-            });
-        });
-    }
+    //     // Remove items
+    //     document.querySelectorAll(".cart-remove-item").forEach((button) => {
+    //         button.addEventListener("click", async (e) => {
+    //             e.preventDefault();
+    //             await this.handleCartRemove(button);
+    //         });
+    //     });
+    // }
 
     initCartPageHandlers() {
         // Clear cart button
@@ -185,6 +216,14 @@ class CartManager {
                 await this.handleClearCart();
             });
         }
+
+        // Remove items
+        document.querySelectorAll(".cart-remove-item").forEach((button) => {
+            button.addEventListener("click", async (e) => {
+                e.preventDefault();
+                await this.handleCartRemove(button);
+            });
+        });
     }
 
     setupQuantityHandlers() {
@@ -216,11 +255,24 @@ class CartManager {
     async handleQuantityChange(button, change) {
         const form = button.closest(".cart-item-form");
         if (!form) return;
+        if (form.dataset.loading === "true") return;
 
         const input = form.querySelector(".quantity-input");
         const productId = input.dataset.productId;
         const currentQuantity = parseInt(input.value) || 1;
         const newQuantity = currentQuantity + change;
+
+        // Check if product is in stock
+        const itemElement = document.querySelector(
+            `.cart-item[data-product-id="${productId}"]`
+        );
+
+        const isInStock = itemElement?.dataset.productInStock === "true";
+
+        if (!isInStock && newQuantity > 0) {
+            this.showFlash("This item is out of stock", "error");
+            return;
+        }
 
         // Validate min/max
         const min = parseInt(input.min) || 1;
@@ -237,34 +289,45 @@ class CartManager {
         // Update input immediately for better UX
         input.value = newQuantity;
 
+        // UPDATE BUTTON STATES IMMEDIATELY
+        this.updateQuantityButtons(form);
+
         // Update in database
         await this.updateCartItem(productId, newQuantity, form);
     }
 
     async handleQuantityInputChange(input) {
-        const productId = input.dataset.productId;
-        const newQuantity = parseInt(input.value) || 1;
-        const form = input.closest(".cart-item-form");
+        clearTimeout(this.debounceTimeout);
+        this.debounceTimeout = setTimeout(async () => {
+            const productId = input.dataset.productId;
+            const newQuantity = parseInt(input.value) || 1;
+            const form = input.closest(".cart-item-form");
 
-        if (!form) return;
+            if (!form) return;
 
-        // Validate min/max
-        const min = parseInt(input.min) || 1;
-        const max = parseInt(input.max) || 999;
+            // Validate min/max
+            const min = parseInt(input.min) || 1;
+            const max = parseInt(input.max) || 999;
 
-        if (newQuantity < min || newQuantity > max) {
-            this.showFlash(
-                `Quantity must be between ${min} and ${max}`,
-                "warning"
-            );
-            input.value = Math.min(Math.max(newQuantity, min), max);
-            return;
-        }
+            if (newQuantity < min || newQuantity > max) {
+                this.showFlash(
+                    `Quantity must be between ${min} and ${max}`,
+                    "warning"
+                );
+                input.value = Math.min(Math.max(newQuantity, min), max);
+                return;
+            }
+            // UPDATE BUTTON STATES
+            this.updateQuantityButtons(form);
 
-        await this.updateCartItem(productId, newQuantity, form);
+            await this.updateCartItem(productId, newQuantity, form);
+        }, this.debounceDelay);
     }
 
     async updateCartItem(productId, quantity, formElement) {
+        if (formElement.dataset.loading === "true") return;
+        formElement.dataset.loading = "true";
+
         const url = formElement.action || formElement.dataset.url;
         const token =
             formElement.querySelector('input[name="_token"]')?.value ||
@@ -281,6 +344,9 @@ class CartManager {
         input.classList.add("opacity-50", "cursor-not-allowed");
 
         try {
+            const controller = new AbortController();
+            setTimeout(() => controller.abort(), 5000);
+
             const response = await fetch(url, {
                 method: "POST",
                 headers: {
@@ -290,6 +356,7 @@ class CartManager {
                     "X-Requested-With": "XMLHttpRequest",
                 },
                 body: JSON.stringify({ quantity }),
+                signal: controller.signal,
             });
 
             const data = await response.json();
@@ -302,14 +369,26 @@ class CartManager {
             this.updateCartCount(data.cart_count || 0);
             this.updateCartTotals(data);
             this.updateItemTotal(productId, data.item_total);
-
+            this.updateQuantityButtons(formElement);
             // Show success message
             this.showFlash(
                 data.message || "Cart updated successfully",
                 "success"
             );
         } catch (error) {
-            this.showFlash(error.message, "error");
+            if (error.name === "AbortError" || error.name === "TimeoutError") {
+                this.showFlash(
+                    "Request timed out. Please check your connection.",
+                    "error"
+                );
+            } else if (error.name === "NetworkError") {
+                this.showFlash(
+                    "Network error. Please check your connection.",
+                    "error"
+                );
+            } else {
+                this.showFlash(error.message, "error");
+            }
 
             // Revert to previous value
             const previousValue = input.getAttribute("data-previous-value");
@@ -321,6 +400,7 @@ class CartManager {
             input.disabled = false;
             input.classList.remove("opacity-50", "cursor-not-allowed");
             input.setAttribute("data-previous-value", input.value);
+            formElement.dataset.loading = "false";
         }
     }
 
@@ -332,9 +412,10 @@ class CartManager {
         if (itemElement) {
             const totalElement = itemElement.querySelector(".item-total");
             if (totalElement) {
-                totalElement.textContent = `<span class="font-bengali">৳</span>${parseFloat(
-                    itemTotal || 0
-                ).toFixed(2)}`;
+                const amount = Number(itemTotal);
+                totalElement.innerHTML = `<span class="font-bengali">৳</span>${amount.toFixed(
+                    2
+                )}`;
 
                 // Add animation
                 totalElement.classList.add("animate-pulse");
@@ -345,57 +426,57 @@ class CartManager {
         }
     }
 
-    async handleCartUpdate(button) {
-        const form = button.closest(".cart-item-form");
-        const url = form.action || form.dataset.url;
-        const token =
-            form.querySelector('input[name="_token"]')?.value ||
-            document.querySelector('meta[name="csrf-token"]')?.content;
-        const quantityInput = form.querySelector('input[name="quantity"]');
-        const quantity = parseInt(quantityInput.value);
-        const productId = quantityInput.dataset.productId;
+    // async handleCartUpdate(button) {
+    //     const form = button.closest(".cart-item-form");
+    //     const url = form.action || form.dataset.url;
+    //     const token =
+    //         form.querySelector('input[name="_token"]')?.value ||
+    //         document.querySelector('meta[name="csrf-token"]')?.content;
+    //     const quantityInput = form.querySelector('input[name="quantity"]');
+    //     const quantity = parseInt(quantityInput.value);
+    //     const productId = quantityInput.dataset.productId;
 
-        button.disabled = true;
-        const originalText = button.innerHTML;
-        button.innerHTML = `
-            <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>`;
+    //     button.disabled = true;
+    //     const originalText = button.innerHTML;
+    //     button.innerHTML = `
+    //         <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+    //             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+    //             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    //         </svg>`;
 
-        try {
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-CSRF-TOKEN": token,
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                    "X-Requested-With": "XMLHttpRequest",
-                },
-                body: JSON.stringify({ quantity }),
-            });
+    //     try {
+    //         const response = await fetch(url, {
+    //             method: "POST",
+    //             headers: {
+    //                 "X-CSRF-TOKEN": token,
+    //                 Accept: "application/json",
+    //                 "Content-Type": "application/json",
+    //                 "X-Requested-With": "XMLHttpRequest",
+    //             },
+    //             body: JSON.stringify({ quantity }),
+    //         });
 
-            const data = await response.json();
+    //         const data = await response.json();
 
-            if (!response.ok || data.success === false) {
-                throw new Error(data.message || "Failed to update cart");
-            }
+    //         if (!response.ok || data.success === false) {
+    //             throw new Error(data.message || "Failed to update cart");
+    //         }
 
-            // Update all totals
-            this.updateCartCount(data.cart_count || 0);
-            this.updateCartTotals(data);
-            this.updateItemTotal(productId, data.item_total);
-            this.showFlash(
-                data.message || "Cart updated successfully",
-                "success"
-            );
-        } catch (error) {
-            this.showFlash(error.message, "error");
-        } finally {
-            button.disabled = false;
-            button.innerHTML = originalText;
-        }
-    }
+    //         // Update all totals
+    //         this.updateCartCount(data.cart_count || 0);
+    //         this.updateCartTotals(data);
+    //         this.updateItemTotal(productId, data.item_total);
+    //         this.showFlash(
+    //             data.message || "Cart updated successfully",
+    //             "success"
+    //         );
+    //     } catch (error) {
+    //         this.showFlash(error.message, "error");
+    //     } finally {
+    //         button.disabled = false;
+    //         button.innerHTML = originalText;
+    //     }
+    // }
 
     async handleCartRemove(button) {
         if (
@@ -449,6 +530,7 @@ class CartManager {
 
                     // Show empty cart message if no items left
                     if (document.querySelectorAll(".cart-item").length === 0) {
+                        console.log("No Items Left 0");
                         this.showEmptyCartMessage();
                     }
                 }, 300);
@@ -472,6 +554,7 @@ class CartManager {
 
         const button = document.getElementById("clear-cart-btn");
         const originalText = button.innerHTML;
+        const url = button.dataset.url;
 
         button.disabled = true;
         button.innerHTML = `
@@ -484,7 +567,7 @@ class CartManager {
             </span>`;
 
         try {
-            const response = await fetch("/cart/clear", {
+            const response = await fetch(url, {
                 method: "POST",
                 headers: {
                     "X-CSRF-TOKEN": document.querySelector(
@@ -526,8 +609,10 @@ class CartManager {
     updateCartTotals(data) {
         // Update cart total
         const totalElement = document.getElementById("cart-total");
-        if (totalElement && (data.cart_total || data.total)) {
-            totalElement.textContent = data.cart_total || data.total;
+        if (totalElement && data.cart_total !== undefined) {
+            totalElement.innerHTML = `<span class="font-bengali">৳</span>${Number(
+                data.cart_total
+            ).toFixed(2)}`;
             totalElement.classList.add("animate-pulse");
             setTimeout(
                 () => totalElement.classList.remove("animate-pulse"),
@@ -537,8 +622,10 @@ class CartManager {
 
         // Update subtotal
         const subtotalElement = document.getElementById("cart-subtotal");
-        if (subtotalElement && data.cart_subtotal) {
-            subtotalElement.textContent = data.cart_subtotal;
+        if (subtotalElement && data.cart_subtotal !== undefined) {
+            subtotalElement.innerHTML = `<span class="font-bengali">৳</span>${Number(
+                data.cart_subtotal
+            ).toFixed(2)}`;
             subtotalElement.classList.add("animate-pulse");
             setTimeout(
                 () => subtotalElement.classList.remove("animate-pulse"),
@@ -548,9 +635,9 @@ class CartManager {
     }
 
     showEmptyCartMessage() {
-        const cartContainer = document.querySelector(
-            ".cart-container, table.cart-table"
-        );
+        console.log("No Items Left 2");
+        const cartContainer = document.querySelector(".cart-container");
+        console.log("No Items Left 2");
         if (cartContainer) {
             const emptyMessage = document.createElement("div");
             emptyMessage.className =
@@ -565,9 +652,64 @@ class CartManager {
                     Continue Shopping
                 </a>
             `;
-
+            cartContainer.innerHTML = "";
             cartContainer.appendChild(emptyMessage);
         }
+    }
+
+    updateQuantityButtons(form) {
+        if (!form) return;
+
+        const input = form.querySelector(".quantity-input");
+        const decrementBtn = form.querySelector(".quantity-decrement");
+        const incrementBtn = form.querySelector(".quantity-increment");
+
+        if (!input || !decrementBtn || !incrementBtn) return;
+
+        const quantity = parseInt(input.value) || 1;
+        const min = parseInt(input.min) || 1;
+        const max = parseInt(input.max) || 999;
+
+        // Decrement button
+        decrementBtn.disabled = quantity <= min;
+        decrementBtn.classList.toggle("opacity-50", decrementBtn.disabled);
+        decrementBtn.classList.toggle(
+            "cursor-not-allowed",
+            decrementBtn.disabled
+        );
+
+        // Increment button
+        incrementBtn.disabled = quantity >= max;
+        incrementBtn.classList.toggle("opacity-50", incrementBtn.disabled);
+        incrementBtn.classList.toggle(
+            "cursor-not-allowed",
+            incrementBtn.disabled
+        );
+    }
+
+    updateCheckoutButton(cartCount) {
+        const buttons = document.querySelectorAll(".checkout-btn");
+        if (!buttons.length) return;
+
+        cartCount = Number(cartCount) || 0;
+
+        buttons.forEach((btn) => {
+            if (cartCount <= 0) {
+                btn.classList.add(
+                    "opacity-50",
+                    "cursor-not-allowed",
+                    "pointer-events-none"
+                );
+                btn.setAttribute("aria-disabled", "true");
+            } else {
+                btn.classList.remove(
+                    "opacity-50",
+                    "cursor-not-allowed",
+                    "pointer-events-none"
+                );
+                btn.removeAttribute("aria-disabled");
+            }
+        });
     }
 }
 
