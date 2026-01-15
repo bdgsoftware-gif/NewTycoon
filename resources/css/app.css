@@ -1,3 +1,278 @@
+/* ============= Imports ============= */
+@import "./flash.css";
+@import "./gsap.css";
+
+/* ============= Tailwind Base ============= */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ============= Global Helpers ============= */
+[x-cloak] {
+    display: none !important;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* ============= Global Animations ============= */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(200%);
+    }
+}
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+/* ============= Tailwind Components Layer ============= */
+@layer components {
+    .suggestion-item {
+        @apply p-3 rounded-lg cursor-pointer transform transition-transform transition-colors duration-200 hover:bg-gray-50;
+    }
+
+    .suggestion-item:hover {
+        @apply translate-x-1;
+    }
+
+    .suggestion-item.active {
+        @apply bg-primary/5;
+    }
+
+    .product-price {
+        @apply text-primary font-semibold;
+    }
+
+    .product-stock {
+        @apply text-xs px-2 py-1 rounded-full;
+    }
+
+    .in-stock {
+        @apply bg-green-100 text-green-800;
+    }
+
+    .out-of-stock {
+        @apply bg-red-100 text-red-800;
+    }
+
+    .category-path {
+        @apply text-xs text-gray-500 truncate;
+    }
+}
+
+/* ============= Swiper Custom Styles ============= */
+.heroSwiper .swiper-progress-fill {
+    will-change: transform;
+    transform-origin: left center;
+}
+
+.heroSwiper .swiper-progress-fill::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 4px;
+    margin-left: auto;
+    background: white;
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+.heroSwiper .swiper-navigation-icon {
+    display: none !important;
+}
+
+/* ============= Categories Section ============= */
+@keyframes gradient-x {
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.categories .animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradient-x 3s ease infinite;
+}
+
+/* ============= Attention / Shake Animation ============= */
+@keyframes attention-shake {
+    0% {
+        transform: translateX(0);
+    }
+    10% {
+        transform: translateX(-4px);
+    }
+    20% {
+        transform: translateX(4px);
+    }
+    30% {
+        transform: translateX(-4px);
+    }
+    40% {
+        transform: translateX(4px);
+    }
+    50%,
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.attention-shake {
+    animation: attention-shake 1s ease-in-out infinite;
+    animation-delay: 3s;
+}
+
+.attention-shake:hover {
+    animation: none;
+}
+
+/* ============= Button Shine Effect (Balanced) ============= */
+@keyframes button-shine {
+    0% {
+        transform: translateX(-150%) skewX(-20deg);
+        opacity: 0;
+    }
+    15% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(220%) skewX(-20deg);
+        opacity: 0;
+    }
+}
+
+.btn-shine {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-shine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 65%;
+    background: linear-gradient(
+        120deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.15) 35%,
+        rgba(255, 255, 255, 0.35) 50%,
+        rgba(255, 255, 255, 0.15) 65%,
+        transparent 100%
+    );
+    transform: translateX(-150%) skewX(-20deg);
+    animation: button-shine 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.btn-shine > * {
+    position: relative;
+    z-index: 20;
+}
+
+.btn-shine:hover::after {
+    animation-play-state: paused;
+}
+
+/* ============= Badge Shine Effect ============= */
+@keyframes badge-shine {
+    0% {
+        transform: translateX(-120%);
+        opacity: 0;
+    }
+    40% {
+        opacity: 0.6;
+    }
+    100% {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+}
+
+.badge-shine {
+    position: relative;
+    overflow: hidden;
+}
+
+.badge-shine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 35%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.35),
+        transparent
+    );
+    animation: badge-shine 4.5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.offer-bg-svg {
+    animation: float-bg 18s linear infinite alternate;
+}
+
+/* ============= Offer Section background SVG ============= */
+@keyframes winterFloat {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.animate-winter-bg {
+    animation: winterFloat 18s ease-in-out infinite;
+}
+
+.snow circle {
+    animation: snowFall 12s linear infinite;
+}
+
+@keyframes snowFall {
+    from {
+        transform: translateY(-40px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(600px);
+        opacity: 1;
+    }
+}

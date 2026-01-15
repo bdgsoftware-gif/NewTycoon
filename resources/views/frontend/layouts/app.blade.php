@@ -16,40 +16,50 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Cambay:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Quantico:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Cambay:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Quantico:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Sans+Bengali:wght@100..900&display=swap"
         rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <!-- Core Styles -->
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @endif
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css" />
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
 
     <!-- Additional Head Scripts & Styles -->
     @stack('head-scripts')
     @stack('styles')
-    
+
 </head>
 
 <body class="font-sans antialiased bg-white">
     <div class="min-h-screen mx-auto max-w-full">
         @include('frontend.partials.navbar')
-
-        <main>
+        <!-- Flash Messages Container -->
+        <x-flash-container />
+        <main class="pt-16">
             @yield('content')
         </main>
 
         @include('frontend.partials.footer')
     </div>
 
-    <!-- Swiper JS -->
-    <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
 
     <!-- Additional Scripts -->
+    <script src="{{ asset('js/cart.js') }}"></script>
+    <script src="{{ asset('js/wishlist.js') }}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+    <script src="{{ asset('js/gsap/gsap-featured-products.js') }}"></script>
+    <script src="{{ asset('js/gsap/gsap-tilt-category-card.js') }}"></script>
+    <script src="{{ asset('js/gsap/gsap-offer-products.js') }}"></script>
+
     @stack('scripts')
+
 </body>
 
 </html>

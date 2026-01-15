@@ -2,52 +2,73 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Role;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
-use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create users with profiles using factory
+        // Create Admin
         $admin = User::factory()->create([
             'name' => 'Admin User',
             'phone' => '01714532308',
             'email' => 'admin@example.com',
-            'email_verified_at' => now(),
             'password' => Hash::make('password'),
-            'remember_token' => Str::random(10),
             'status' => 'active',
             'email_verified_at' => Carbon::now(),
         ]);
-        $admin->roles()->attach(Role::where('name', 'Admin')->first());
+        $admin->roles()->attach(Role::where('name', 'admin')->first());
 
+        // Create Moderator
         $moderator = User::factory()->create([
             'name' => 'Moderator User',
             'phone' => '01714932315',
             'email' => 'moderator@example.com',
-            'email_verified_at' => now(),
             'password' => Hash::make('password'),
-            'remember_token' => Str::random(10),
             'status' => 'active',
             'email_verified_at' => Carbon::now(),
         ]);
-        $moderator->roles()->attach(Role::where('name', 'Moderator')->first());
+        $moderator->roles()->attach(Role::where('name', 'moderator')->first());
 
-        $customer = User::factory()->create([
-            'name' => 'Customer User',
-            'phone' => '01714582315',
-            'email' => 'customer@example.com',
-            'email_verified_at' => now(),
+        // Create 10 Customers
+        for ($i = 1; $i <= 10; $i++) {
+            $customer = User::factory()->create([
+                'name' => 'Customer User ' . $i,
+                'phone' => '0171' . rand(1000000, 9999999),
+                'email' => 'customer' . $i . '@example.com',
+                'password' => Hash::make('password'),
+                'status' => 'active',
+                'email_verified_at' => Carbon::now(),
+            ]);
+            $customer->roles()->attach(Role::where('name', 'customer')->first());
+        }
+
+        // Create some vendors
+        $vendor = User::factory()->create([
+            'name' => 'Vendor User',
+            'phone' => '01714982315',
+            'email' => 'vendor@example.com',
             'password' => Hash::make('password'),
-            'remember_token' => Str::random(10),
             'status' => 'active',
             'email_verified_at' => Carbon::now(),
         ]);
-        $customer->roles()->attach(Role::where('name', 'Customer')->first());
+        $vendor->roles()->attach(Role::where('name', 'customer')->first());
+
+        // Create 3 more vendors
+        for ($i = 1; $i <= 3; $i++) {
+            $vendor = User::factory()->create([
+                'name' => 'Vendor ' . $i,
+                'phone' => '0172' . rand(1000000, 9999999),
+                'email' => 'vendor' . $i . '@example.com',
+                'password' => Hash::make('password'),
+                'status' => 'active',
+                'email_verified_at' => Carbon::now(),
+            ]);
+            $vendor->roles()->attach(Role::where('name', 'customer')->first());
+        }
     }
 }

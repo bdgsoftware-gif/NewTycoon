@@ -90,6 +90,9 @@ return new class extends Migration
             $table->string('ip_address')->nullable();
             $table->string('user_agent')->nullable();
 
+            $table->foreignId('shipping_address_id')->nullable()->constrained('addresses')->nullOnDelete();
+            $table->foreignId('billing_address_id')->nullable()->constrained('addresses')->nullOnDelete();
+
             $table->timestamps();
             $table->softDeletes();
 

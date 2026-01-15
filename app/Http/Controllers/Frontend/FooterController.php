@@ -3,51 +3,41 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
+use App\Models\FooterColumn;
+use App\Models\FooterSetting;
 
 class FooterController extends Controller
 {
-    public function getFooterData()
+    public function getFooterData(): array
     {
-        $columns = [
-            [
-                'title' => 'Information',
-                'links' => ['About Us', 'Careers', 'Press & Media', 'Brand Partners', 'Affiliates'],
-            ],
-            [
-                'title' => 'Customer Service',
-                'links' => ['Contact Us', 'Shipping Info', 'Returns', 'Size Guide', 'FAQ'],
-            ],
-            [
-                'title' => 'Legal',
-                'links' => ['Privacy Policy', 'Terms of Service', 'Shipping Policy', 'Refund Policy', 'Cookie Policy'],
-            ],
-            [
-                'title' => 'Shop',
-                'links' => ['New Arrivals', 'Best Sellers', 'Sale', 'Gift Cards', 'Store Locator'],
-            ],
-        ];
+        // Columns with active links
+        $columns = FooterColumn::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->with(['activeLinks:id,footer_column_id,title_en,title_bn,url,sort_order'])
+            ->get()
+            ->map(fn($column) => [
+                'title' => $column->title,
+                'links' => $column->activeLinks->map(fn($link) => [
+                    'title' => $link->title,
+                    'url'   => $link->url,
+                ])->values(),
+            ])
+            ->values();
 
-        $brand = [
-            'name' => 'TYCOON',
-            'description' => 'Your premier destination for cutting-edge technology and electronics. We bring you the latest innovations with exceptional quality and service.',
-            'productImage' => 'images/footer-product.png', // Use your local image path
-        ];
-
-        $payments = [
-            'https://cdn-icons-png.flaticon.com/512/196/196578.png',
-            'https://cdn-icons-png.flaticon.com/512/196/196561.png',
-            'https://cdn-icons-png.flaticon.com/512/196/196539.png',
-            'https://cdn-icons-png.flaticon.com/512/888/888871.png',
-            'https://cdn-icons-png.flaticon.com/512/888/888879.png',
-            'https://cdn-icons-png.flaticon.com/512/888/888870.png',
-        ];
+        // Footer settings (singleton)
+        $settings = FooterSetting::first();
 
         return [
             'columns' => $columns,
-            'brand' => $brand,
-            'payments' => $payments,
+            'brand' => [
+                'name'        => $settings?->brand_name ?? 'TYCOON',
+                'description' => $settings?->brand_description ?? '',
+                'productImage' => $settings?->product_image ?? null,
+                'productLink' => $settings?->product_link ?? '/',
+            ],
+            'payments' => $settings?->payment_methods ?? [],
+            'social_links' => $settings?->social_links ?? [],
         ];
     }
 }

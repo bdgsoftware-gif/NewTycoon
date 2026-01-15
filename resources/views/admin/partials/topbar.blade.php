@@ -2,13 +2,7 @@
 <header class="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-40">
     <div class="flex items-center justify-between h-16 px-6">
         <!-- Left Section -->
-        <div class="flex items-center space-x-4">
-            <!-- Mobile Menu Toggle (for mobile responsiveness) -->
-            <button @click="$dispatch('toggle-mobile-menu')" class="lg:hidden p-2 rounded-lg hover:bg-gray-100">
-                <svg class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
+        <div class="flex items-center space-x-4 ">
 
             <!-- Page Title -->
             <div>
@@ -85,7 +79,7 @@
                         <p class="text-xs text-gray-500 truncate">{{ Auth::user()->email }}</p>
                     </div>
 
-                    <a href="{{ route('profile') }}"
+                    <a href="{{ route('admin.profile.index') }}"
                         class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">
                         <i class="fas fa-user-circle mr-3 text-gray-400"></i>
                         My Profile
@@ -99,7 +93,7 @@
                         </a>
                     @endif
 
-                    <a href="{{ route('home') }}"
+                    <a href="{{ route('home') }}" target="_blank"
                         class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200 border-t border-gray-100">
                         <i class="fas fa-external-link-alt mr-3 text-gray-400"></i>
                         View Website

@@ -2,271 +2,184 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Product extends Model
 {
     use HasFactory, SoftDeletes;
 
+    /* -----------------------------------------------------------------
+     | Constants
+     |------------------------------------------------------------------*/
+    public const DEFAULT_FEATURED_IMAGE = 'products/featured/default.jpg';
+
+    /* -----------------------------------------------------------------
+     | Mass Assignment
+     |------------------------------------------------------------------*/
     protected $fillable = [
-        'name',
+        // Bilingual
+        'name_en',
+        'name_bn',
+        'short_description_en',
+        'short_description_bn',
+        'description_en',
+        'description_bn',
+
+        // SEO
+        'meta_title_en',
+        'meta_title_bn',
+        'meta_description_en',
+        'meta_description_bn',
+        'meta_keywords',
+
+        // Identity
         'sku',
         'slug',
-        'short_description',
-        'description',
+
+        // Pricing
         'price',
         'compare_price',
         'cost_price',
+        'discount_percentage',
+
+        // Inventory
         'quantity',
         'alert_quantity',
         'track_quantity',
         'allow_backorder',
-        'featured_image',
+        'stock_status',
+
+        // Product info
+        'model_number',
+        'warranty_duration',
+        'warranty_unit',
+        'warranty_type',
+        'specifications',
+
+        // Media
+        'featured_images',
         'gallery_images',
+
+        // Shipping
         'weight',
         'length',
         'width',
         'height',
-        'meta_title',
-        'meta_description',
-        'meta_keywords',
+
+        // Flags
         'is_featured',
-        'is_bestseller',
+        'is_bestsells',
         'is_new',
         'status',
-        'stock_status',
-        'average_rating',
-        'rating_count',
-        'total_sold',
-        'total_revenue',
+
+        // Relations
         'category_id',
         'brand_id',
         'vendor_id',
     ];
 
+    /* -----------------------------------------------------------------
+     | Casts
+     |------------------------------------------------------------------*/
     protected $casts = [
         'price' => 'decimal:2',
         'compare_price' => 'decimal:2',
         'cost_price' => 'decimal:2',
+        'discount_percentage' => 'integer',
+
         'quantity' => 'integer',
         'alert_quantity' => 'integer',
+
         'track_quantity' => 'boolean',
         'allow_backorder' => 'boolean',
+
+        'is_featured' => 'boolean',
+        'is_bestsells' => 'boolean',
+        'is_new' => 'boolean',
+
+        'featured_images' => 'array',
         'gallery_images' => 'array',
+        'specifications' => 'array',
+
         'weight' => 'decimal:2',
         'length' => 'decimal:2',
         'width' => 'decimal:2',
         'height' => 'decimal:2',
-        'is_featured' => 'boolean',
-        'is_bestseller' => 'boolean',
-        'is_new' => 'boolean',
-        'average_rating' => 'decimal:2',
-        'rating_count' => 'integer',
-        'total_sold' => 'integer',
-        'total_revenue' => 'decimal:2',
     ];
 
-    /**
-     * The attributes that should be hidden for arrays.
-     */
     protected $hidden = [
         'cost_price',
         'vendor_id',
     ];
 
-    /**
-     * Boot the model.
-     */
-    protected static function boot()
+    protected $appends = [
+        'in_stock',
+        'discount_amount',
+        'featured_images_urls',
+        'gallery_images_urls',
+        'url',
+        'is_low_stock',
+        'profit_margin',
+        'profit_per_unit',
+        'specifications_array',
+    ];
+
+    /* -----------------------------------------------------------------
+     | Boot Logic
+     |------------------------------------------------------------------*/
+    protected static function booted(): void
     {
-        parent::boot();
+        static::saving(function (Product $product) {
+            if (blank($product->slug)) {
+                $product->slug = $product->generateUniqueSlug($product->id);
+            }
 
-        static::creating(function ($product) {
-            // Generate SKU if not provided
-            if (empty($product->sku)) {
-                $product->sku = 'PROD-' . strtoupper(Str::random(8));
-            }
-            
-            // Generate slug if not provided
-            if (empty($product->slug)) {
-                $product->slug = Str::slug($product->name);
-            }
-            
-            // Ensure unique slug
-            $originalSlug = $product->slug;
-            $count = 1;
-            while (static::where('slug', $product->slug)->exists()) {
-                $product->slug = $originalSlug . '-' . $count++;
-            }
-        });
-
-        static::updating(function ($product) {
-            // Update slug if name changed
-            if ($product->isDirty('name') && empty($product->slug)) {
-                $product->slug = Str::slug($product->name);
-            }
-            
-            // Update stock status based on quantity
-            if ($product->isDirty('quantity')) {
-                $product->updateStockStatus();
-            }
-        });
-
-        static::saving(function ($product) {
-            // Calculate discount percentage
-            if ($product->compare_price > $product->price) {
-                $product->discount_percentage = round(($product->compare_price - $product->price) / $product->compare_price * 100);
-            } else {
-                $product->discount_percentage = 0;
+            if (blank($product->sku)) {
+                $product->sku = $product->generateUniqueSku();
             }
         });
     }
 
-    /**
-     * Get the category that owns the product.
-     */
-    public function category()
+    /* -----------------------------------------------------------------
+     | Relationships
+     |------------------------------------------------------------------*/
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    /**
-     * Get the brand that owns the product.
-     */
-    public function brand()
-    {
-        return $this->belongsTo(Brand::class);
-    }
-
-    /**
-     * Get the vendor that owns the product.
-     */
-    public function vendor()
-    {
-        return $this->belongsTo(User::class, 'vendor_id');
-    }
-
-    /**
-     * Get the product's reviews.
-     */
-    public function reviews()
+    public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
     }
 
-    /**
-     * Get the product's order items.
-     */
-    public function orderItems()
+    public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
     }
 
+
     /**
      * Get the product's wishlist items.
      */
-    public function wishlists()
+    public function wishlists(): HasMany
     {
         return $this->hasMany(Wishlist::class);
     }
-
-    /**
-     * Update stock status based on quantity.
-     */
-    public function updateStockStatus()
-    {
-        if ($this->quantity <= 0) {
-            if ($this->allow_backorder) {
-                $this->stock_status = 'backorder';
-            } else {
-                $this->stock_status = 'out_of_stock';
-            }
-        } else {
-            $this->stock_status = 'in_stock';
-        }
-        
-        if (!$this->isDirty('stock_status')) {
-            $this->saveQuietly(['stock_status']);
-        }
-    }
-
-    /**
-     * Check if product is in stock.
-     */
-    public function getInStockAttribute()
-    {
-        return $this->stock_status === 'in_stock' || $this->stock_status === 'backorder';
-    }
-
-    /**
-     * Get the discount amount.
-     */
-    public function getDiscountAmountAttribute()
-    {
-        if ($this->compare_price > $this->price) {
-            return $this->compare_price - $this->price;
-        }
-        
-        return 0;
-    }
-
-    /**
-     * Get the product's main image URL.
-     */
-    public function getFeaturedImageUrlAttribute()
-    {
-        if ($this->featured_image) {
-            if (strpos($this->featured_image, 'http') === 0) {
-                return $this->featured_image;
-            }
-            
-            return Storage::url($this->featured_image);
-        }
-        
-        return asset('images/default-product.png');
-    }
-
-    /**
-     * Get the product's gallery images URLs.
-     */
-    public function getGalleryImagesUrlsAttribute()
-    {
-        if (!$this->gallery_images || empty($this->gallery_images)) {
-            return [$this->featured_image_url];
-        }
-        
-        return array_map(function ($image) {
-            if (strpos($image, 'http') === 0) {
-                return $image;
-            }
-            
-            return Storage::url($image);
-        }, $this->gallery_images);
-    }
-
-    /**
-     * Get the product's URL.
-     */
-    public function getUrlAttribute()
-    {
-        return route('products.show', $this->slug);
-    }
-
-    /**
-     * Scope a query to only include active products.
-     */
+    /* -----------------------------------------------------------------
+     | Scopes
+     |------------------------------------------------------------------*/
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
     }
 
-    /**
-     * Scope a query to only include featured products.
-     */
     public function scopeFeatured($query)
     {
         return $query->where('is_featured', true);
@@ -275,9 +188,9 @@ class Product extends Model
     /**
      * Scope a query to only include bestseller products.
      */
-    public function scopeBestseller($query)
+    public function scopeBestsell($query)
     {
-        return $query->where('is_bestseller', true);
+        return $query->where('is_bestsells', true);
     }
 
     /**
@@ -288,31 +201,21 @@ class Product extends Model
         return $query->where('is_new', true);
     }
 
-    /**
-     * Scope a query to only include products in stock.
-     */
     public function scopeInStock($query)
     {
-        return $query->where(function ($q) {
-            $q->where('stock_status', 'in_stock')
-              ->orWhere('stock_status', 'backorder');
+        return $query->whereIn('stock_status', ['in_stock', 'backorder']);
+    }
+
+    public function scopeSearch($query, string $term)
+    {
+        return $query->where(function ($q) use ($term) {
+            $q->where('name_en', 'like', "%{$term}%")
+                ->orWhere('name_bn', 'like', "%{$term}%")
+                ->orWhere('sku', 'like', "%{$term}%")
+                ->orWhere('model_number', 'like', "%{$term}%");
         });
     }
 
-    /**
-     * Scope a query to search products.
-     */
-    public function scopeSearch($query, $search)
-    {
-        return $query->where(function ($q) use ($search) {
-            $q->where('name', 'LIKE', "%{$search}%")
-              ->orWhere('sku', 'LIKE', "%{$search}%")
-              ->orWhere('short_description', 'LIKE', "%{$search}%")
-              ->orWhereHas('category', function ($q) use ($search) {
-                  $q->where('name', 'LIKE', "%{$search}%");
-              });
-        });
-    }
 
     /**
      * Scope a query to filter by price range.
@@ -330,59 +233,127 @@ class Product extends Model
         return $query->where('category_id', $categoryId);
     }
 
-    /**
-     * Increment sold quantity and revenue.
-     */
-    public function incrementSold($quantity, $price)
+    public function scopeWithActiveCategory($query)
     {
-        $this->increment('total_sold', $quantity);
-        $this->increment('total_revenue', $quantity * $price);
-        
-        if ($this->track_quantity) {
-            $this->decrement('quantity', $quantity);
-            $this->updateStockStatus();
+        return $query->whereHas('category', fn($q) => $q->active());
+    }
+
+    public function getInStockAttribute(): bool
+    {
+        return $this->stock_status === 'in_stock';
+    }
+    public function getIsActiveAttribute(): bool
+    {
+        return $this->status === 'active';
+    }
+
+    public function scopeOfferAbove($query, float $minDiscount = 10)
+    {
+        return $query->where(function ($q) use ($minDiscount) {
+            $q->where('discount_percentage', '>=', $minDiscount);
+        });
+    }
+
+
+
+
+
+    /* -----------------------------------------------------------------
+     | Accessors
+     |------------------------------------------------------------------*/
+    public function getNameAttribute(): string
+    {
+        return app()->isLocale('bn')
+            ? ($this->name_bn ?: $this->name_en)
+            : $this->name_en;
+    }
+
+    public function getFeaturedImageUrlAttribute(): string
+    {
+        $image = $this->featured_images[0] ?? null;
+
+        return $image
+            ? asset('storage/' . $image)
+            : asset('images/no-image.jpg');
+    }
+
+    // Multiple Images fetching
+    public function getFeaturedImagesUrlsAttribute(): array
+    {
+        return collect($this->featured_images ?? [])
+            ->map(fn($img) => asset('storage/' . $img))
+            ->toArray();
+    }
+
+    public function getIsLowStockAttribute(): bool
+    {
+        return $this->track_quantity && $this->quantity <= $this->alert_quantity;
+    }
+
+    public function getShortDescriptionAttribute(): ?string
+    {
+        return app()->getLocale() === 'bn'
+            ? ($this->short_description_bn ?: $this->short_description_en)
+            : $this->short_description_en;
+    }
+
+    public function getDescriptionAttribute(): ?string
+    {
+        return app()->getLocale() === 'bn'
+            ? ($this->description_bn ?: $this->description_en)
+            : $this->description_en;
+    }
+
+    public function getWarrantyLabelAttribute(): ?string
+    {
+        if (!$this->warranty_duration || !$this->warranty_unit) {
+            return null;
         }
+
+        return "{$this->warranty_duration} " . ucfirst($this->warranty_unit);
     }
 
-    /**
-     * Decrement sold quantity and revenue (for refunds/cancellations).
-     */
-    public function decrementSold($quantity, $price)
+    public function getWarrantyExpiryDate(?Carbon $purchaseDate = null): ?Carbon
     {
-        $this->decrement('total_sold', $quantity);
-        $this->decrement('total_revenue', $quantity * $price);
-        
-        if ($this->track_quantity) {
-            $this->increment('quantity', $quantity);
-            $this->updateStockStatus();
+        if (!$this->warranty_duration || !$this->warranty_unit) {
+            return null;
         }
+
+        $purchaseDate ??= now();
+
+        return $purchaseDate->copy()->add(
+            $this->warranty_unit,
+            $this->warranty_duration
+        );
     }
 
-    /**
-     * Check if product quantity is low.
-     */
-    public function getIsLowStockAttribute()
+    /* -----------------------------------------------------------------
+     | Helpers
+     |------------------------------------------------------------------*/
+    protected function generateUniqueSlug(?int $ignoreId = null): string
     {
-        return $this->quantity <= $this->alert_quantity;
-    }
+        $base = Str::slug($this->name_en);
+        $slug = $base;
+        $i = 1;
 
-    /**
-     * Calculate profit margin.
-     */
-    public function getProfitMarginAttribute()
-    {
-        if ($this->cost_price > 0 && $this->price > 0) {
-            return (($this->price - $this->cost_price) / $this->price) * 100;
+        while (
+            static::where('slug', $slug)
+            ->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))
+            ->exists()
+        ) {
+            $slug = "{$base}-{$i}";
+            $i++;
         }
-        
-        return 0;
+
+        return $slug;
     }
 
-    /**
-     * Calculate profit per unit.
-     */
-    public function getProfitPerUnitAttribute()
+    protected function generateUniqueSku(): string
     {
-        return $this->price - $this->cost_price;
+        do {
+            $sku = 'SKU-' . now()->format('YmdHis') . '-' . strtoupper(Str::random(4));
+        } while (static::where('sku', $sku)->exists());
+
+        return $sku;
     }
 }

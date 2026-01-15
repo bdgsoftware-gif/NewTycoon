@@ -1,58 +1,66 @@
 <!-- Products Section -->
-<section class="py-16 bg-gray-50">
+<section class="py-6 md:py-12 bg-gray-50 featured-products-section">
     <div class="max-w-8xl mx-auto px-4">
         <!-- Section Title -->
         <h2
-            class="text-3xl sm:text-4xl md:text-5xl font-semibold text-center text-gray-900 mb-12 leading-tight font-quantico">
-            Featured Products
+            class="featured-products-title text-2xl md:text-4xl lg:text-5xl font-semibold text-center text-gray-900 mb-6 md:mb-12 leading-tight font-quantico">
+            {{ __('common.featured-products') }}
         </h2>
+        <!-- Skeletons -->
+        <div class="featured-skeletons grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6">
+            @for ($i = 0; $i < 8; $i++)
+                <div class="skeleton-card"></div>
+            @endfor
+        </div>
 
         <!-- Products Grid -->
-        <div class="grid grid-cols-4 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div
+            class="featured-products grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 hidden">
             @foreach ($products as $product)
-                <div
-                    class="group bg-white rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-xl relative">
+                <div class="group bg-white rounded-md lg:rounded-3xl overflow-hidden relative featured-product-card">
                     <!-- Product Image with Overlay -->
-                    <a href="{{ route('product.show', $product['slug']) }}" class="block relative">
+                    <a href="{{ route('product.show', $product->slug) }}" class="block relative">
                         <div class="relative w-full aspect-square bg-gray-100 overflow-hidden">
-                            <img src="{{ asset($product['images'][0]) }}"
+                            <img src="{{ $product->featured_image_url }}"
                                 class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105">
 
                             <!-- Product Badges -->
-                            @if ($product['is_new'])
+                            @if ($product->is_new)
                                 <span
-                                    class="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold font-cambay">
+                                    class="absolute top-3 left-3 bg-gradient-to-r from-primary to-primary-dark text-white text-[10px] md:text-xs font-bold  px-1 py-0.5 md:px-3 md:py-1 rounded-full font-inter">
                                     New
                                 </span>
                             @endif
 
-                            @if ($product['discount_percentage'] > 0)
+                            @if ($product->discount_percentage > 0)
                                 <span
-                                    class="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold font-quantico">
-                                    -{{ $product['discount_percentage'] }}%
+                                    class="absolute top-3 right-3 bg-gradient-to-r from-red-600 to-orange-500  text-white  px-1 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-xs font-semibold font-quantico shadow-md">
+                                    -{{ $product->discount_percentage }}%
                                 </span>
                             @endif
+
 
                             <!-- Hover Overlay with Actions -->
                             <div
                                 class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
                                 <div
                                     class="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 space-y-3">
-                                    @if ($product['in_stock'])
-                                        <form action="{{ route('checkout.direct', $product['id']) }}" method="POST"
+                                    @if ($product->in_stock)
+                                        <form action="{{ route('checkout.process', $product->id) }}" method="POST"
                                             class="inline-block">
                                             @csrf
-                                            <button type="submit"
+                                            <button type="submit" title="Click to Buy"
                                                 class="bg-white text-gray-900 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg font-quantico">
                                                 Buy Now
                                             </button>
                                         </form>
                                     @else
-                                        <form action="{{ route('wishlist.add', $product['id']) }}" method="POST"
-                                            class="inline-block">
+                                        <form action="{{ route('wishlist.add', $product->id) }}" method="POST"
+                                            class="add-to-wishlist-form inline-block">
                                             @csrf
                                             <button type="submit"
-                                                class="bg-white text-gray-900 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center space-x-2">
+                                                class="wishlist-btn bg-white text-gray-900 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center space-x-2"
+                                                title="Add to Wishlist">
                                                 <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -66,9 +74,9 @@
 
                                     <!-- Quick Actions -->
                                     <div class="flex justify-center space-x-3">
-                                        <button
+                                        <button title="View Details"
                                             class="bg-white p-3 rounded-full hover:bg-gray-100 transition-all duration-300 transform hover:scale-110"
-                                            onclick="quickView({{ $product['id'] }})">
+                                            onclick="quickView({{ $product->id }})">
                                             <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -78,12 +86,12 @@
                                             </svg>
                                         </button>
 
-                                        <form action="{{ route('cart.add', $product['id']) }}" method="POST"
-                                            class="inline-block">
+                                        <form action="{{ route('cart.add', $product->id) }}" method="POST"
+                                            class="add-to-cart-form inline-block">
                                             @csrf
-                                            <button type="submit"
-                                                class="bg-white p-3 rounded-full hover:bg-gray-100 transition-all duration-300 transform hover:scale-110 {{ !$product['in_stock'] ? 'opacity-50 cursor-not-allowed' : '' }}"
-                                                {{ !$product['in_stock'] ? 'disabled' : '' }}>
+                                            <button type="submit" title="Add to Cart"
+                                                class="add-to-cart-btn bg-white p-3 rounded-full hover:bg-gray-100 transition-all duration-300 transform hover:scale-110 {{ !$product->in_stock ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                                {{ !$product->in_stock ? 'disabled' : '' }}>
                                                 <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -98,57 +106,144 @@
                         </div>
                     </a>
 
-                    <!-- Product Info -->
-                    <div class="p-5">
-                        <a href="{{ route('product.show', $product['slug']) }}" class="block">
+                    <!-- Product Info - Elegant with Divider -->
+                    <div class="p-2 md:p-5">
+                        <!-- Product Name -->
+                        <a href="{{ route('product.show', $product->slug) }}" class="block mb-1"
+                            title="{{ $product->name }}">
                             <h3
-                                class="text-lg font-semibold text-gray-900 mb-2 hover:text-primary transition-colors duration-200 line-clamp-2 font-cambay">
-                                {{ $product['name'] }}
+                                class="text-sm font-medium text-gray-900 hover:text-primary transition-colors duration-200 line-clamp-2 mb-1 font-quantico">
+                                {{ $product->name }}
                             </h3>
                         </a>
 
-                        <!-- Rating -->
-                        @if ($product['rating'] > 0)
-                            <div class="flex items-center mb-3">
-                                <div class="flex text-yellow-400">
-                                    @for ($i = 1; $i <= 5; $i++)
-                                        @if ($i <= floor($product['rating']))
-                                            <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
-                                                <path
-                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
-                                        @else
-                                            <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.921-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                                            </svg>
-                                        @endif
-                                    @endfor
+                        <!-- Divider -->
+                        <div class="h-px bg-gray-200 mb-1"></div>
+
+                        <!-- Price Section -->
+                        <div class="space-y-1">
+                            @if ($product->discount_percentage > 0)
+                                <div class="flex items-end justify-between">
+                                    <div>
+                                        <span class="text-base md:text-2xl font-bold  text-gray-900 font-quantico">
+                                            <span class="font-bengali">৳</span>
+                                            {{ format_currency($product->price, '') }}
+                                        </span>
+                                        <div class="md:mt-1">
+                                            <span class="text-sm md:text-base text-gray-500 line-through font-quantico">
+                                                <span class="font-bengali">৳</span>
+                                                {{ format_currency($product->compare_price, '') }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <!-- Action Buttons -->
+                                        <div class="flex items-center justify-between pt-1">
+                                            <div class="flex items-center md:space-x-1">
+                                                <!-- Wishlist Icon -->
+                                                <form action="{{ route('wishlist.add', $product->id) }}" method="POST"
+                                                    class="add-to-wishlist-form inline-block">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="wishlist-btn p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                                                        title="Add to Wishlist">
+                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                            class="w-4 h-4 lg:w-5 lg:h-5 text-gray-400 hover:text-red-500"
+                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                        </svg>
+                                                    </button>
+                                                </form>
+
+                                                <!-- Cart/Call Icon -->
+                                                @if ($product->in_stock)
+                                                    <form action="{{ route('cart.add', $product->id) }}" method="POST"
+                                                        class="add-to-cart-form inline-block">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="add-to-cart-btn p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                                                            title="Add to Cart"
+                                                            {{ !$product->in_stock ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                                            {{ !$product->in_stock ? 'disabled' : '' }}>
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                class="w-4 h-4 lg:w-5 lg:h-5 text-gray-400 hover:text-primary"
+                                                                fill="none" viewBox="0 0 24 24"
+                                                                stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                            </svg>
+                                                        </button>
+                                                    </form>
+                                                @else
+                                                    <a href="{{ route('contact') }}"
+                                                        class="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200 inline-block"
+                                                        title="Call for Availability +8801714XXXXXX">
+                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                            class="w-4 h-4 lg:w-5 lg:h-5 text-gray-400 hover:text-green-600"
+                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M21.97 18.33C21.97 18.69 21.89 19.06 21.72 19.42C21.55 19.78 21.33 20.12 21.04 20.44C20.55 20.98 20.01 21.37 19.4 21.62C18.8 21.87 18.15 22 17.45 22C16.43 22 15.34 21.76 14.19 21.27C13.04 20.78 11.89 20.12 10.75 19.29C9.6 18.45 8.51 17.52 7.47 16.49C6.44 15.45 5.51 14.36 4.68 13.22C3.86 12.08 3.2 10.94 2.72 9.81C2.24 8.67 2 7.58 2 6.54C2 5.86 2.12 5.21 2.36 4.61C2.6 4 2.98 3.44 3.51 2.94C4.15 2.31 4.85 2 5.59 2C5.87 2 6.15 2.06 6.4 2.18C6.66 2.3 6.89 2.48 7.07 2.74L9.39 6.01C9.57 6.26 9.7 6.49 9.79 6.71C9.88 6.92 9.93 7.13 9.93 7.32C9.93 7.56 9.86 7.8 9.72 8.03C9.59 8.26 9.4 8.5 9.16 8.74L8.4 9.53C8.29 9.64 8.24 9.77 8.24 9.93C8.24 10.01 8.25 10.08 8.27 10.16C8.3 10.24 8.33 10.3 8.35 10.36C8.53 10.69 8.84 11.12 9.28 11.64C9.73 12.16 10.21 12.69 10.73 13.22C11.27 13.75 11.79 14.24 12.32 14.69C12.84 15.13 13.27 15.43 13.61 15.61C13.66 15.63 13.72 15.66 13.79 15.69C13.87 15.72 13.95 15.73 14.04 15.73C14.21 15.73 14.34 15.67 14.45 15.56L15.21 14.81C15.46 14.56 15.7 14.37 15.93 14.25C16.16 14.11 16.39 14.04 16.64 14.04C16.83 14.04 17.03 14.08 17.25 14.17C17.47 14.26 17.7 14.39 17.95 14.56L21.26 16.91C21.52 17.09 21.7 17.3 21.81 17.55C21.91 17.8 21.97 18.05 21.97 18.33Z" />
+                                                        </svg>
+                                                    </a>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        <span class="hidden md:inline-block text-xs text-emerald-600 font-medium">
+                                            {{ $product->in_stock ? '✓ Available' : '✗ Sold Out' }}
+                                        </span>
+                                    </div>
                                 </div>
-                                <span class="text-sm text-gray-500 ml-2">({{ $product['review_count'] }})</span>
-                            </div>
-                        @endif
+                            @else
+                                <div class="flex items-start justify-between">
+                                    <span class="text-2xl font-bold text-gray-900 font-quantico">
+                                        <span class="font-bengali">৳</span>{{ format_currency($product->price, '') }}
+                                    </span>
+                                    <div>
+                                        <!-- Action Buttons -->
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-1">
+                                                <!-- Wishlist Icon -->
+                                                <form action="{{ route('wishlist.add', $product->id) }}"
+                                                    method="POST" class="add-to-wishlist-form inline-block">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="wishlist-btn p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                                                        title="Add to Wishlist">
+                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                            class="w-4 h-4 lg:w-5 lg:h-5 text-gray-400 hover:text-red-500"
+                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                                <!-- Cart Icon -->
+                                                <button type="button"
+                                                    class="p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                                                    title="Add to Cart">
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                        class="w-4 h-4 lg:w-5 lg:h-5 text-gray-400 hover:text-primary"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
 
-                        <!-- Price -->
-                        <div class="flex items-center justify-between font-quantico">
-                            <div class="flex items-center space-x-2">
-                                @if ($product['discount_percentage'] > 0)
-                                    <span
-                                        class="text-2xl font-bold text-gray-900">${{ number_format($product['discounted_price'], 2) }}</span>
-                                    <span
-                                        class="text-lg text-gray-500 line-through">${{ number_format($product['original_price'], 2) }}</span>
-                                @else
-                                    <span
-                                        class="text-2xl font-bold text-gray-900">${{ number_format($product['original_price'], 2) }}</span>
-                                @endif
-                            </div>
-
-                            <!-- Stock Status -->
-                            <div
-                                class="text-sm {{ $product['in_stock'] ? 'text-green-600' : 'text-red-600' }} font-cambay">
-                                {{ $product['in_stock'] ? 'In Stock' : 'Out of Stock' }}
-                            </div>
+                                        <span class="hidden md:inline-block text-xs text-primary font-medium">
+                                            {{ $product->in_stock ? '✓ Available' : '✗ Sold Out' }}
+                                        </span>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -161,62 +256,22 @@
         @endphp
         @if (isset($loadMore) && $loadMore)
             <div class="text-center mt-12">
-                <button
-                    class="bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-primary-dark transition-all duration-300 transform hover:scale-105 font-quantico">
-                    Load More Products
-                </button>
+                <a href="{{ route('products.index') }}" target="_self"
+                    class="group relative inline-flex items-center justify-center bg-primary text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 transform font-quantico overflow-hidden">
+
+                    <div class="relative overflow-hidden">
+                        <span
+                            class="inline-block transition-transform duration-300 transform group-hover:-translate-y-full">
+                            {{ __('common.view-more-products') }}
+                        </span>
+
+                        <span
+                            class="absolute top-full left-0 inline-block w-full transition-transform duration-300 transform group-hover:-translate-y-full">
+                            {{ __('common.view-more-products') }}
+                        </span>
+                    </div>
+                </a>
             </div>
         @endif
     </div>
 </section>
-
-<script>
-    function quickView(productId) {
-        // Implement quick view modal functionality
-        console.log('Quick view for product:', productId);
-        // You can use AJAX to fetch product details and show in a modal
-    }
-
-    // Add to wishlist with feedback
-    document.addEventListener('DOMContentLoaded', function() {
-        const wishlistForms = document.querySelectorAll('form[action*="wishlist"]');
-
-        wishlistForms.forEach(form => {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                // Add your AJAX request here
-                fetch(form.action, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({
-                            product_id: form.querySelector(
-                                'input[name="product_id"]')?.value
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Show success message
-                            alert('Product added to wishlist!');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-            });
-        });
-    });
-</script>
-
-<style>
-    .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-</style>

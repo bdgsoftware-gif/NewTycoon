@@ -13,9 +13,9 @@ class Products extends Component
      */
     public $products;
 
-    public function __construct($products)
+    public function __construct($featuredProducts)
     {
-        $this->products = $products;
+        $this->products = $featuredProducts;
     }
 
     /**

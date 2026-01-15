@@ -5,7 +5,12 @@
 
 @section('breadcrumb')
     <li class="inline-flex items-center">
-        <span class="text-gray-500">Dashboard</span>
+        <svg class="h-5 w-5 text-gray-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                clip-rule="evenodd" />
+        </svg>
+        <span class="text-gray-500">Home</span>
     </li>
 @endsection
 
@@ -19,7 +24,8 @@
                 <div>
                     <p class="text-sm font-inter font-medium text-gray-500 uppercase tracking-wider">Total Revenue</p>
                     <p class="text-3xl font-cambay font-bold text-gray-900 mt-2">
-                        ${{ number_format($stats['total_revenue'], 2) }}</p>
+                        <span class="font-bengali">৳</span>{{ number_format($stats['total_revenue'], 2) }}
+                    </p>
                     <div class="mt-3 flex items-center">
                         <span
                             class="text-sm font-medium {{ $stats['revenue_change'] >= 0 ? 'text-green-600' : 'text-red-600' }}">
@@ -30,11 +36,12 @@
                     </div>
                 </div>
                 <div class="h-14 w-14 rounded-xl bg-primary-light flex items-center justify-center">
-                    <i class="fas fa-dollar-sign text-primary text-2xl"></i>
+                    <span class="font-bengali text-primary text-2xl leading-tight">৳</span>
                 </div>
             </div>
             <div class="mt-4 pt-4 border-t border-gray-100">
-                <p class="text-xs text-gray-500">Monthly: ${{ number_format($stats['monthly_revenue'], 2) }}</p>
+                <p class="text-xs text-gray-500">Monthly: <span
+                        class="font-bengali">৳</span>{{ number_format($stats['monthly_revenue'], 2) }}</p>
             </div>
         </div>
 
@@ -120,80 +127,21 @@
 
     <!-- Charts Section -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
         <!-- Revenue Chart -->
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold font-cambay text-gray-900">Revenue Overview</h3>
-                <div class="flex items-center space-x-2">
-                    <span class="text-sm text-gray-500">Last 7 days</span>
-                </div>
-            </div>
-            <div class="h-64">
-                <div class="flex items-end h-48 space-x-2">
-                    @foreach ($salesData as $day)
-                        <div class="flex-1 flex flex-col items-center">
-                            <div class="w-full rounded-t-lg transition-all duration-300 hover:opacity-80 cursor-pointer"
-                                style="height: {{ $day['revenue'] > 0 ? max(20, ($day['revenue'] / max(array_column($salesData, 'revenue'))) * 100) : 0 }}%; background: linear-gradient(to top, #ea2f30, #fdba74);"
-                                title="${{ number_format($day['revenue'], 2) }}"></div>
-                            <span class="text-xs text-gray-500 mt-2">{{ $day['day'] }}</span>
-                            <span class="text-xs font-medium mt-1">{{ $day['date'] }}</span>
-                        </div>
-                    @endforeach
-                </div>
-                <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
-                    <div>
-                        <p class="text-sm text-gray-500">Total Revenue (7 days)</p>
-                        <p class="text-lg font-bold text-gray-900">
-                            ${{ number_format(array_sum(array_column($salesData, 'revenue')), 2) }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Total Orders</p>
-                        <p class="text-lg font-bold text-gray-900">{{ array_sum(array_column($salesData, 'orders')) }}</p>
-                    </div>
-                </div>
-            </div>
+        <div class="bg-white rounded-2xl border p-6">
+            <h3 class="text-lg font-semibold mb-4">Revenue Overview (Last 7 Days)</h3>
+            <div id="revenueChart" class="h-72"></div>
         </div>
 
         <!-- Order Status Chart -->
-        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold font-cambay text-gray-900">Order Status Distribution</h3>
-            </div>
-            <div class="h-64">
-                <div class="grid grid-cols-2 gap-4">
-                    @php
-                        $statusColors = [
-                            'pending' => 'bg-yellow-100 text-yellow-800 border-yellow-200',
-                            'processing' => 'bg-blue-100 text-blue-800 border-blue-200',
-                            'completed' => 'bg-green-100 text-green-800 border-green-200',
-                            'cancelled' => 'bg-red-100 text-red-800 border-red-200',
-                            'refunded' => 'bg-purple-100 text-purple-800 border-purple-200',
-                        ];
-                    @endphp
-
-                    @foreach ($orderStatusData as $status => $count)
-                        @if (isset($statusColors[$status]))
-                            <div class="flex flex-col p-4 rounded-xl border {{ $statusColors[$status] }}">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-medium capitalize">{{ $status }}</span>
-                                    <span class="text-lg font-bold">{{ $count }}</span>
-                                </div>
-                                <div class="mt-2 w-full bg-white/50 rounded-full h-2">
-                                    <div class="h-2 rounded-full {{ str_replace('bg-', 'bg-opacity-80 ', $statusColors[$status]) }}"
-                                        style="width: {{ $stats['total_orders'] > 0 ? ($count / $stats['total_orders']) * 100 : 0 }}%">
-                                    </div>
-                                </div>
-                                <div class="mt-2 text-xs text-gray-600">
-                                    {{ $stats['total_orders'] > 0 ? round(($count / $stats['total_orders']) * 100, 1) : 0 }}%
-                                    of total
-                                </div>
-                            </div>
-                        @endif
-                    @endforeach
-                </div>
-            </div>
+        <div class="bg-white rounded-2xl border p-6">
+            <h3 class="text-lg font-semibold mb-4">Order Status Distribution</h3>
+            <div id="orderStatusChart" class="h-72"></div>
         </div>
+
     </div>
+
 
     <!-- Recent Activity Section -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -299,7 +247,8 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm font-medium text-gray-900">
-                                        ${{ number_format($order->total_amount, 2) }}</div>
+                                        <span class="font-bengali">৳</span>{{ number_format($order->total_amount, 2) }}
+                                    </div>
                                     <div class="text-xs text-gray-500">{{ $order->items->sum('quantity') }} items</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -338,9 +287,9 @@
                             <div class="flex items-center space-x-4">
                                 <div
                                     class="h-16 w-16 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
-                                    @if ($product->featured_image)
-                                        <img src="{{ Storage::url($product->featured_image) }}"
-                                            alt="{{ $product->name }}" class="h-full w-full object-cover">
+                                    @if ($product->featured_image_url)
+                                        <img src="{{ $product->featured_image_url }}" alt="{{ $product->name }}"
+                                            class="h-full w-full object-cover">
                                     @else
                                         <i class="fas fa-box text-gray-400 text-xl"></i>
                                     @endif
@@ -351,8 +300,8 @@
                                         {{ $product->name }}</h4>
                                     <p class="text-xs text-gray-500">{{ $product->category->name ?? 'Uncategorized' }}</p>
                                     <div class="mt-2 flex items-center justify-between">
-                                        <span
-                                            class="text-sm font-bold text-gray-900">${{ number_format($product->price, 2) }}</span>
+                                        <span class="text-sm font-bold text-gray-900"><span
+                                                class="font-bengali">৳</span>{{ number_format($product->price, 2) }}</span>
                                         <div class="flex items-center">
                                             <i class="fas fa-star text-yellow-400 text-xs mr-1"></i>
                                             <span
@@ -390,24 +339,72 @@
 
 @push('scripts')
     <script>
-        // Add hover effect for chart bars
         document.addEventListener('DOMContentLoaded', function() {
-            const bars = document.querySelectorAll('[title^="$"]');
-            bars.forEach(bar => {
-                bar.addEventListener('mouseenter', function() {
-                    this.style.transform = 'scaleY(1.1)';
-                });
-                bar.addEventListener('mouseleave', function() {
-                    this.style.transform = 'scaleY(1)';
-                });
-            });
 
-            // Initialize tooltips
-            tippy('[title]', {
-                placement: 'top',
-                animation: 'scale',
-                duration: 200,
-            });
+            /* ==========================
+                Revenue Line Chart
+            =========================== */
+
+            const salesData = @json($salesData);
+
+            const revenueChart = new ApexCharts(
+                document.querySelector("#revenueChart"), {
+                    chart: {
+                        type: 'line',
+                        height: 300,
+                        toolbar: {
+                            show: false
+                        }
+                    },
+                    series: [{
+                        name: 'Revenue',
+                        data: salesData.map(item => item.revenue)
+                    }],
+                    xaxis: {
+                        categories: salesData.map(item => item.date)
+                    },
+                    stroke: {
+                        curve: 'smooth',
+                        width: 3
+                    },
+                    colors: ['#ea2f30'],
+                    markers: {
+                        size: 4
+                    },
+                    tooltip: {
+                        y: {
+                            formatter: value => '৳ ' + value.toLocaleString()
+                        }
+                    }
+                }
+            );
+
+            revenueChart.render();
+
+
+            /* ==========================
+                Order Status Donut Chart
+            =========================== */
+
+            const orderStatusData = @json($orderStatusData);
+
+            const statusChart = new ApexCharts(
+                document.querySelector("#orderStatusChart"), {
+                    chart: {
+                        type: 'donut',
+                        height: 300
+                    },
+                    series: Object.values(orderStatusData),
+                    labels: Object.keys(orderStatusData),
+                    colors: ['#facc15', '#60a5fa', '#22c55e', '#ef4444', '#a855f7'],
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            );
+
+            statusChart.render();
+
         });
     </script>
 @endpush

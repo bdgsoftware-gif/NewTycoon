@@ -1,54 +1,197 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Frontend\HomeController;
-use App\Http\Controllers\Frontend\ProductController;
-use App\Http\Controllers\Frontend\CartController;
-use App\Http\Controllers\Frontend\WishlistController;
-use App\Http\Controllers\Frontend\CheckoutController;
-use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Frontend\CartController;
+use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\OrderController;
+use App\Http\Controllers\Frontend\ReviewController;
+use App\Http\Controllers\Frontend\SearchController;
+use App\Http\Controllers\Frontend\ProductController;
+use App\Http\Controllers\Frontend\CategoryController;
+use App\Http\Controllers\Frontend\CheckoutController;
+use App\Http\Controllers\Frontend\WishlistController;
+use App\Http\Controllers\Frontend\NewsletterController;
 
 // ==============================
 // PUBLIC FRONTEND ROUTES
 // ==============================
+
+// Home
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Language Switcher
+Route::get('/language/{locale}', function ($locale) {
+    if (!in_array($locale, ['en', 'bn'])) {
+        abort(400);
+    }
+
+    session(['locale' => $locale]);
+    cookie()->queue('locale', $locale, 60 * 24 * 30);
+
+    return redirect()->back();
+});
+
+
+// Products
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-Route::get('/product/{slug}', [ProductController::class, 'show'])
-    ->name('product.show');
-    
+Route::get('/products/category/{category:slug}', [ProductController::class, 'category'])->name('products.category');
+Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
 
-// Cart / Wishlist
-Route::middleware('auth')->group(function () {
-    Route::post('/wishlist/{product}', [WishlistController::class, 'add'])->name('wishlist.add');
-    Route::post('/cart/{product}', [CartController::class, 'add'])->name('cart.add');
+// Categories
+Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+Route::get('/category/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
+
+// Brands
+Route::get('/brands', [ProductController::class, 'brands'])->name('brands.index');
+
+// Search Routes
+Route::get('/search/suggest', [SearchController::class, 'suggest'])->name('search.suggest');
+Route::get('/search', [SearchController::class, 'search'])->name('search');
+Route::get('/search/popular', [SearchController::class, 'popular'])->name('search.popular');
+
+
+// Cart Routes (available for guests and user)
+Route::prefix('cart')->name('cart.')->group(function () {
+    Route::get('/', [CartController::class, 'index'])->name('index');
+    Route::post('/add/{product}', [CartController::class, 'add'])->name('add');
+    Route::post('/update/{product}', [CartController::class, 'update'])->name('update');
+    Route::post('/remove/{product}', [CartController::class, 'remove'])->name('remove');
+    Route::post('/clear', [CartController::class, 'clear'])->name('clear');
 });
 
-// Order Track (public)
-Route::prefix('orders')->group(function () {
-    Route::get('/track', [OrderController::class, 'track'])->name('trackOrder');
+// Wishlist (requires auth)
+Route::middleware('auth')->prefix('wishlist')->name('wishlist.')->group(function () {
+    Route::get('/', [WishlistController::class, 'index'])->name('index');
+    Route::post('/add/{product}', [WishlistController::class, 'add'])->name('add');
+    Route::post('/remove/{product}', [WishlistController::class, 'remove'])->name('remove');
+    Route::post('/move-to-cart/{product}', [WishlistController::class, 'moveToCart'])->name('moveToCart');
 });
 
-// Static Pages
-Route::view('/terms', 'terms')->name('terms');
-Route::view('/privacy', 'privacy')->name('privacy');
-Route::get('/about', [HomeController::class, 'about'])->name('about');
-Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
+// Checkout (guest + user)
+Route::prefix('checkout')->name('checkout.')->group(function () {
+    Route::get('/', [CheckoutController::class, 'index'])->name('index');
+    Route::post('/process', [CheckoutController::class, 'process'])->name('process');
+    Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');
+    Route::get('/cancel', [CheckoutController::class, 'cancel'])->name('cancel');
+});
 
-// Search (public)
-Route::get('/search', [HomeController::class, 'search'])->name('search');
+
+// Order Tracking (public)
+Route::prefix('orders')->name('orders.')->group(function () {
+    Route::get('/track', [OrderController::class, 'track'])->name('track');
+    Route::get('/{order}/tracking', [OrderController::class, 'tracking'])->name('tracking');
+});
+
+// Reviews
+Route::middleware('auth')->prefix('reviews')->name('reviews.')->group(function () {
+    Route::post('/{product}', [ReviewController::class, 'store'])->name('store');
+    Route::put('/{review}', [ReviewController::class, 'update'])->name('update');
+    Route::delete('/{review}', [ReviewController::class, 'destroy'])->name('destroy');
+});
+
+// User Profile
+Route::middleware('auth')->prefix('profile')->name('profile.')->group(function () {
+    Route::get('/', [ProfileController::class, 'index'])->name('index');
+    Route::get('/orders', [ProfileController::class, 'orders'])->name('orders');
+    Route::get('/orders/{order}', [ProfileController::class, 'orderDetails'])->name('order.details');
+    Route::get('/addresses', [ProfileController::class, 'addresses'])->name('addresses');
+    Route::post('/addresses', [ProfileController::class, 'storeAddress'])->name('addresses.store');
+    Route::put('/addresses/{address}', [ProfileController::class, 'updateAddress'])->name('addresses.update');
+    Route::delete('/addresses/{address}', [ProfileController::class, 'deleteAddress'])->name('addresses.delete');
+    Route::get('/settings', [ProfileController::class, 'settings'])->name('settings');
+    Route::put('/settings', [ProfileController::class, 'updateSettings'])->name('settings.update');
+    Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+});
+
+// ========================= Start Static Pages =========================
+// =========================
+// About & Brand
+// =========================
+Route::view('/about-us', 'frontend.pages.about')->name('about');
+Route::view('/technology-and-innovation', 'frontend.pages.technology')->name('technology');
+Route::view('/certifications', 'frontend.pages.certifications')->name('certifications');
+Route::view('/partners', 'frontend.pages.partners')->name('partners');
+Route::view('/sustainability', 'frontend.pages.sustainability')->name('sustainability');
+
+// =========================
+// Support & Service
+// =========================
+Route::view('/contact', 'frontend.pages.contact')->name('contact');
+Route::view('/support', 'frontend.pages.support')->name('support');
+Route::view('/warranty', 'frontend.pages.warranty')->name('warranty');
+Route::view('/service-centers', 'frontend.pages.service-centers')->name('service-centers');
+Route::view('/manuals', 'frontend.pages.manuals')->name('manuals');
+Route::view('/spare-parts', 'frontend.pages.spare-parts')->name('spare-parts');
+
+// =========================
+// Customer Help
+// =========================
+Route::view('/how-to-order', 'frontend.pages.how-to-order')->name('how-to-order');
+Route::view('/shipping', 'frontend.pages.shipping')->name('shipping');
+Route::view('/returns', 'frontend.pages.returns')->name('returns');
+Route::view('/faq', 'frontend.pages.faq')->name('faq');
+
+// =========================
+// Legal
+// =========================
+Route::view('/terms', 'frontend.pages.terms')->name('terms');
+Route::view('/privacy', 'frontend.pages.privacy')->name('privacy');
+
+// ========================= End Static Pages =========================
+
+// Contact Form
+Route::post('/contact', [HomeController::class, 'contactSubmit'])->name('contact.submit');
+
+// Newsletter routes
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+Route::post('/newsletter/unsubscribe', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
 
 // ==============================
-// AUTHENTICATED USER ROUTES
+// AUTHENTICATED USER DASHBOARD
 // ==============================
-Route::middleware(['auth', 'role:customer'])->group(function () {
-    Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [ProfileController::class, 'dashboard'])->name('dashboard');
-    Route::post('/checkout/{product}', [CheckoutController::class, 'direct'])->name('checkout.direct');
+
+    // User Orders
+    Route::get('/my-orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/my-orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('/my-orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::post('/my-orders/{order}/return', [OrderController::class, 'return'])->name('orders.return');
+
+    // Downloads (if applicable)
+    Route::get('/downloads', [ProfileController::class, 'downloads'])->name('downloads');
+    // User Profile Management
+    Route::get('/profile', [ProfileController::class, 'profile'])->name('profile');
+    Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updateProfilePassword'])->name('profile.password.update');
+    Route::delete('/profile/delete', [ProfileController::class, 'deleteAccount'])->name('profile.delete');
 });
 
 // ==============================
-// AUTH ROUTES (Login/Signup/Reset)
+// TESTING WER ROUTES
+// ==============================
+Route::get('/test-flash', function () {
+    flash('Success! Progress bar should work now.', 'success', 8000);
+    flash('Error test with longer description.', 'error', 6000, 'Detailed error message here');
+    flash('Warning message', 'warning', 4000);
+    flash('Info message', 'info', 10000, 'This should show a progress bar');
+
+    return view('test-flash');
+});
+
+Route::get('/test-flash-ajax', function () {
+    return response()->json(['success' => true]);
+});
+
+// ==============================
+// AUTH ROUTES
 // ==============================
 require __DIR__ . '/auth.php';
+
+// ==============================
+// ADMIN ROUTES
+// ==============================
+require __DIR__ . '/admin.php';

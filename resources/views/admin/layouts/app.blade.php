@@ -17,7 +17,10 @@
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cambay:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Quantico:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Sans+Bengali:wght@100..900&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Core Styles -->
@@ -35,32 +38,13 @@
         <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Topbar -->
             @include('admin.partials.topbar')
-
+            <!-- Flash Messages Container -->
+            <x-flash-container />
             <!-- Main Content -->
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto p-4 no-scrollbar">
                 <div class="max-w-8xl mx-auto">
                     <!-- Breadcrumb -->
                     @include('admin.partials.breadcrumb')
-
-                    <!-- Flash Messages -->
-                    @if (session('success'))
-                        <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fas fa-check-circle text-green-500 mr-3"></i>
-                                <span class="text-green-800">{{ session('success') }}</span>
-                            </div>
-                        </div>
-                    @endif
-
-                    @if (session('error'))
-                        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fas fa-exclamation-circle text-red-500 mr-3"></i>
-                                <span class="text-red-800">{{ session('error') }}</span>
-                            </div>
-                        </div>
-                    @endif
-
                     <!-- Content -->
                     @yield('content')
                 </div>
@@ -71,8 +55,16 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <!-- Alpine -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    {{-- <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script> --}}
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    {{-- Global Button Lock Utility --}}
+    <script src="{{ asset('js/button-lock.js') }}"></script>
+    <!-- Page specific scripts -->
     @stack('scripts')
 </body>
 

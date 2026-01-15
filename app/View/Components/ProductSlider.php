@@ -12,6 +12,7 @@ class ProductSlider extends Component
      * Create a new component instance.
      */
     public $slidingProducts;
+    public $adsImages;
     public $title;
     public $sliderId;
     public $autoPlay;
@@ -23,6 +24,7 @@ class ProductSlider extends Component
 
     public function __construct(
         $slidingProducts = [],
+        $adsImages = [],
         $title = 'Recommended for you',
         $sliderId = 'productSlider',
         $autoPlay = true,
@@ -33,6 +35,7 @@ class ProductSlider extends Component
         $cardStyle = 'modern'
     ) {
         $this->slidingProducts = $slidingProducts ?: [];
+        $this->adsImages = $adsImages ?: [];
         $this->title = $title;
         $this->sliderId = $sliderId;
         $this->autoPlay = filter_var($autoPlay, FILTER_VALIDATE_BOOLEAN);

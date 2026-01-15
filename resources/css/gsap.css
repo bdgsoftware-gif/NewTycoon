@@ -1,0 +1,41 @@
+.skeleton-card {
+    height: 320px;
+    border-radius: 1.5rem;
+    background: linear-gradient(
+        90deg,
+        rgba(234, 47, 48, 0.06) 25%,
+        rgba(177, 97, 48, 0.1) 37%,
+        rgba(234, 47, 48, 0.06) 63%
+    );
+    background-size: 400% 100%;
+    animation: skeleton-loading 1.4s ease infinite;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 100% 0;
+    }
+    100% {
+        background-position: 0 0;
+    }
+}
+/* ================== Ads Section Infinite Loop ================= */
+.ads-skeleton {
+    background: linear-gradient(
+        90deg,
+        rgba(234, 47, 48, 0.06) 25%,
+        rgba(177, 97, 48, 0.1) 37%,
+        rgba(234, 47, 48, 0.06) 63%
+    );
+    background-size: 400% 100%;
+    animation: ads-skeleton-loading 1.4s ease infinite;
+}
+
+@keyframes ads-skeleton-loading {
+    0% {
+        background-position: 100% 0;
+    }
+    100% {
+        background-position: 0 0;
+    }
+}
