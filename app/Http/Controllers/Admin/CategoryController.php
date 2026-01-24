@@ -26,13 +26,17 @@ class CategoryController extends Controller
             ->latest()
             ->paginate(30);
 
-        $rootCategories = Category::whereNull('parent_id')->get();
+        // Only categories without products can be parents
+        $rootCategories = Category::whereNull('parent_id')
+            ->whereDoesntHave('products')
+            ->get();
 
         $stats = [
             'totalCategories' => Category::count(),
             'activeCategories' => Category::where('is_active', true)->count(),
             'featuredCategories' => Category::where('is_featured', true)->count(),
             'totalProducts' => Product::count(),
+            'leafCategories' => Category::leaf()->count(), // Categories that can have products
         ];
 
         return view('admin.categories.index', array_merge($stats, [
@@ -43,12 +47,24 @@ class CategoryController extends Controller
 
     public function create()
     {
-        $parentCategories = Category::whereNull('parent_id')
-            ->where('is_active', true)
-            ->get();
+        // Only active categories without products and within depth limit can be parents
+        $parentCategories = Category::where('is_active', true)
+            ->whereDoesntHave('products')
+            ->where('depth', '<', Category::MAX_DEPTH)
+            ->orderBy('depth')
+            ->orderBy('name_en')
+            ->get()
+            ->map(function ($category) {
+                return [
+                    'id' => $category->id,
+                    'name' => $category->full_path,
+                    'depth' => $category->depth,
+                ];
+            });
 
         return view('admin.categories.create', [
             'parentCategories' => $parentCategories,
+            'maxDepth' => Category::MAX_DEPTH,
         ]);
     }
 
@@ -64,9 +80,11 @@ class CategoryController extends Controller
             }
 
             // Create the category
-            Category::create($data);
+            $category = Category::create($data);
 
-            flash('Category created successfully!', 'success', 5000, 'The category has been added to the system.');
+            flash('Category created successfully!', 'success', 5000, 
+                'The category "' . $category->name_en . '" has been added at depth level ' . $category->depth . '.');
+            
             return redirect()->route('admin.categories.index');
         } catch (\Exception $e) {
             Log::error('Error creating category: ' . $e->getMessage(), [
@@ -81,20 +99,43 @@ class CategoryController extends Controller
 
     public function edit(Category $category)
     {
-        $parentCategories = Category::whereNull('parent_id')
+        // Get potential parent categories
+        // Exclude: self, descendants, categories with products, max depth reached, inactive categories
+        $descendantIds = $category->getAllDescendantIds();
+        
+        $parentCategories = Category::where('is_active', true)
             ->where('id', '!=', $category->id)
-            ->where('is_active', true)
-            ->get();
-        // dd($category);
+            ->whereNotIn('id', $descendantIds)
+            ->whereDoesntHave('products')
+            ->where('depth', '<', Category::MAX_DEPTH)
+            ->orderBy('depth')
+            ->orderBy('name_en')
+            ->get()
+            ->filter(function ($potentialParent) use ($category) {
+                // Check if moving would exceed depth limit
+                $newDepth = $potentialParent->depth + 1;
+                $maxChildDepth = $this->getMaxDescendantDepth($category);
+                return ($newDepth + $maxChildDepth) <= Category::MAX_DEPTH;
+            })
+            ->map(function ($cat) {
+                return [
+                    'id' => $cat->id,
+                    'name' => $cat->full_path,
+                    'depth' => $cat->depth,
+                ];
+            });
+
         return view('admin.categories.edit', [
-            'category' => $category->load('children'),
+            'category' => $category->load('children', 'products'),
             'parentCategories' => $parentCategories,
+            'maxDepth' => Category::MAX_DEPTH,
+            'hasProducts' => $category->products()->exists(),
+            'hasChildren' => $category->hasChildren(),
         ]);
     }
 
     public function update(UpdateCategoryRequest $request, Category $category)
     {
-        // dd($request->all());
         try {
             $data = $request->validated();
 
@@ -118,16 +159,15 @@ class CategoryController extends Controller
                 $data['image'] = null;
             }
 
-            // Prevent setting self as parent
-            if (isset($data['parent_id']) && $data['parent_id'] == $category->id) {
-                flash('Invalid Selection', 'error', 8000, 'A category cannot be its own parent.');
-                return redirect()->back()->withInput();
-            }
-
             // Update the category
             $category->update($data);
 
-            flash('Category Updated!', 'success', 5000, $category->name_en . ' has been successfully updated.');
+            $message = 'Category "' . $category->name_en . '" updated successfully';
+            if ($category->wasChanged('parent_id')) {
+                $message .= '. Descendant depths have been recalculated.';
+            }
+
+            flash('Category Updated!', 'success', 5000, $message);
             return redirect()->route('admin.categories.index');
         } catch (\Exception $e) {
             Log::error('Error updating category: ' . $e->getMessage(), [
@@ -148,6 +188,20 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         try {
+            // Check if category has children
+            if ($category->hasChildren()) {
+                flash('Cannot Delete!', 'error', 8000, 
+                    'This category has subcategories. Please delete or reassign them first.');
+                return redirect()->back();
+            }
+
+            // Check if category has products
+            if ($category->products()->exists()) {
+                flash('Cannot Delete!', 'error', 8000, 
+                    'This category has ' . $category->products()->count() . ' products assigned. Please reassign or delete them first.');
+                return redirect()->back();
+            }
+
             // Delete associated image
             if ($category->image) {
                 Storage::disk('public')->delete($category->image);
@@ -155,7 +209,6 @@ class CategoryController extends Controller
 
             $category->delete();
 
-            // Success feedback
             flash('Category Deleted!', 'success', 5000, 'The category has been successfully deleted.');
 
             return redirect()->route('admin.categories.index');
@@ -165,7 +218,6 @@ class CategoryController extends Controller
                 'category_id' => $category->id,
             ]);
 
-            // Error feedback
             flash('Deletion Failed!', 'error', 8000, 'An error occurred while deleting the category. Please try again.');
 
             return redirect()->back();
@@ -189,12 +241,26 @@ class CategoryController extends Controller
             'is_active' => 'required|boolean',
         ]);
 
+        // Check if activating and parent is inactive
+        if ($request->is_active && !$category->isParentActive()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot activate category when parent is inactive.',
+            ], 422);
+        }
+
         $category->is_active = $request->is_active;
         $category->save();
+
+        // If deactivating, children will be automatically deactivated by model observer
+        $message = $request->is_active 
+            ? 'Category activated successfully.' 
+            : 'Category and all its subcategories deactivated successfully.';
 
         return response()->json([
             'success' => true,
             'is_active' => $category->is_active,
+            'message' => $message,
         ]);
     }
 
@@ -208,10 +274,12 @@ class CategoryController extends Controller
         try {
             $categories = Category::whereIn('id', $request->ids)->get();
             $count = 0;
+            $skipped = 0;
 
             foreach ($categories as $category) {
-                // Don't delete if has children
-                if ($category->children()->count() > 0) {
+                // Don't delete if has children or products
+                if ($category->children()->count() > 0 || $category->products()->count() > 0) {
+                    $skipped++;
                     continue;
                 }
 
@@ -224,10 +292,16 @@ class CategoryController extends Controller
                 $count++;
             }
 
+            $message = "{$count} categories deleted successfully.";
+            if ($skipped > 0) {
+                $message .= " {$skipped} categories skipped (have children or products).";
+            }
+
             return response()->json([
                 'success' => true,
-                'message' => "{$count} categories deleted successfully.",
-                'count' => $count
+                'message' => $message,
+                'count' => $count,
+                'skipped' => $skipped,
             ]);
         } catch (\Exception $e) {
             Log::error('Bulk delete error: ' . $e->getMessage());
@@ -246,13 +320,32 @@ class CategoryController extends Controller
         ]);
 
         try {
-            $count = Category::whereIn('id', $request->ids)
-                ->update(['is_active' => true]);
+            $categories = Category::whereIn('id', $request->ids)->get();
+            $count = 0;
+            $skipped = 0;
+
+            foreach ($categories as $category) {
+                // Check if parent is active
+                if (!$category->isParentActive()) {
+                    $skipped++;
+                    continue;
+                }
+
+                $category->is_active = true;
+                $category->save();
+                $count++;
+            }
+
+            $message = "{$count} categories activated.";
+            if ($skipped > 0) {
+                $message .= " {$skipped} categories skipped (parent inactive).";
+            }
 
             return response()->json([
                 'success' => true,
-                'message' => "{$count} categories activated.",
-                'count' => $count
+                'message' => $message,
+                'count' => $count,
+                'skipped' => $skipped,
             ]);
         } catch (\Exception $e) {
             Log::error('Bulk activate error: ' . $e->getMessage());
@@ -274,9 +367,11 @@ class CategoryController extends Controller
             $count = Category::whereIn('id', $request->ids)
                 ->update(['is_active' => false]);
 
+            // Note: Child categories will be automatically deactivated by model observers
+
             return response()->json([
                 'success' => true,
-                'message' => "{$count} categories deactivated.",
+                'message' => "{$count} categories and their descendants deactivated.",
                 'count' => $count
             ]);
         } catch (\Exception $e) {
@@ -332,5 +427,57 @@ class CategoryController extends Controller
                 'message' => 'Failed to reorder category.'
             ], 500);
         }
+    }
+
+    /**
+     * Helper to get max descendant depth
+     */
+    private function getMaxDescendantDepth(Category $category): int
+    {
+        if (!$category->hasChildren()) {
+            return 0;
+        }
+
+        $maxDepth = 0;
+        foreach ($category->children as $child) {
+            $childMaxDepth = 1 + $this->getMaxDescendantDepth($child);
+            $maxDepth = max($maxDepth, $childMaxDepth);
+        }
+
+        return $maxDepth;
+    }
+
+    /**
+     * Get categories eligible to be parents (for AJAX)
+     */
+    public function getEligibleParents(Request $request)
+    {
+        $categoryId = $request->input('category_id');
+        
+        $query = Category::where('is_active', true)
+            ->whereDoesntHave('products')
+            ->where('depth', '<', Category::MAX_DEPTH);
+
+        if ($categoryId) {
+            $category = Category::find($categoryId);
+            if ($category) {
+                $descendantIds = $category->getAllDescendantIds();
+                $query->where('id', '!=', $categoryId)
+                    ->whereNotIn('id', $descendantIds);
+            }
+        }
+
+        $categories = $query->orderBy('depth')
+            ->orderBy('name_en')
+            ->get()
+            ->map(function ($cat) {
+                return [
+                    'id' => $cat->id,
+                    'name' => $cat->full_path,
+                    'depth' => $cat->depth,
+                ];
+            });
+
+        return response()->json($categories);
     }
 }

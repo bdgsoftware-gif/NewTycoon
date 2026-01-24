@@ -58,17 +58,17 @@ class FooterSeeder extends Seeder
                     ['en' => 'Sustainability', 'bn' => 'টেকসই উন্নয়ন', 'url' => '/sustainability'],
                 ],
             ],
-            [
-                'title_en' => 'Support & Service',
-                'title_bn' => 'সহায়তা ও সেবা',
-                'links' => [
-                    ['en' => 'Contact Support', 'bn' => 'সাপোর্টে যোগাযোগ', 'url' => '/support'],
-                    ['en' => 'Warranty Policy', 'bn' => 'ওয়ারেন্টি নীতি', 'url' => '/warranty'],
-                    ['en' => 'Service Centers', 'bn' => 'সার্ভিস সেন্টার', 'url' => '/service-centers'],
-                    ['en' => 'Product Manuals', 'bn' => 'প্রোডাক্ট ম্যানুয়াল', 'url' => '/manuals'],
-                    ['en' => 'Spare Parts', 'bn' => 'স্পেয়ার পার্টস', 'url' => '/spare-parts'],
-                ],
-            ],
+            // [
+            //     'title_en' => 'Support & Service',
+            //     'title_bn' => 'সহায়তা ও সেবা',
+            //     'links' => [
+            //         ['en' => 'Contact Support', 'bn' => 'সাপোর্টে যোগাযোগ', 'url' => '/support'],
+            //         ['en' => 'Warranty Policy', 'bn' => 'ওয়ারেন্টি নীতি', 'url' => '/warranty'],
+            //         ['en' => 'Service Centers', 'bn' => 'সার্ভিস সেন্টার', 'url' => '/service-centers'],
+            //         ['en' => 'Product Manuals', 'bn' => 'প্রোডাক্ট ম্যানুয়াল', 'url' => '/manuals'],
+            //         ['en' => 'Spare Parts', 'bn' => 'স্পেয়ার পার্টস', 'url' => '/spare-parts'],
+            //     ],
+            // ],
             [
                 'title_en' => 'Customer Help',
                 'title_bn' => 'গ্রাহক সহায়তা',

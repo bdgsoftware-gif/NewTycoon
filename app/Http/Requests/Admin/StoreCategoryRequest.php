@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\Category;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreCategoryRequest extends FormRequest
@@ -18,13 +20,47 @@ class StoreCategoryRequest extends FormRequest
             'name_en' => ['required', 'string', 'max:255'],
             'name_bn' => ['nullable', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255', 'unique:categories,slug'],
-            'parent_id' => ['nullable', 'exists:categories,id'],
+            'parent_id' => [
+                'nullable',
+                'exists:categories,id',
+                function ($attribute, $value, $fail) {
+                    if ($value) {
+                        $parent = Category::find($value);
+
+                        // Check if parent can have children (depth limit)
+                        if ($parent && !$parent->canHaveChildren()) {
+                            $fail('The selected parent category has reached maximum depth and cannot have children.');
+                        }
+
+                        // Check if parent is active
+                        if ($parent && !$parent->is_active) {
+                            $fail('Cannot create category under an inactive parent category.');
+                        }
+
+                        // Check if parent has products
+                        if ($parent && $parent->products()->exists()) {
+                            $fail('Cannot create subcategory under a category that has products assigned. Products can only be assigned to leaf categories.');
+                        }
+                    }
+                },
+            ],
             'description_en' => ['nullable', 'string'],
             'description_bn' => ['nullable', 'string'],
             'image' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:2048'],
             'is_featured' => ['boolean'],
             'show_in_nav' => ['boolean'],
-            'is_active' => ['boolean'],
+            'is_active' => [
+                'boolean',
+                function ($attribute, $value, $fail) {
+                    // If trying to create as active, check if parent is active
+                    if ($value && $this->parent_id) {
+                        $parent = Category::find($this->parent_id);
+                        if ($parent && !$parent->isParentActive()) {
+                            $fail('Cannot activate category when parent category is inactive.');
+                        }
+                    }
+                },
+            ],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string'],
             'meta_keywords' => ['nullable', 'string'],

@@ -20,9 +20,7 @@ class ProductController extends Controller
     {
         $this->middleware(['auth', 'role:admin']);
     }
-    /* -----------------------------------------------------------------
-     | Index
-     |------------------------------------------------------------------*/
+
     public function index(Request $request)
     {
         $products = Product::with('category')
@@ -38,27 +36,50 @@ class ProductController extends Controller
             ->latest()
             ->paginate(20);
 
-        $categories = Category::where('is_active', true)->orderBy('name_en')->get();
+        // Only leaf categories (no children) can have products
+        $categories = Category::where('is_active', true)
+            ->leaf() // Only categories without children
+            ->orderBy('name_en')
+            ->get()
+            ->map(function ($category) {
+                return [
+                    'id' => $category->id,
+                    'name' => $category->full_path,
+                ];
+            });
 
         return view('admin.products.index', compact('products', 'categories'));
     }
 
-    /* -----------------------------------------------------------------
-     | Create
-     |------------------------------------------------------------------*/
     public function create()
     {
-        $categories = Category::where('is_active', true)->orderBy('name_en')->get();
+        // Only active leaf categories can be assigned to products
+        $categories = Category::where('is_active', true)
+            ->leaf()
+            ->orderBy('name_en')
+            ->get()
+            ->map(function ($category) {
+                return [
+                    'id' => $category->id,
+                    'name' => $category->full_path,
+                    'depth' => $category->depth,
+                ];
+            });
+
+        if ($categories->isEmpty()) {
+            flash(
+                'No Available Categories',
+                'warning',
+                8000,
+                'Please create leaf categories (categories without subcategories) before adding products.'
+            );
+        }
 
         return view('admin.products.create', compact('categories'));
     }
 
-    /* -----------------------------------------------------------------
-     | Store
-     |------------------------------------------------------------------*/
     public function store(StoreProductRequest $request)
     {
-        // dd($request->all());
         DB::transaction(function () use ($request) {
             $product = Product::create(
                 array_merge(
@@ -86,19 +107,24 @@ class ProductController extends Controller
             ->with('success', 'Product created successfully.');
     }
 
-    /* -----------------------------------------------------------------
-     | Edit
-     |------------------------------------------------------------------*/
     public function edit(Product $product)
     {
-        $categories = Category::where('is_active', true)->orderBy('name_en')->get();
+        // Only active leaf categories can be assigned
+        $categories = Category::where('is_active', true)
+            ->leaf()
+            ->orderBy('name_en')
+            ->get()
+            ->map(function ($category) {
+                return [
+                    'id' => $category->id,
+                    'name' => $category->full_path,
+                    'depth' => $category->depth,
+                ];
+            });
 
         return view('admin.products.edit', compact('product', 'categories'));
     }
 
-    /* -----------------------------------------------------------------
-     | Update
-     |------------------------------------------------------------------*/
     public function update(UpdateProductRequest $request, Product $product)
     {
         DB::transaction(function () use ($request, $product) {
@@ -179,9 +205,6 @@ class ProductController extends Controller
         return view('admin.products.show', compact('product'));
     }
 
-    /* -----------------------------------------------------------------
-     | Destroy
-     |------------------------------------------------------------------*/
     public function destroy(Product $product)
     {
         DB::transaction(function () use ($product) {
@@ -227,9 +250,6 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Remove multiple products.
-     */
     public function destroyMultiple(Request $request)
     {
         $request->validate([
@@ -272,9 +292,6 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Update product status.
-     */
     public function updateStatus(Request $request, Product $product)
     {
         $request->validate([
@@ -296,9 +313,6 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Update stock status.
-     */
     public function updateStockStatus(Request $request, Product $product)
     {
         $request->validate([
@@ -320,9 +334,6 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Update featured status.
-     */
     public function updateFeaturedStatus(Request $request, Product $product)
     {
         try {
@@ -373,9 +384,6 @@ class ProductController extends Controller
         return redirect()->back()->with('success', $message);
     }
 
-    /**
-     * Check SKU availability.
-     */
     public function checkSku(Request $request)
     {
         $request->validate([
@@ -395,5 +403,25 @@ class ProductController extends Controller
             'available' => !$exists,
             'message' => $exists ? 'SKU already taken' : 'SKU is available'
         ]);
+    }
+
+    /**
+     * Get available categories for product assignment (AJAX)
+     */
+    public function getAvailableCategories()
+    {
+        $categories = Category::where('is_active', true)
+            ->leaf()
+            ->orderBy('name_en')
+            ->get()
+            ->map(function ($category) {
+                return [
+                    'id' => $category->id,
+                    'name' => $category->full_path,
+                    'depth' => $category->depth,
+                ];
+            });
+
+        return response()->json($categories);
     }
 }

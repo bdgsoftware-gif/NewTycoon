@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -24,14 +25,79 @@ class UpdateCategoryRequest extends FormRequest
                 'max:255',
                 Rule::unique('categories', 'slug')->ignore($this->category)
             ],
-            'parent_id' => ['nullable', 'exists:categories,id'],
+            'parent_id' => [
+                'nullable',
+                'exists:categories,id',
+                function ($attribute, $value, $fail) {
+                    $category = $this->route('category');
+
+                    if ($value) {
+                        // Prevent setting self as parent
+                        if ($value == $category->id) {
+                            $fail('A category cannot be its own parent.');
+                        }
+
+                        $parent = Category::find($value);
+
+                        // Check if parent can have children (depth limit)
+                        if ($parent && !$parent->canHaveChildren()) {
+                            $fail('The selected parent category has reached maximum depth and cannot have children.');
+                        }
+
+                        // Check if parent is active
+                        if ($parent && !$parent->is_active) {
+                            $fail('Cannot assign an inactive category as parent.');
+                        }
+
+                        // Check if parent has products
+                        if ($parent && $parent->products()->exists()) {
+                            $fail('Cannot create subcategory under a category that has products. Products can only be assigned to leaf categories.');
+                        }
+
+                        // Prevent circular reference
+                        if ($this->wouldCreateCircularReference($category, $value)) {
+                            $fail('Cannot set this parent as it would create a circular reference.');
+                        }
+
+                        // Check if new depth would exceed limit
+                        $newDepth = $this->calculateNewDepth($parent);
+                        $maxChildDepth = $this->getMaxDescendantDepth($category);
+
+                        if ($newDepth + $maxChildDepth > Category::MAX_DEPTH) {
+                            $fail('This change would exceed the maximum category depth of ' . Category::MAX_DEPTH . ' levels.');
+                        }
+                    } else {
+                        // If removing parent (making root), check if resulting depth is valid
+                        $maxChildDepth = $this->getMaxDescendantDepth($category);
+
+                        if (1 + $maxChildDepth > Category::MAX_DEPTH) {
+                            $fail('Cannot make this a root category as its descendants would exceed maximum depth.');
+                        }
+                    }
+                },
+            ],
             'description_en' => ['nullable', 'string'],
             'description_bn' => ['nullable', 'string'],
             'image' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:2048'],
             'remove_image' => ['nullable', 'boolean'],
             'is_featured' => ['boolean'],
             'show_in_nav' => ['boolean'],
-            'is_active' => ['boolean'],
+            'is_active' => [
+                'boolean',
+                function ($attribute, $value, $fail) {
+                    $category = $this->route('category');
+
+                    // If trying to activate, check if parent is active
+                    if ($value && !$category->is_active) {
+                        if ($category->parent_id) {
+                            $parent = $category->parent;
+                            if ($parent && !$parent->isParentActive()) {
+                                $fail('Cannot activate category when parent category is inactive.');
+                            }
+                        }
+                    }
+                },
+            ],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string'],
             'meta_keywords' => ['nullable', 'string'],
@@ -121,5 +187,44 @@ class UpdateCategoryRequest extends FormRequest
         if ($this->boolean('remove_image')) {
             $this->merge(['image' => null]);
         }
+    }
+
+    /**
+     * Check if setting new parent would create circular reference
+     */
+    private function wouldCreateCircularReference(Category $category, int $newParentId): bool
+    {
+        $descendantIds = $category->getAllDescendantIds();
+        return in_array($newParentId, $descendantIds);
+    }
+
+    /**
+     * Calculate new depth with given parent
+     */
+    private function calculateNewDepth(?Category $parent): int
+    {
+        if (!$parent) {
+            return 1;
+        }
+
+        return $parent->depth + 1;
+    }
+
+    /**
+     * Get maximum depth among descendants
+     */
+    private function getMaxDescendantDepth(Category $category): int
+    {
+        if (!$category->hasChildren()) {
+            return 0;
+        }
+
+        $maxDepth = 0;
+        foreach ($category->children as $child) {
+            $childMaxDepth = 1 + $this->getMaxDescendantDepth($child);
+            $maxDepth = max($maxDepth, $childMaxDepth);
+        }
+
+        return $maxDepth;
     }
 }

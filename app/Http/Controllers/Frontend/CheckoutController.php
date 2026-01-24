@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Models\Cart;
+use App\Models\User;
 use App\Models\Order;
 use App\Models\Address;
 use App\Models\Payment;
@@ -10,8 +11,10 @@ use App\Models\Product;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class CheckoutController extends Controller
 {
@@ -30,14 +33,23 @@ class CheckoutController extends Controller
 
         // Check stock for all items
         foreach ($cart->items as $item) {
-            if ($item->product->track_quantity && $item->product->quantity < $item->quantity && !$item->product->allow_backorder) {
+            if (!$item->product) {
                 return redirect()->route('cart.index')
-                    ->with('error', 'Some items in your cart are out of stock');
+                    ->with('error', 'Some items in your cart are no longer available');
+            }
+
+            if (
+                $item->product->track_quantity &&
+                $item->product->quantity < $item->quantity &&
+                !$item->product->allow_backorder
+            ) {
+                return redirect()->route('cart.index')
+                    ->with('error', "{$item->product->name} is out of stock");
             }
         }
 
         $user = Auth::user();
-        $addresses = $user ? $user->addresses : collect();
+        $addresses = $user ? $user->addresses()->where('type', 'shipping')->get() : collect();
         $isGuest = !Auth::check();
 
         return view('frontend.checkout.index', compact('cart', 'user', 'addresses', 'isGuest'));
@@ -48,16 +60,24 @@ class CheckoutController extends Controller
      */
     public function process(Request $request)
     {
-        $request->validate([
-            'shipping_address_id' => 'required_if:use_existing_shipping,true',
-            'billing_address_id' => 'required_if:use_existing_billing,true',
-            'shipping_method' => 'required|string',
-            'payment_method' => 'required|string',
-            'notes' => 'nullable|string',
-            'create_account' => 'boolean',
-            'password' => 'required_if:create_account,true|min:6',
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string|max:500',
+            'city' => 'required|string|max:100',
+            'postal_code' => 'required|string|max:10',
+            'payment_method' => 'required|in:cod,online',
+            'notes' => 'nullable|string|max:1000',
             'terms' => 'accepted',
-        ]);
+        ];
+
+        // Guest account creation
+        if (!Auth::check() && $request->boolean('create_account')) {
+            $rules['password'] = 'required|min:8|confirmed';
+        }
+
+        $validated = $request->validate($rules);
 
         $cart = Cart::getCurrentCart();
 
@@ -68,9 +88,20 @@ class CheckoutController extends Controller
             ], 400);
         }
 
-        // Validate stock
+        // Validate stock again
         foreach ($cart->items as $item) {
-            if ($item->product->track_quantity && $item->product->quantity < $item->quantity && !$item->product->allow_backorder) {
+            if (!$item->product) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Some items are no longer available'
+                ], 400);
+            }
+
+            if (
+                $item->product->track_quantity &&
+                $item->product->quantity < $item->quantity &&
+                !$item->product->allow_backorder
+            ) {
                 return response()->json([
                     'success' => false,
                     'message' => "{$item->product->name} is out of stock"
@@ -81,89 +112,140 @@ class CheckoutController extends Controller
         DB::beginTransaction();
 
         try {
-            // Create order
+            $userId = Auth::id();
+
+            if (!$userId && $request->boolean('create_account')) {
+                $user = User::create([
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'phone' => $validated['phone'],
+                    'password' => Hash::make($validated['password']),
+                    'status' => 'active',
+                ]);
+
+                // Assign customer role
+                $user->assignRole('customer');
+
+                // Auto-login
+                Auth::login($user);
+                $userId = $user->id;
+
+                // Create address for user
+                Address::create([
+                    'user_id' => $userId,
+                    'type' => 'shipping',
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'phone' => $validated['phone'],
+                    'address_line_1' => $validated['address'],
+                    'address_line_2' => null,
+                    'city' => $validated['city'],
+                    'state' => 'Dhaka', // Default for Bangladesh
+                    'postal_code' => $validated['postal_code'],
+                    'country' => 'Bangladesh',
+                    'is_default' => true,
+                ]);
+            }
+
+            // ✅ CREATE ORDER
             $order = Order::create([
                 'order_number' => $this->generateOrderNumber(),
+                'user_id' => $userId,
 
-                // USER OR GUEST
-                'user_id' => Auth::id(),
+                // Customer info
+                'customer_name' => $validated['name'],
+                'customer_email' => $validated['email'],
+                'customer_phone' => $validated['phone'],
 
-                // CUSTOMER SNAPSHOT
-                'customer_name'  => $request->customer_name,
-                'customer_email' => $request->customer_email,
-                'customer_phone' => $request->customer_phone,
+                // Shipping address (Bangladesh only)
+                'shipping_name' => $validated['name'],
+                'shipping_email' => $validated['email'],
+                'shipping_phone' => $validated['phone'],
+                'shipping_address_line1' => $validated['address'],
+                'shipping_address_line2' => null,
+                'shipping_city' => $validated['city'],
+                'shipping_state' => 'Bangladesh',
+                'shipping_country' => 'Bangladesh',
+                'shipping_zip_code' => $validated['postal_code'],
 
-                // SHIPPING SNAPSHOT
-                'shipping_name' => $request->shipping_name,
-                'shipping_email' => $request->shipping_email,
-                'shipping_phone' => $request->shipping_phone,
-                'shipping_address_line1' => $request->shipping_address_1,
-                'shipping_address_line2' => $request->shipping_address_2,
-                'shipping_city' => $request->shipping_city,
-                'shipping_state' => $request->shipping_state,
-                'shipping_country' => $request->shipping_country,
-                'shipping_zip_code' => $request->shipping_postal_code,
+                // Billing same as shipping
+                'billing_same_as_shipping' => true,
 
-                // BILLING
-                'billing_same_as_shipping' => $request->same_as_shipping,
-
-                // TOTALS
+                // Totals
                 'subtotal' => $cart->subtotal,
-                'shipping_cost' => 0,
+                'shipping_cost' => 0, // Free shipping for now
                 'tax_amount' => 0,
                 'discount_amount' => 0,
                 'total_amount' => $cart->subtotal,
 
-                // STATUS
+                // Status
                 'status' => 'pending',
                 'payment_status' => 'pending',
 
-                // META
-                'shipping_method' => $request->shipping_method,
-                'payment_method' => $request->payment_method,
+                // Payment & Shipping
+                'payment_method' => $validated['payment_method'],
+                'shipping_method' => 'standard', // Default
+
+                // Notes
+                'customer_note' => $validated['notes'] ?? null,
+
+                // Meta
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent(),
             ]);
 
-
-            // Create order items
+            // ✅ CREATE ORDER ITEMS
             foreach ($cart->items as $item) {
+                $product = $item->product;
+
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'product_id' => $item->product_id,
+                    'product_id' => $product->id,
+                    'product_name' => $product->name,
+                    'product_sku' => $product->sku ?? 'N/A',
+                    'product_image' => is_array($product->featured_images) && !empty($product->featured_images)
+                        ? $product->featured_images[0]
+                        : null,
                     'quantity' => $item->quantity,
                     'unit_price' => $item->price,
                     'total_price' => $item->quantity * $item->price,
+                    'discount_amount' => 0,
+                    'tax_amount' => 0,
                 ]);
 
-                // Update product stock
-                if ($item->product->track_quantity) {
-                    $item->product->decrement('quantity', $item->quantity);
-                    $item->product->updateStockStatus();
+                // ✅ UPDATE PRODUCT STOCK
+                if ($product->track_quantity) {
+                    $product->decrement('quantity', $item->quantity);
+                    $product->increment('total_sold', $item->quantity);
+                    $product->updateStockStatus();
                 }
             }
 
-            // Clear cart
-            $cart->clear();
-
-            // Create initial payment record
+            // ✅ CREATE PAYMENT RECORD
             Payment::create([
                 'order_id' => $order->id,
-                'payment_method' => $request->payment_method,
+                'payment_method' => $validated['payment_method'],
                 'amount' => $order->total_amount,
-                'status' => 'pending',
+                'status' => $validated['payment_method'] === 'cod' ? 'pending' : 'pending',
                 'transaction_id' => null,
             ]);
 
+            // ✅ CLEAR CART
+            $cart->items()->delete();
+
             DB::commit();
 
-            // Redirect to payment gateway or order confirmation
+            // ✅ SEND ORDER CONFIRMATION EMAIL (Optional)
+            // Mail::to($order->customer_email)->send(new OrderConfirmation($order));
+
             return response()->json([
                 'success' => true,
                 'redirect_url' => route('checkout.success', $order->order_number)
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+
+            Log::error('Checkout failed: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -178,6 +260,7 @@ class CheckoutController extends Controller
     public function success($orderNumber)
     {
         $order = Order::where('order_number', $orderNumber)
+            ->with('items.product')
             ->when(Auth::check(), fn($q) => $q->where('user_id', Auth::id()))
             ->firstOrFail();
 
@@ -193,71 +276,6 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Save address
-     */
-    public function saveAddress(Request $request)
-    {
-        $request->validate([
-            'type' => 'required|in:shipping,billing',
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
-            'address_line_1' => 'required|string|max:255',
-            'address_line_2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:100',
-            'state' => 'required|string|max:100',
-            'postal_code' => 'required|string|max:20',
-            'country' => 'required|string|max:100',
-        ]);
-
-        $address = Address::create([
-            'user_id' => Auth::id(),
-            'type' => $request->type,
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'address_line_1' => $request->address_line_1,
-            'address_line_2' => $request->address_line_2,
-            'city' => $request->city,
-            'state' => $request->state,
-            'postal_code' => $request->postal_code,
-            'country' => $request->country,
-            'is_default' => $request->boolean('is_default', false),
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'address' => $address
-        ]);
-    }
-
-    /**
-     * Calculate shipping
-     */
-    public function calculateShipping(Request $request)
-    {
-        $request->validate([
-            'city' => 'required|string',
-            'postal_code' => 'required|string',
-        ]);
-
-        // Implement your shipping calculation logic
-        $shippingAmount = 0; // Default free shipping
-
-        // Example: Charge shipping for specific areas
-        if (in_array($request->city, ['Remote Area 1', 'Remote Area 2'])) {
-            $shippingAmount = 150;
-        }
-
-        return response()->json([
-            'success' => true,
-            'shipping_amount' => $shippingAmount
-        ]);
-    }
-
-    /**
      * Generate unique order number
      */
     private function generateOrderNumber()
@@ -267,91 +285,5 @@ class CheckoutController extends Controller
         } while (Order::where('order_number', $orderNumber)->exists());
 
         return $orderNumber;
-    }
-
-    /**
-     * Get shipping address ID
-     */
-    private function getShippingAddressId(Request $request)
-    {
-        if ($request->use_existing_shipping && $request->shipping_address_id) {
-            return $request->shipping_address_id;
-        }
-
-        // Create new shipping address
-        if (Auth::check() && $request->save_address) {
-            $address = Address::create([
-                'user_id' => Auth::id(),
-                'type' => 'shipping',
-                'first_name' => $request->shipping_first_name,
-                'last_name' => $request->shipping_last_name,
-                'email' => $request->shipping_email,
-                'phone' => $request->shipping_phone,
-                'address_line_1' => $request->shipping_address_1,
-                'address_line_2' => $request->shipping_address_2,
-                'city' => $request->shipping_city,
-                'state' => $request->shipping_state,
-                'postal_code' => $request->shipping_postal_code,
-                'country' => $request->shipping_country,
-            ]);
-        }
-        return $address->id;
-    }
-
-    /**
-     * Get billing address ID
-     */
-    private function getBillingAddressId(Request $request)
-    {
-        if ($request->same_as_shipping) {
-            return $this->getShippingAddressId($request);
-        }
-
-        if ($request->use_existing_billing && $request->billing_address_id) {
-            return $request->billing_address_id;
-        }
-
-        // Create new billing address
-        $address = Address::create([
-            'user_id' => Auth::id(),
-            'type' => 'billing',
-            'first_name' => $request->billing_first_name,
-            'last_name' => $request->billing_last_name,
-            'email' => $request->billing_email,
-            'phone' => $request->billing_phone,
-            'address_line_1' => $request->billing_address_1,
-            'address_line_2' => $request->billing_address_2,
-            'city' => $request->billing_city,
-            'state' => $request->billing_state,
-            'postal_code' => $request->billing_postal_code,
-            'country' => $request->billing_country,
-        ]);
-
-        return $address->id;
-    }
-
-    /**
-     * Process direct checkout (from product page)
-     */
-    public function directCheckout(Request $request, Product $product)
-    {
-        $request->validate([
-            'quantity' => 'nullable|integer|min:1',
-        ]);
-
-        $quantity = $request->quantity ?? 1;
-
-        // Check stock
-        if ($product->track_quantity && $product->quantity < $quantity && !$product->allow_backorder) {
-            return redirect()->back()
-                ->with('error', 'Product is out of stock');
-        }
-
-        // Create temporary cart with single item
-        $cart = Cart::getCurrentCart();
-        $cart->clear(); // Clear existing items
-        $cart->addItem($product->id, $quantity);
-
-        return redirect()->route('checkout.index');
     }
 }

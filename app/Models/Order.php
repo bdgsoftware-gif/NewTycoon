@@ -404,4 +404,20 @@ class Order extends Model
 
         return $colors[$this->payment_status] ?? 'bg-gray-100 text-gray-800';
     }
+
+    /**
+     * Get the payment for this order
+     */
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
+    }
+
+    /**
+     * Get all payments for this order
+     */
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
 }

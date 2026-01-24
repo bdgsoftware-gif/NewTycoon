@@ -31,7 +31,10 @@ Route::get('/language/{locale}', function ($locale) {
     session(['locale' => $locale]);
     cookie()->queue('locale', $locale, 60 * 24 * 30);
 
-    return redirect()->back();
+    return redirect()->back()->withHeaders([
+        'X-Frame-Options' => 'DENY',
+        'X-Content-Type-Options' => 'nosniff'
+    ]);
 });
 
 
@@ -48,10 +51,11 @@ Route::get('/category/{category:slug}', [CategoryController::class, 'show'])->na
 Route::get('/brands', [ProductController::class, 'brands'])->name('brands.index');
 
 // Search Routes
-Route::get('/search/suggest', [SearchController::class, 'suggest'])->name('search.suggest');
-Route::get('/search', [SearchController::class, 'search'])->name('search');
-Route::get('/search/popular', [SearchController::class, 'popular'])->name('search.popular');
-
+Route::middleware(['throttle:60,1'])->group(function () {
+    Route::get('/search/suggest', [SearchController::class, 'suggest'])->name('search.suggest');
+    Route::get('/search', [SearchController::class, 'search'])->name('search');
+    Route::get('/search/popular', [SearchController::class, 'popular'])->name('search.popular');
+});
 
 // Cart Routes (available for guests and user)
 Route::prefix('cart')->name('cart.')->group(function () {
@@ -74,7 +78,8 @@ Route::middleware('auth')->prefix('wishlist')->name('wishlist.')->group(function
 Route::prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/', [CheckoutController::class, 'index'])->name('index');
     Route::post('/process', [CheckoutController::class, 'process'])->name('process');
-    Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('success');
+    Route::get('/checkout/success/{orderNumber}', [CheckoutController::class, 'success'])->name('success');
+    Route::get('/checkout/failed', [CheckoutController::class, 'failed'])->name('failed');
     Route::get('/cancel', [CheckoutController::class, 'cancel'])->name('cancel');
 });
 
@@ -146,9 +151,10 @@ Route::view('/privacy', 'frontend.pages.privacy')->name('privacy');
 Route::post('/contact', [HomeController::class, 'contactSubmit'])->name('contact.submit');
 
 // Newsletter routes
-Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
-Route::post('/newsletter/unsubscribe', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
-
+Route::middleware(['throttle:60,1'])->group(function () {
+    Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+    Route::post('/newsletter/unsubscribe', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
+});
 // ==============================
 // AUTHENTICATED USER DASHBOARD
 // ==============================
