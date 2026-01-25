@@ -32,6 +32,7 @@ class ProductController extends Controller
         $query = Product::query()
             ->with(['category:id,name_en,name_bn,slug,parent_id'])
             ->active()
+            ->latest()
             ->withActiveCategory();
 
         if ($search) {
@@ -136,7 +137,6 @@ class ProductController extends Controller
 
     public function show($slug)
     {
-        // ✅ OPTIMIZED: Load only needed columns
         $product = Product::where('slug', $slug)
             ->where('status', 'active')
             ->select([
@@ -175,12 +175,12 @@ class ProductController extends Controller
             ])
             ->firstOrFail();
 
-        // ✅ Check category is active
+        // Check category is active
         if ($product->category && !$product->category->is_active) {
             abort(404);
         }
 
-        // ✅ OPTIMIZED: Get reviews with pagination
+        // OPTIMIZED: Get reviews with pagination
         $reviews = DB::table('reviews')
             ->join('users', 'reviews.user_id', '=', 'users.id')
             ->where('reviews.product_id', $product->id)
@@ -197,7 +197,7 @@ class ProductController extends Controller
             ->limit(10)
             ->get();
 
-        // ✅ OPTIMIZED: Get related products with raw query
+        // OPTIMIZED: Get related products with raw query
         $relatedProducts = DB::table('products')
             ->join('categories', 'products.category_id', '=', 'categories.id')
             ->where('products.category_id', $product->category_id)
@@ -222,10 +222,10 @@ class ProductController extends Controller
             ->limit(4)
             ->get();
 
-        // ✅ Get breadcrumbs
+        // Get breadcrumbs
         $breadcrumbs = $this->getBreadcrumbsOptimized($product);
         // dd($breadcrumbs);
-        // ✅ Track view (async, no performance impact)
+        // Track view (async, no performance impact)
         $this->trackProductView($product);
 
         return view('frontend.products.show', compact('product', 'reviews', 'relatedProducts', 'breadcrumbs'));
@@ -313,7 +313,7 @@ class ProductController extends Controller
 
     /**
      * Apply sorting to query
-     * ✅ FIXED: Use actual database columns
+     * FIXED: Use actual database columns
      */
     protected function applySorting($query, string $sort): void
     {
@@ -325,10 +325,10 @@ class ProductController extends Controller
                 $query->orderBy('price', 'desc');
                 break;
             case 'name_asc':
-                $query->orderBy('name_en', 'asc');  // ✅ FIXED: Use column name
+                $query->orderBy('name_en', 'asc');  // FIXED: Use column name
                 break;
             case 'name_desc':
-                $query->orderBy('name_en', 'desc');  // ✅ FIXED: Use column name
+                $query->orderBy('name_en', 'desc');  // FIXED: Use column name
                 break;
             case 'popular':
                 $query->orderBy('total_sold', 'desc')

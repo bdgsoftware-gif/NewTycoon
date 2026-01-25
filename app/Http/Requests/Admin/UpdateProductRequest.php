@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use App\Models\Category;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -52,8 +53,7 @@ class UpdateProductRequest extends FormRequest
             'allow_backorder' => 'boolean',
             'stock_status' => 'required|in:in_stock,out_of_stock,backorder',
             'model_number' => 'nullable|string|max:100',
-            'warranty_duration' => 'nullable|integer|min:0',
-            'warranty_unit' => 'nullable|in:days,weeks,months,years',
+            'warranty_period' => 'nullable|integer|min:0',
             'warranty_type' => 'nullable|string|max:100',
             'specifications' => 'nullable|array',
             'featured_images' => 'nullable|array|max:2',
@@ -81,27 +81,39 @@ class UpdateProductRequest extends FormRequest
                 'required',
                 'exists:categories,id',
                 function ($attribute, $value, $fail) {
-                    $category = Category::find($value);
+                    // OPTIMIZED: Single query with all checks
+                    $categoryData = DB::table('categories as c')
+                        ->leftJoin('categories as parent', 'c.parent_id', '=', 'parent.id')
+                        ->leftJoin('categories as children', 'c.id', '=', 'children.parent_id')
+                        ->where('c.id', $value)
+                        ->select(
+                            'c.is_active',
+                            'c.depth',
+                            DB::raw('COUNT(DISTINCT children.id) as children_count'),
+                            DB::raw('CASE WHEN c.parent_id IS NULL THEN 1 ELSE parent.is_active END as parent_active')
+                        )
+                        ->groupBy('c.id', 'c.is_active', 'c.depth', 'c.parent_id', 'parent.is_active')
+                        ->first();
 
-                    if (!$category) {
+                    if (!$categoryData) {
                         $fail('The selected category does not exist.');
                         return;
                     }
 
                     // Check if category is active
-                    if (!$category->is_active) {
+                    if (!$categoryData->is_active) {
                         $fail('Cannot assign product to an inactive category.');
                         return;
                     }
 
                     // Check if category is a leaf (has no children)
-                    if ($category->hasChildren()) {
+                    if ($categoryData->children_count > 0) {
                         $fail('Products can only be assigned to leaf categories (categories without subcategories).');
                         return;
                     }
 
-                    // Check if parent categories are active
-                    if (!$category->isParentActive()) {
+                    // Check if parent is active
+                    if (!$categoryData->parent_active) {
                         $fail('Cannot assign product to this category because one of its parent categories is inactive.');
                         return;
                     }

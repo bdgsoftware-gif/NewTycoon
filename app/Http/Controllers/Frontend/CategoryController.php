@@ -12,40 +12,69 @@ use Illuminate\Support\Facades\Cache;
 class CategoryController extends Controller
 {
     /**
-     * Display all categories
+     * Display all categories with product counts at all levels
      */
     public function index()
     {
-        // ✅ OPTIMIZED: Cache category list
         $categories = Cache::remember('categories.index', 3600, function () {
-            return Category::active()
-                ->root()
+
+            $categories = Category::active()
+                ->root() // depth = 0
                 ->with(['children' => function ($query) {
                     $query->active()
+                        ->with(['children' => function ($q) {
+                            $q->active()
+                                ->orderBy('order')
+                                ->select(
+                                    'id',
+                                    'name_en',
+                                    'name_bn',
+                                    'slug',
+                                    'parent_id',
+                                    'image',
+                                    'description_en',
+                                    'description_bn',
+                                    'order'
+                                );
+                        }])
                         ->orderBy('order')
-                        ->select('id', 'name_en', 'name_bn', 'slug', 'parent_id', 'image', 'description_en', 'description_bn', 'order');
+                        ->select(
+                            'id',
+                            'name_en',
+                            'name_bn',
+                            'slug',
+                            'parent_id',
+                            'image',
+                            'description_en',
+                            'description_bn',
+                            'order'
+                        );
                 }])
-                ->select('id', 'name_en', 'name_bn', 'slug', 'parent_id', 'image', 'description_en', 'description_bn', 'is_featured', 'order')
+                ->select(
+                    'id',
+                    'name_en',
+                    'name_bn',
+                    'slug',
+                    'parent_id',
+                    'image',
+                    'description_en',
+                    'description_bn',
+                    'is_featured',
+                    'order'
+                )
                 ->orderBy('order')
                 ->get();
-        });
 
-        $featuredCategories = Cache::remember('categories.featured', 3600, function () {
-            return Category::active()
-                ->featured()
-                ->root()
-                ->select('id', 'name_en', 'name_bn', 'slug', 'image', 'description_en', 'description_bn', 'order')
-                ->orderBy('order')
-                ->limit(12)
-                ->get();
+            return $categories;
         });
-
-        return view('frontend.categories.index', compact('categories', 'featuredCategories'));
+        dd($categories);
+        return view('frontend.categories.index', compact('categories'));
     }
+
 
     /**
      * Display a specific category with products
-     * ✅ FULLY OPTIMIZED - No N+1 queries, proper indexing
+     * FULLY OPTIMIZED - No N+1 queries, proper indexing
      */
     public function show(Request $request, Category $category)
     {
@@ -64,24 +93,8 @@ class CategoryController extends Controller
         $query = Product::active()
             ->withActiveCategory()
             ->whereIn('category_id', $categoryIds)
-            ->select([
-                'id',
-                'name_en',
-                'name_bn',
-                'slug',
-                'price',
-                'compare_price',
-                'discount_percentage',
-                'featured_images',
-                'stock_status',
-                'is_new',
-                'is_featured',
-                'category_id',
-                'average_rating',
-                'rating_count',
-            ]);
+            ->select(['id',  'name_en',  'name_bn',  'slug',  'price',  'compare_price',  'discount_percentage',  'featured_images',  'stock_status',  'is_new', 'category_id',]);
 
-        // ✅ FIXED: Apply search
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name_en', 'like', "%{$search}%")
@@ -90,7 +103,6 @@ class CategoryController extends Controller
             });
         }
 
-        // ✅ FIXED: Apply price filter (THIS WAS MISSING!)
         if ($minPrice !== null && $minPrice !== '') {
             $query->where('price', '>=', $minPrice);
         }
@@ -98,7 +110,6 @@ class CategoryController extends Controller
             $query->where('price', '<=', $maxPrice);
         }
 
-        // ✅ FIXED: Apply status filter (THIS WAS MISSING!)
         if ($status) {
             switch ($status) {
                 case 'in_stock':
@@ -119,27 +130,49 @@ class CategoryController extends Controller
             }
         }
 
-        // ✅ FIXED: Use proper sorting method
         $this->applySorting($query, $sort);
 
         $products = $query->paginate(24)->withQueryString();
 
-        // ✅ OPTIMIZED: Get subcategories - only if parent category
         $subcategories = collect([]);
-        if ($category->depth < 2) { // Only show subcategories for parent/root categories
-            $subcategories = Category::where('parent_id', $category->id)
-                ->where('is_active', true)
-                ->select('id', 'name_en', 'name_bn', 'slug')
-                ->orderBy('order')
-                ->get();
+        if ($category->depth < 2) {
+            $subcategories = DB::table('categories as c')
+                ->where('c.parent_id', $category->id)
+                ->where('c.is_active', true)
+                ->select(
+                    'c.id',
+                    'c.name_en',
+                    'c.name_bn',
+                    'c.slug',
+                    'c.depth',
+                    'c.parent_id',
+                    'c.order',
+                    DB::raw('(
+                    SELECT COUNT(*)
+                    FROM products
+                    WHERE category_id = c.id
+                    AND status = "active") + 
+                    ( SELECT COUNT(*)
+                    FROM products p
+                    INNER JOIN categories child ON p.category_id = child.id
+                    WHERE child.parent_id = c.id
+                    AND p.status = "active"
+                ) as products_count')
+                )
+                ->orderBy('c.order')
+                ->get()
+                ->map(function ($cat) {
+                    $cat->name = app()->getLocale() === 'bn'
+                        ? ($cat->name_bn ?: $cat->name_en)
+                        : $cat->name_en;
+                    return $cat;
+                });
         }
 
-        // ✅ OPTIMIZED: Get price range with single query
         $priceRange = $this->getPriceRangeOptimized($categoryIds);
 
-        // ✅ OPTIMIZED: Simplified breadcrumbs
         $breadcrumbs = $this->getBreadcrumbsOptimized($category);
-        // dd($breadcrumbs);
+        // dd($subcategories);
         return view('frontend.categories.show', [
             'category' => $category,
             'products' => $products,
@@ -151,17 +184,23 @@ class CategoryController extends Controller
         ]);
     }
 
+
     /**
-     * ✅ OPTIMIZED: Get category IDs without recursion
+     * OPTIMIZED: Get category IDs without recursion
      */
     protected function getCategoryIdsOptimized(Category $category): array
     {
-        // If it's a leaf category, just return its ID
-        if ($category->depth === 2) {
+        // Instead of checking depth === 2
+        $hasChildren = DB::table('categories')
+            ->where('parent_id', $category->id)
+            ->exists();
+
+        // If it's a leaf category (no children), just return its ID
+        if (!$hasChildren) {
             return [$category->id];
         }
 
-        // Get all descendant IDs in one query
+        // Get all descendant IDs (children + grandchildren)
         return DB::table('categories')
             ->where(function ($query) use ($category) {
                 $query->where('id', $category->id)
@@ -178,7 +217,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * ✅ OPTIMIZED: Get price range with single query
+     * OPTIMIZED: Get price range with single query
      */
     protected function getPriceRangeOptimized(array $categoryIds): array
     {
@@ -195,7 +234,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * ✅ OPTIMIZED: Simplified breadcrumbs
+     * OPTIMIZED: Simplified breadcrumbs
      */
     protected function getBreadcrumbsOptimized(Category $category): array
     {
@@ -240,7 +279,7 @@ class CategoryController extends Controller
 
 
     /**
-     * ✅ OPTIMIZED: Apply sorting to raw query
+     * OPTIMIZED: Apply sorting to raw query
      */
     protected function applySorting($query, string $sort): void
     {

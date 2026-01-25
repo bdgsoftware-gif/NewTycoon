@@ -38,7 +38,7 @@
         </div>
 
         <!-- Subcategories (if any) -->
-        @if ($subcategories && $subcategories->count() > 0)
+        {{-- @if ($subcategories && $subcategories->count() > 0)
             <div class="mb-8">
                 <h2 class="text-xl font-semibold text-gray-900 mb-4 font-quantico">Subcategories</h2>
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -57,7 +57,7 @@
                     @endforeach
                 </div>
             </div>
-        @endif
+        @endif --}}
 
         <div class="flex flex-col lg:flex-row gap-8">
             <!-- Filters Sidebar -->
@@ -96,7 +96,24 @@
                             @endif
                         </form>
                     </div>
-
+                    <!-- Sub-Category Filter -->
+                    @if ($subcategories && $subcategories->count() > 0)
+                        <div class="mb-6">
+                            <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Categories</h3>
+                            <div class="space-y-2 max-h-96 overflow-y-auto no-scrollbar border-b border-gray-200 shadow-sm"
+                                role="navigation" aria-label="Category filters">
+                                @foreach ($subcategories as $subcat)
+                                    <a href="{{ route('categories.show', $subcat->slug) }}"
+                                        class="flex items-center justify-between px-3 py-2 rounded-lg font-inter transition-colors
+                                        {{ request()->segment(2) == $subcat->slug ? 'bg-primary-light text-primary border border-primary' : 'hover:bg-gray-50 border border-gray-200' }}">
+                                        <span>{{ $subcat->name }}</span>
+                                        <span
+                                            class="text-xs bg-gray-100 px-2 py-1 rounded">{{ $subcat->products_count ?? 0 }}</span>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                     <!-- Price Range Filter -->
                     <div class="mb-6">
                         <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Price Range</h3>
@@ -237,12 +254,12 @@
                                 $secondaryImage = $featuredImages[1] ?? $primaryImage;
 
                                 // Ensure we're getting proper numeric values
-                                $finalPrice = floatval($productData->price ?? 0);
-                                $originalPrice = floatval($productData->compare_price ?? ($productData->price ?? 0));
-                                $discountPercentage = intval($productData->discount_percentage ?? 0);
-                                $savingsAmount = $originalPrice - $finalPrice;
+$finalPrice = floatval($productData->price ?? 0);
+$originalPrice = floatval($productData->compare_price ?? ($productData->price ?? 0));
+$discountPercentage = intval($productData->discount_percentage ?? 0);
+$savingsAmount = $originalPrice - $finalPrice;
 
-                                $inStock = ($productData->stock_status ?? '') === 'in_stock';
+$inStock = ($productData->stock_status ?? '') === 'in_stock';
                                 $isNew = boolval($productData->is_new ?? false);
                                 $rating = floatval($productData->average_rating ?? 0);
                                 $reviewCount = intval($productData->rating_count ?? 0);
@@ -445,7 +462,7 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // ✅ Sort select change handler
+            // Sort select change handler
             const sortSelect = document.getElementById('sortSelect');
             if (sortSelect) {
                 sortSelect.addEventListener('change', function() {

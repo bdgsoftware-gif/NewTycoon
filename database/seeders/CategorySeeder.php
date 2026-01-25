@@ -465,7 +465,7 @@ class CategorySeeder extends Seeder
             }
         }
 
-        $this->command->info('✅ Categories seeded successfully!');
+        $this->command->info('Categories seeded successfully!');
         $this->command->info('📁 Total categories created: ' . Category::count());
         $this->command->info('📁 Level 1 (Parent) categories: ' . Category::whereNull('parent_id')->count());
         $this->command->info('📁 Level 2 (Child) categories: ' . Category::where('depth', 2)->count());

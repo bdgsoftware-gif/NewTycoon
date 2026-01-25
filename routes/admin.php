@@ -64,6 +64,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/{product}/edit', [ProductController::class, 'edit'])->name('edit');
         Route::put('/{product}', [ProductController::class, 'update'])->name('update');
         Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy');
+        Route::post('/{product}/change-status', [ProductController::class, 'changeStatus'])->name('changeStatus');
 
         // Bulk Actions
         Route::post('/bulk/action', [ProductController::class, 'bulkActon'])->name('bulk-action');

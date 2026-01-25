@@ -36,7 +36,10 @@ class HomeController extends Controller
 
         $products = $this->activeProductService->getHomepageActiveProducts();
         // Get active featured products
-        $featuredProducts = $this->activeProductService->getActiveFeaturedProducts(8);
+        $featuredProducts = Cache::remember('homepage.featured.products', 3600, function () {
+            return $this->activeProductService->getActiveFeaturedProducts(8);
+        });
+
         // $featuredProducts = FeaturedProductViewResource::collection($featuredProducts);
         // dd($featuredProducts);
 

@@ -58,13 +58,13 @@
                             <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Categories</h3>
                             <div class="space-y-2 max-h-96 overflow-y-auto no-scrollbar border-b border-gray-200 shadow-sm"
                                 role="navigation" aria-label="Category filters">
-                                <!-- ✅ FIXED: Simplified 'All Categories' link -->
+                                <!-- FIXED: Simplified 'All Categories' link -->
                                 <a href="{{ route('products.index', request()->except('category')) }}"
                                     class="block px-3 py-2 rounded-lg {{ !request('category') ? 'bg-primary-light text-primary border border-primary' : 'hover:bg-gray-50 border border-gray-200' }} font-inter transition-colors">
                                     All Categories
                                 </a>
                                 @foreach ($categories as $cat)
-                                    <!-- ✅ FIXED: Only preserve search and sort when changing category -->
+                                    <!-- FIXED: Only preserve search and sort when changing category -->
                                     <a href="{{ route('products.index', array_merge(request()->only(['search', 'sort']), ['category' => $cat->id])) }}"
                                         class="flex items-center justify-between px-3 py-2 rounded-lg {{ request('category') == $cat->id ? 'bg-primary-light text-primary border border-primary' : 'hover:bg-gray-50 border border-gray-200' }} font-inter transition-colors">
                                         <span>{{ $cat->name }}</span>
@@ -119,7 +119,7 @@
                     <div class="mb-6">
                         <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Status</h3>
                         <div class="grid grid-cols-2 gap-2">
-                            <!-- ✅ FIXED: Removed 'status' param instead of setting to 'all' -->
+                            <!-- FIXED: Removed 'status' param instead of setting to 'all' -->
                             <a href="{{ route('products.index', request()->except('status')) }}"
                                 class="px-3 py-2 text-center rounded-lg border {{ !request('status') ? 'bg-primary-light text-primary border-primary' : 'border-gray-200 hover:bg-gray-50' }} text-sm font-inter transition-colors">
                                 All
@@ -273,12 +273,12 @@
                                     <!-- Price + Wishlist -->
                                     <div class="mt-auto">
                                         <div class="flex items-center justify-between">
-                                            <!-- ✅ FIXED: No decimal for BDT -->
+                                            <!-- FIXED: No decimal for BDT -->
                                             <span class="text-lg font-bold font-quantico text-gray-900">
                                                 <span class="font-bengali">৳</span>{{ number_format($finalPrice, 0) }}
                                             </span>
 
-                                            <!-- ✅ FIXED: Wishlist with proper form and CSRF -->
+                                            <!-- FIXED: Wishlist with proper form and CSRF -->
                                             @if ($inStock)
                                                 @auth
                                                     <form action="{{ route('wishlist.add', $product->id) }}" method="POST"
@@ -310,7 +310,7 @@
                                             @endif
                                         </div>
 
-                                        <!-- ✅ FIXED: Show actual savings amount -->
+                                        <!-- FIXED: Show actual savings amount -->
                                         @if ($discountPercentage > 0 && $savingsAmount > 0)
                                             <div class="flex items-center space-x-2 mt-2 font-inter">
                                                 <span
@@ -403,7 +403,7 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // ✅ FIXED: Sort select change handler
+            // FIXED: Sort select change handler
             const sortSelect = document.getElementById('sortSelect');
             if (sortSelect) {
                 sortSelect.addEventListener('change', function() {
@@ -458,7 +458,7 @@
                 });
             }
 
-            // ✅ FIXED: Removed auto-submit search debounce - only submit on form submit
+            // FIXED: Removed auto-submit search debounce - only submit on form submit
             const searchForm = document.getElementById('searchForm');
             if (searchForm) {
                 searchForm.addEventListener('submit', function(e) {

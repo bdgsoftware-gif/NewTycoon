@@ -455,7 +455,7 @@ class ProductSeeder extends Seeder
             }
         }
 
-        $this->command->info('✅ Products seeded successfully!');
+        $this->command->info('Products seeded successfully!');
         $this->command->info("📦 Total products created: {$productsCreated}");
         $this->command->info("⏭ Categories skipped: {$productsSkipped}");
         $this->command->info('🏷 Featured products: ' . Product::where('is_featured', true)->count());

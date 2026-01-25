@@ -21,7 +21,7 @@
 @endsection
 
 @section('content')
-    <div class="max-w-7xl mx-auto">
+    <div class="max-w-8xl mx-auto">
         <form action="{{ route('admin.hero-slides.store') }}" method="POST" enctype="multipart/form-data" id="slideForm">
             @csrf
 

@@ -231,7 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
         message,
         type = "success",
         duration = 5000,
-        description = ""
+        description = "",
     ) {
         if (window.flashSystem && window.flashSystem.add) {
             return window.flashSystem.add({

@@ -220,7 +220,7 @@ class Product extends Model
         return $this->status === 'active';
     }
 
-    // ✅ FIXED: Added missing accessor
+    // FIXED: Added missing accessor
     public function getDiscountAmountAttribute(): float
     {
         if (!$this->compare_price || $this->compare_price <= $this->price) {
@@ -246,7 +246,7 @@ class Product extends Model
             ->toArray();
     }
 
-    // ✅ FIXED: Added missing accessor
+    // FIXED: Added missing accessor
     public function getGalleryImagesUrlsAttribute(): array
     {
         return collect($this->gallery_images ?? [])
@@ -254,7 +254,7 @@ class Product extends Model
             ->toArray();
     }
 
-    // ✅ FIXED: Added missing accessor
+    // FIXED: Added missing accessor
     public function getUrlAttribute(): string
     {
         return route('product.show', $this->slug);
@@ -265,7 +265,7 @@ class Product extends Model
         return $this->track_quantity && $this->quantity <= $this->alert_quantity;
     }
 
-    // ✅ FIXED: Added missing accessor
+    // FIXED: Added missing accessor
     public function getProfitMarginAttribute(): float
     {
         if (!$this->cost_price || $this->cost_price <= 0) {
@@ -275,7 +275,7 @@ class Product extends Model
         return (($this->price - $this->cost_price) / $this->cost_price) * 100;
     }
 
-    // ✅ FIXED: Added missing accessor
+    // FIXED: Added missing accessor
     public function getProfitPerUnitAttribute(): float
     {
         if (!$this->cost_price) {
@@ -285,7 +285,7 @@ class Product extends Model
         return $this->price - $this->cost_price;
     }
 
-    // ✅ FIXED: Added missing accessor
+    // FIXED: Added missing accessor
     public function getSpecificationsArrayAttribute(): array
     {
         if (!$this->specifications || !is_array($this->specifications)) {

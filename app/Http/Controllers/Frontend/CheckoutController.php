@@ -147,7 +147,7 @@ class CheckoutController extends Controller
                 ]);
             }
 
-            // ✅ CREATE ORDER
+            // CREATE ORDER
             $order = Order::create([
                 'order_number' => $this->generateOrderNumber(),
                 'user_id' => $userId,
@@ -194,7 +194,7 @@ class CheckoutController extends Controller
                 'user_agent' => $request->userAgent(),
             ]);
 
-            // ✅ CREATE ORDER ITEMS
+            // CREATE ORDER ITEMS
             foreach ($cart->items as $item) {
                 $product = $item->product;
 
@@ -213,7 +213,7 @@ class CheckoutController extends Controller
                     'tax_amount' => 0,
                 ]);
 
-                // ✅ UPDATE PRODUCT STOCK
+                // UPDATE PRODUCT STOCK
                 if ($product->track_quantity) {
                     $product->decrement('quantity', $item->quantity);
                     $product->increment('total_sold', $item->quantity);
@@ -221,7 +221,7 @@ class CheckoutController extends Controller
                 }
             }
 
-            // ✅ CREATE PAYMENT RECORD
+            // CREATE PAYMENT RECORD
             Payment::create([
                 'order_id' => $order->id,
                 'payment_method' => $validated['payment_method'],
@@ -230,12 +230,12 @@ class CheckoutController extends Controller
                 'transaction_id' => null,
             ]);
 
-            // ✅ CLEAR CART
+            // CLEAR CART
             $cart->items()->delete();
 
             DB::commit();
 
-            // ✅ SEND ORDER CONFIRMATION EMAIL (Optional)
+            // SEND ORDER CONFIRMATION EMAIL (Optional)
             // Mail::to($order->customer_email)->send(new OrderConfirmation($order));
 
             return response()->json([

@@ -25,13 +25,13 @@ class HeroSlideSeeder extends Seeder
                 [
                     'label_en' => 'Shop Now',
                     'label_bn' => 'কিনুন',
-                    'url' => '/shop',
+                    'url' => '/products',
                     'style' => 'primary',
                 ],
                 [
                     'label_en' => 'Learn More',
                     'label_bn' => 'বিস্তারিত',
-                    'url' => '/about',
+                    'url' => '/about-us',
                     'style' => 'outline',
                 ],
             ],

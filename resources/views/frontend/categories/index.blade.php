@@ -7,52 +7,13 @@
     <div class="min-h-screen bg-gray-50">
         {{-- Header --}}
         <div class="bg-white border-b">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <h1 class="text-3xl font-bold text-gray-900 mb-2">Shop by Category</h1>
                 <p class="text-gray-600">Find products organized by category</p>
             </div>
         </div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {{-- Featured Categories --}}
-            @if ($featuredCategories->count() > 0)
-                <section class="mb-12">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Featured Categories</h2>
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-                        @foreach ($featuredCategories as $category)
-                            <a href="{{ route('categories.show', $category->slug) }}"
-                                class="group bg-white rounded-lg border border-gray-200 hover:border-primary hover:shadow-md transition-all duration-200 p-4">
-                                {{-- Icon/Image --}}
-                                <div
-                                    class="aspect-square mb-3 rounded-lg bg-gray-50 flex items-center justify-center overflow-hidden">
-                                    @if ($category->image)
-                                        <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}"
-                                            class="w-full h-full object-contain p-2" loading="lazy">
-                                    @else
-                                        <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                        </svg>
-                                    @endif
-                                </div>
-
-                                {{-- Name --}}
-                                <h3
-                                    class="font-semibold text-gray-900 text-sm mb-1 line-clamp-2 group-hover:text-primary transition-colors">
-                                    {{ $category->name }}
-                                </h3>
-
-                                {{-- Product count --}}
-                                <p class="text-xs text-gray-500">
-                                    {{ $category->products_count ?? 0 }} {{ __('items') }}
-                                </p>
-                            </a>
-                        @endforeach
-                    </div>
-                </section>
-            @endif
-
+        <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {{-- All Categories --}}
             <section>
                 <div class="flex items-center justify-between mb-6">
@@ -61,70 +22,109 @@
                 </div>
 
                 @if ($categories->count() > 0)
-                    <div class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         @foreach ($categories as $category)
-                            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                                {{-- Parent Category --}}
-                                <div class="p-4 sm:p-6 border-b border-gray-100">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center space-x-4">
-                                            {{-- Icon --}}
-                                            @if ($category->image)
-                                                <div
-                                                    class="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center overflow-hidden flex-shrink-0">
-                                                    <img src="{{ asset('storage/' . $category->image) }}"
-                                                        alt="{{ $category->name }}" class="w-full h-full object-contain"
-                                                        loading="lazy">
-                                                </div>
-                                            @endif
-
-                                            {{-- Info --}}
-                                            <div>
-                                                <a href="{{ route('categories.show', $category->slug) }}"
-                                                    class="text-lg font-bold text-gray-900 hover:text-primary transition-colors">
-                                                    {{ $category->name }}
-                                                </a>
-                                                @if ($category->description)
-                                                    <p class="text-sm text-gray-600 mt-1 line-clamp-1">
-                                                        {{ $category->description }}</p>
-                                                @endif
-                                            </div>
+                            {{-- Category Folder Card --}}
+                            <div
+                                class="bg-white rounded-xl border border-gray-200 hover:border-primary hover:shadow-md transition-all duration-200 overflow-hidden group">
+                                {{-- Folder Header --}}
+                                <div class="p-4 border-b border-gray-100">
+                                    <div class="flex items-start space-x-3">
+                                        {{-- Folder Icon --}}
+                                        <div
+                                            class="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                                <path
+                                                    d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z" />
+                                            </svg>
                                         </div>
 
-                                        <div class="flex items-center space-x-4">
-                                            <span class="text-sm text-gray-500 hidden sm:block">
-                                                {{ $category->products_count ?? 0 }} products
-                                            </span>
+                                        {{-- Folder Info --}}
+                                        <div class="flex-1 min-w-0">
                                             <a href="{{ route('categories.show', $category->slug) }}"
-                                                class="inline-flex items-center px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-lg transition-colors">
-                                                View
-                                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M9 5l7 7-7 7" />
-                                                </svg>
+                                                class="text-lg font-semibold text-gray-900 hover:text-primary transition-colors truncate block">
+                                                {{ $category->name }}
                                             </a>
+                                            @if ($category->description)
+                                                <p class="text-sm text-gray-500 mt-1 line-clamp-2">
+                                                    {{ $category->description }}
+                                                </p>
+                                            @endif
                                         </div>
                                     </div>
+
+                                    {{-- Products Count --}}
+
+                                    <a href="{{ route('categories.show', $category->slug) }}"
+                                        class="text-sm text-primary hover:text-primary-dark font-medium inline-flex items-center text-right">
+                                        Open
+                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </a>
+
                                 </div>
 
-                                {{-- Subcategories --}}
-                                @if ($category->children->count() > 0)
-                                    <div class="p-4 sm:p-6 bg-gray-50">
-                                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                                {{-- Subcategories (Level 2) --}}
+                                @if ($category->children && $category->children->count() > 0)
+                                    <div class="p-3 bg-gray-50/50">
+                                        <div class="space-y-1">
                                             @foreach ($category->children as $child)
-                                                <a href="{{ route('categories.show', $child->slug) }}"
-                                                    class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-primary hover:shadow-sm transition-all group">
-                                                    <span
-                                                        class="text-sm text-gray-700 group-hover:text-primary transition-colors truncate">
-                                                        {{ $child->name }}
-                                                    </span>
-                                                    @if ($child->products_count > 0)
-                                                        <span class="text-xs text-gray-500 ml-2 flex-shrink-0">
-                                                            {{ $child->products_count }}
-                                                        </span>
+                                                <div class="group/item">
+                                                    <a href="{{ route('categories.show', $child->slug) }}"
+                                                        class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-white hover:shadow-sm transition-all duration-150">
+                                                        <div class="flex items-center space-x-2 min-w-0 flex-1">
+                                                            {{-- Subfolder Icon --}}
+                                                            <svg class="w-4 h-4 text-gray-400 flex-shrink-0 group-hover/item:text-primary"
+                                                                fill="currentColor" viewBox="0 0 24 24">
+                                                                <path
+                                                                    d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
+                                                            </svg>
+                                                            <span
+                                                                class="text-sm text-gray-600 group-hover/item:text-primary truncate">
+                                                                {{ $child->name }}
+                                                            </span>
+                                                        </div>
+                                                        {{-- Child product count --}}
+                                                        @if (($child->products_count ?? 0) > 0)
+                                                            <span
+                                                                class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded flex-shrink-0 ml-2">
+                                                                {{ $child->products_count }}
+                                                            </span>
+                                                        @endif
+                                                    </a>
+
+                                                    {{-- Sub-subcategories (Level 3) --}}
+                                                    @if ($child->children && $child->children->count() > 0)
+                                                        <div class="ml-6 mt-1 space-y-1">
+                                                            @foreach ($child->children as $grandchild)
+                                                                <a href="{{ route('categories.show', $grandchild->slug) }}"
+                                                                    class="flex items-center justify-between px-3 py-1.5 rounded-lg hover:bg-white hover:shadow-sm transition-all duration-150 group/subitem">
+                                                                    <div class="flex items-center space-x-2 min-w-0 flex-1">
+                                                                        {{-- File Icon for leaf categories --}}
+                                                                        <svg class="w-3.5 h-3.5 text-gray-300 flex-shrink-0 group-hover/subitem:text-primary"
+                                                                            fill="currentColor" viewBox="0 0 24 24">
+                                                                            <path
+                                                                                d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+                                                                        </svg>
+                                                                        <span
+                                                                            class="text-xs text-gray-500 group-hover/subitem:text-primary truncate">
+                                                                            {{ $grandchild->name }}
+                                                                        </span>
+                                                                    </div>
+                                                                    {{-- Grandchild product count --}}
+                                                                    @if (($grandchild->products_count ?? 0) > 0)
+                                                                        <span
+                                                                            class="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded flex-shrink-0 ml-2">
+                                                                            {{ $grandchild->products_count }}
+                                                                        </span>
+                                                                    @endif
+                                                                </a>
+                                                            @endforeach
+                                                        </div>
                                                     @endif
-                                                </a>
+                                                </div>
                                             @endforeach
                                         </div>
                                     </div>

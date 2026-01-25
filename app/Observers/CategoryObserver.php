@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Category;
+use Illuminate\Support\Facades\Cache;
 
 class CategoryObserver
 {
@@ -13,10 +14,10 @@ class CategoryObserver
      */
     public function updating(Category $category): void
     {
-        // If category is being deactivated, deactivate all children
         if ($category->isDirty('is_active') && $category->is_active === false) {
             $this->deactivateChildren($category);
         }
+        Cache::forget('homepage.featured.categories');
     }
 
     /**
@@ -27,11 +28,11 @@ class CategoryObserver
         foreach ($category->children as $child) {
             if ($child->is_active) {
                 $child->is_active = false;
-                $child->saveQuietly(); // Save without triggering events to avoid recursion
-
+                $child->saveQuietly();
                 // Recursively deactivate grandchildren
                 $this->deactivateChildren($child);
             }
         }
+        Cache::forget('homepage.featured.categories');
     }
 }

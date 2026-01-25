@@ -6,9 +6,12 @@ use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use App\Http\Requests\Admin\StoreCategoryRequest;
 use App\Http\Requests\Admin\UpdateCategoryRequest;
 
@@ -19,48 +22,70 @@ class CategoryController extends Controller
         $this->middleware(['auth', 'role:admin']);
     }
 
+    /**
+     * Display categories
+     */
     public function index()
     {
-        $categories = Category::with(['parent', 'children'])
-            ->withCount('products')
-            ->latest()
-            ->paginate(30);
+        $categories = Category::select(['id', 'name_en', 'name_bn', 'slug', 'parent_id', 'depth', 'order', 'is_active', 'is_featured', 'image', 'created_at'])
+            ->whereNull('parent_id')
+            ->with([
+                'children' => function ($query) {
+                    $query->select('id', 'parent_id', 'name_en', 'name_bn', 'slug', 'depth', 'order', 'is_active', 'is_featured', 'image', 'created_at')
+                        ->with([
+                            'children' => function ($q) {
+                                $q->select('id', 'parent_id', 'name_en', 'name_bn', 'slug', 'depth', 'order', 'is_active', 'is_featured', 'image', 'created_at')
+                                    ->withCount('products');
+                            }
+                        ])->withCount('products');
+                }
+            ])->withCount('products')->orderBy('order')->orderBy('name_en')->paginate(8);
 
-        // Only categories without products can be parents
-        $rootCategories = Category::whereNull('parent_id')
-            ->whereDoesntHave('products')
-            ->get();
+        $rootCategories = DB::table('categories')->whereNull('parent_id')
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))->from('products')->whereColumn('products.category_id', 'categories.id');
+            })->select('id', 'name_en', 'name_bn')->get();
 
-        $stats = [
-            'totalCategories' => Category::count(),
-            'activeCategories' => Category::where('is_active', true)->count(),
-            'featuredCategories' => Category::where('is_featured', true)->count(),
-            'totalProducts' => Product::count(),
-            'leafCategories' => Category::leaf()->count(), // Categories that can have products
-        ];
+        $stats = DB::table('categories')
+            ->selectRaw('
+                COUNT(*) as totalCategories,
+                SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as activeCategories,
+                SUM(CASE WHEN is_featured = 1 AND parent_id IS NULL THEN 1 ELSE 0 END) as featuredCategories,
+                SUM(CASE WHEN depth = 2 THEN 1 ELSE 0 END) as leafCategories
+            ')->first();
 
-        return view('admin.categories.index', array_merge($stats, [
+        $stats->totalProducts = Product::count();
+        // dd($categories);
+        return view('admin.categories.index', [
             'categories' => $categories,
             'rootCategories' => $rootCategories,
-        ]));
+            'totalCategories' => $stats->totalCategories,
+            'activeCategories' => $stats->activeCategories,
+            'featuredCategories' => $stats->featuredCategories,
+            'totalProducts' => $stats->totalProducts,
+            'leafCategories' => $stats->leafCategories,
+        ]);
     }
 
+    /**
+     * Show create form
+     */
     public function create()
     {
-        // Only active categories without products and within depth limit can be parents
-        $parentCategories = Category::where('is_active', true)
-            ->whereDoesntHave('products')
-            ->where('depth', '<', Category::MAX_DEPTH)
-            ->orderBy('depth')
-            ->orderBy('name_en')
+        $parentCategories = DB::table('categories as c')
+            ->leftJoin('products as p', 'c.id', '=', 'p.category_id')
+            ->where('c.is_active', true)
+            ->where('c.depth', '<', Category::MAX_DEPTH)
+            ->whereNull('p.id') // No products
+            ->select('c.id', 'c.name_en', 'c.name_bn', 'c.depth', 'c.parent_id')
+            ->orderBy('c.depth')
+            ->orderBy('c.name_en')
             ->get()
             ->map(function ($category) {
-                return [
-                    'id' => $category->id,
-                    'name' => $category->full_path,
-                    'depth' => $category->depth,
-                ];
+                $category->full_name = $this->getFullPath($category->id);
+                return $category;
             });
+
 
         return view('admin.categories.create', [
             'parentCategories' => $parentCategories,
@@ -68,6 +93,9 @@ class CategoryController extends Controller
         ]);
     }
 
+    /**
+     * Store category
+     */
     public function store(StoreCategoryRequest $request)
     {
         try {
@@ -82,9 +110,13 @@ class CategoryController extends Controller
             // Create the category
             $category = Category::create($data);
 
-            flash('Category created successfully!', 'success', 5000, 
-                'The category "' . $category->name_en . '" has been added at depth level ' . $category->depth . '.');
-            
+            flash(
+                'Category created successfully!',
+                'success',
+                5000,
+                'The category "' . $category->name_en . '" has been added at depth level ' . $category->depth . '.'
+            );
+
             return redirect()->route('admin.categories.index');
         } catch (\Exception $e) {
             Log::error('Error creating category: ' . $e->getMessage(), [
@@ -97,43 +129,45 @@ class CategoryController extends Controller
         }
     }
 
+    /**
+     * Show edit form
+     */
     public function edit(Category $category)
     {
-        // Get potential parent categories
-        // Exclude: self, descendants, categories with products, max depth reached, inactive categories
-        $descendantIds = $category->getAllDescendantIds();
-        
-        $parentCategories = Category::where('is_active', true)
-            ->where('id', '!=', $category->id)
-            ->whereNotIn('id', $descendantIds)
-            ->whereDoesntHave('products')
-            ->where('depth', '<', Category::MAX_DEPTH)
-            ->orderBy('depth')
-            ->orderBy('name_en')
+        $descendantIds = $this->getDescendantIdsOptimized($category->id);
+
+        $parentCategories = DB::table('categories as c')
+            ->leftJoin('products as p', 'c.id', '=', 'p.category_id')
+            ->where('c.is_active', true)
+            ->where('c.id', '!=', $category->id)
+            ->whereNotIn('c.id', $descendantIds)
+            ->whereNull('p.id')
+            ->where('c.depth', '<', Category::MAX_DEPTH)
+            ->select('c.id', 'c.name_en', 'c.name_bn', 'c.depth')
+            ->orderBy('c.depth')
+            ->orderBy('c.name_en')
             ->get()
-            ->filter(function ($potentialParent) use ($category) {
-                // Check if moving would exceed depth limit
-                $newDepth = $potentialParent->depth + 1;
-                $maxChildDepth = $this->getMaxDescendantDepth($category);
-                return ($newDepth + $maxChildDepth) <= Category::MAX_DEPTH;
-            })
-            ->map(function ($cat) {
-                return [
-                    'id' => $cat->id,
-                    'name' => $cat->full_path,
-                    'depth' => $cat->depth,
-                ];
+            ->map(function ($category) {
+                $category->full_name = $this->getFullPath($category->id);
+                return $category;
             });
 
+        $hasProducts = DB::table('products')->where('category_id', $category->id)->exists();
+
+        $hasChildren = DB::table('categories')->where('parent_id', $category->id)->exists();
+
         return view('admin.categories.edit', [
-            'category' => $category->load('children', 'products'),
+            'category' => $category->load('children:id,parent_id,name_en,name_bn', 'products:id,name_en,category_id'),
             'parentCategories' => $parentCategories,
             'maxDepth' => Category::MAX_DEPTH,
-            'hasProducts' => $category->products()->exists(),
-            'hasChildren' => $category->hasChildren(),
+            'hasProducts' => $hasProducts,
+            'hasChildren' => $hasChildren,
         ]);
     }
 
+    /**
+     * Update category
+     */
     public function update(UpdateCategoryRequest $request, Category $category)
     {
         try {
@@ -141,7 +175,6 @@ class CategoryController extends Controller
 
             // Handle image update
             if ($request->hasFile('image')) {
-                // Delete old image if exists
                 if ($category->image) {
                     Storage::disk('public')->delete($category->image);
                 }
@@ -152,7 +185,6 @@ class CategoryController extends Controller
             }
             // If remove_image flag is true
             elseif ($request->has('remove_image') && $request->boolean('remove_image')) {
-                // Delete the image file
                 if ($category->image) {
                     Storage::disk('public')->delete($category->image);
                 }
@@ -176,7 +208,7 @@ class CategoryController extends Controller
                 'request' => $request->all(),
             ]);
 
-            if ($e instanceof \Illuminate\Validation\ValidationException) {
+            if ($e instanceof ValidationException) {
                 throw $e;
             }
 
@@ -185,20 +217,24 @@ class CategoryController extends Controller
         }
     }
 
+    /**
+     * Delete category
+     */
     public function destroy(Category $category)
     {
         try {
-            // Check if category has children
-            if ($category->hasChildren()) {
-                flash('Cannot Delete!', 'error', 8000, 
-                    'This category has subcategories. Please delete or reassign them first.');
+            $hasChildren = DB::table('categories')->where('parent_id', $category->id)->exists();
+
+            if ($hasChildren) {
+                flash('Cannot Delete!', 'error', 8000, 'This category has subcategories. Please delete or reassign them first.');
                 return redirect()->back();
             }
 
-            // Check if category has products
-            if ($category->products()->exists()) {
-                flash('Cannot Delete!', 'error', 8000, 
-                    'This category has ' . $category->products()->count() . ' products assigned. Please reassign or delete them first.');
+            // OPTIMIZED: Check products with raw query
+            $productCount = DB::table('products')->where('category_id', $category->id)->count();
+
+            if ($productCount > 0) {
+                flash('Cannot Delete!', 'error', 8000, "This category has {$productCount} products assigned. Please reassign or delete them first.");
                 return redirect()->back();
             }
 
@@ -224,10 +260,14 @@ class CategoryController extends Controller
         }
     }
 
+    /**
+     * Toggle featured status
+     */
     public function toggleFeature(Category $category)
     {
         $category->is_featured = !$category->is_featured;
         $category->save();
+        Cache::forget('homepage.featured.categories');
 
         return response()->json([
             'success' => true,
@@ -235,26 +275,35 @@ class CategoryController extends Controller
         ]);
     }
 
+    /**
+     * Change status
+     */
     public function changeStatus(Request $request, Category $category)
     {
         $request->validate([
             'is_active' => 'required|boolean',
         ]);
 
-        // Check if activating and parent is inactive
-        if ($request->is_active && !$category->isParentActive()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cannot activate category when parent is inactive.',
-            ], 422);
+        // OPTIMIZED: Check parent active status with raw query
+        if ($request->is_active && $category->parent_id) {
+            $parentActive = DB::table('categories')
+                ->where('id', $category->parent_id)
+                ->where('is_active', true)
+                ->exists();
+
+            if (!$parentActive) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot activate category when parent is inactive.',
+                ], 422);
+            }
         }
 
         $category->is_active = $request->is_active;
         $category->save();
 
-        // If deactivating, children will be automatically deactivated by model observer
-        $message = $request->is_active 
-            ? 'Category activated successfully.' 
+        $message = $request->is_active
+            ? 'Category activated successfully.'
             : 'Category and all its subcategories deactivated successfully.';
 
         return response()->json([
@@ -264,6 +313,9 @@ class CategoryController extends Controller
         ]);
     }
 
+    /**
+     * Bulk delete
+     */
     public function bulkDelete(Request $request)
     {
         $request->validate([
@@ -272,24 +324,42 @@ class CategoryController extends Controller
         ]);
 
         try {
-            $categories = Category::whereIn('id', $request->ids)->get();
+            // OPTIMIZED: Get categories with children/products count in one query
+            $categoriesData = DB::table('categories as c')
+                ->leftJoin('categories as children', 'c.id', '=', 'children.parent_id')
+                ->leftJoin('products as p', 'c.id', '=', 'p.category_id')
+                ->whereIn('c.id', $request->ids)
+                ->select(
+                    'c.id',
+                    'c.image',
+                    DB::raw('COUNT(DISTINCT children.id) as children_count'),
+                    DB::raw('COUNT(DISTINCT p.id) as products_count')
+                )
+                ->groupBy('c.id', 'c.image')
+                ->get();
+
             $count = 0;
             $skipped = 0;
+            $deletedIds = [];
 
-            foreach ($categories as $category) {
-                // Don't delete if has children or products
-                if ($category->children()->count() > 0 || $category->products()->count() > 0) {
+            foreach ($categoriesData as $data) {
+                if ($data->children_count > 0 || $data->products_count > 0) {
                     $skipped++;
                     continue;
                 }
 
                 // Delete image if exists
-                if ($category->image) {
-                    Storage::disk('public')->delete($category->image);
+                if ($data->image) {
+                    Storage::disk('public')->delete($data->image);
                 }
 
-                $category->delete();
+                $deletedIds[] = $data->id;
                 $count++;
+            }
+
+            // OPTIMIZED: Bulk delete
+            if (!empty($deletedIds)) {
+                DB::table('categories')->whereIn('id', $deletedIds)->delete();
             }
 
             $message = "{$count} categories deleted successfully.";
@@ -312,6 +382,9 @@ class CategoryController extends Controller
         }
     }
 
+    /**
+     * Bulk activate
+     */
     public function bulkActivate(Request $request)
     {
         $request->validate([
@@ -320,19 +393,30 @@ class CategoryController extends Controller
         ]);
 
         try {
-            $categories = Category::whereIn('id', $request->ids)->get();
+            $categories = Category::whereIn('id', $request->ids)
+                ->select('id', 'parent_id')
+                ->get();
+
             $count = 0;
             $skipped = 0;
 
             foreach ($categories as $category) {
-                // Check if parent is active
-                if (!$category->isParentActive()) {
-                    $skipped++;
-                    continue;
+                // OPTIMIZED: Check parent with raw query
+                if ($category->parent_id) {
+                    $parentActive = DB::table('categories')
+                        ->where('id', $category->parent_id)
+                        ->where('is_active', true)
+                        ->exists();
+
+                    if (!$parentActive) {
+                        $skipped++;
+                        continue;
+                    }
                 }
 
-                $category->is_active = true;
-                $category->save();
+                DB::table('categories')
+                    ->where('id', $category->id)
+                    ->update(['is_active' => true]);
                 $count++;
             }
 
@@ -356,6 +440,9 @@ class CategoryController extends Controller
         }
     }
 
+    /**
+     * Bulk deactivate
+     */
     public function bulkDeactivate(Request $request)
     {
         $request->validate([
@@ -364,10 +451,10 @@ class CategoryController extends Controller
         ]);
 
         try {
-            $count = Category::whereIn('id', $request->ids)
+            // OPTIMIZED: Bulk update
+            $count = DB::table('categories')
+                ->whereIn('id', $request->ids)
                 ->update(['is_active' => false]);
-
-            // Note: Child categories will be automatically deactivated by model observers
 
             return response()->json([
                 'success' => true,
@@ -383,6 +470,9 @@ class CategoryController extends Controller
         }
     }
 
+    /**
+     * Reorder categories
+     */
     public function reorder(Request $request, Category $category)
     {
         $request->validate([
@@ -390,17 +480,16 @@ class CategoryController extends Controller
         ]);
 
         try {
-            $sibling = null;
-
+            // OPTIMIZED: Use raw query for sibling lookup
             if ($request->direction === 'up') {
-                // Move up - find previous sibling
-                $sibling = Category::where('parent_id', $category->parent_id)
+                $sibling = DB::table('categories')
+                    ->where('parent_id', $category->parent_id ?: null)
                     ->where('order', '<', $category->order)
                     ->orderBy('order', 'desc')
                     ->first();
             } else {
-                // Move down - find next sibling
-                $sibling = Category::where('parent_id', $category->parent_id)
+                $sibling = DB::table('categories')
+                    ->where('parent_id', $category->parent_id ?: null)
                     ->where('order', '>', $category->order)
                     ->orderBy('order', 'asc')
                     ->first();
@@ -409,11 +498,12 @@ class CategoryController extends Controller
             if ($sibling) {
                 // Swap orders
                 $tempOrder = $category->order;
-                $category->order = $sibling->order;
-                $sibling->order = $tempOrder;
 
-                $category->save();
-                $sibling->save();
+                DB::table('categories')->where('id', $category->id)
+                    ->update(['order' => $sibling->order]);
+
+                DB::table('categories')->where('id', $sibling->id)
+                    ->update(['order' => $tempOrder]);
             }
 
             return response()->json([
@@ -430,54 +520,82 @@ class CategoryController extends Controller
     }
 
     /**
-     * Helper to get max descendant depth
-     */
-    private function getMaxDescendantDepth(Category $category): int
-    {
-        if (!$category->hasChildren()) {
-            return 0;
-        }
-
-        $maxDepth = 0;
-        foreach ($category->children as $child) {
-            $childMaxDepth = 1 + $this->getMaxDescendantDepth($child);
-            $maxDepth = max($maxDepth, $childMaxDepth);
-        }
-
-        return $maxDepth;
-    }
-
-    /**
-     * Get categories eligible to be parents (for AJAX)
+     * Get eligible parent categories (AJAX)
      */
     public function getEligibleParents(Request $request)
     {
         $categoryId = $request->input('category_id');
-        
-        $query = Category::where('is_active', true)
-            ->whereDoesntHave('products')
-            ->where('depth', '<', Category::MAX_DEPTH);
+
+        $query = DB::table('categories as c')
+            ->leftJoin('products as p', 'c.id', '=', 'p.category_id')
+            ->where('c.is_active', true)
+            ->where('c.depth', '<', Category::MAX_DEPTH)
+            ->whereNull('p.id');
 
         if ($categoryId) {
-            $category = Category::find($categoryId);
-            if ($category) {
-                $descendantIds = $category->getAllDescendantIds();
-                $query->where('id', '!=', $categoryId)
-                    ->whereNotIn('id', $descendantIds);
-            }
+            $descendantIds = $this->getDescendantIdsOptimized($categoryId);
+            $query->where('c.id', '!=', $categoryId)
+                ->whereNotIn('c.id', $descendantIds);
         }
 
-        $categories = $query->orderBy('depth')
-            ->orderBy('name_en')
+        $categories = $query
+            ->select('c.id', 'c.name_en', 'c.name_bn', 'c.depth')
+            ->orderBy('c.depth')
+            ->orderBy('c.name_en')
             ->get()
             ->map(function ($cat) {
                 return [
                     'id' => $cat->id,
-                    'name' => $cat->full_path,
+                    'name' => $this->getFullPath($cat->id),
                     'depth' => $cat->depth,
                 ];
             });
 
         return response()->json($categories);
+    }
+
+    /**
+     * OPTIMIZED: Get descendant IDs with raw query
+     */
+    private function getDescendantIdsOptimized(int $categoryId): array
+    {
+        return DB::table('categories')
+            ->where(function ($query) use ($categoryId) {
+                $query->where('parent_id', $categoryId)
+                    ->orWhereIn('parent_id', function ($subQuery) use ($categoryId) {
+                        $subQuery->select('id')
+                            ->from('categories')
+                            ->where('parent_id', $categoryId);
+                    });
+            })
+            ->pluck('id')
+            ->toArray();
+    }
+
+    /**
+     * OPTIMIZED: Get full category path
+     */
+    private function getFullPath(int $categoryId): string
+    {
+        $category = DB::table('categories')->where('id', $categoryId)->first();
+        if (!$category) return '';
+
+        $path = [$category->name_en];
+
+        if ($category->parent_id) {
+            $parent = DB::table('categories')->where('id', $category->parent_id)->first();
+            if ($parent) {
+                array_unshift($path, $parent->name_en);
+
+                if ($parent->parent_id) {
+                    $grandparent = DB::table('categories')->where('id', $parent->parent_id)->first();
+                    if ($grandparent) {
+                        array_unshift($path, $grandparent->name_en);
+                    }
+                }
+            }
+        }
+
+        return implode(' > ', $path);
     }
 }
