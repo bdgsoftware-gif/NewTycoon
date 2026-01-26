@@ -67,7 +67,7 @@ class CategoryController extends Controller
 
             return $categories;
         });
-        dd($categories);
+        // dd($categories);
         return view('frontend.categories.index', compact('categories'));
     }
 

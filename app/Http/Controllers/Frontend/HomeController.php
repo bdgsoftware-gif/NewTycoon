@@ -65,7 +65,6 @@ class HomeController extends Controller
         // dd($featuredProducts, $offerProducts);
         $userStories = $this->getUserStories();
 
-
         return view('frontend.home', compact(
             'heroSlides',
             'categories',

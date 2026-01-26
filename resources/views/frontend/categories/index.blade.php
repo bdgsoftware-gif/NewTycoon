@@ -52,18 +52,6 @@
                                             @endif
                                         </div>
                                     </div>
-
-                                    {{-- Products Count --}}
-
-                                    <a href="{{ route('categories.show', $category->slug) }}"
-                                        class="text-sm text-primary hover:text-primary-dark font-medium inline-flex items-center text-right">
-                                        Open
-                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 5l7 7-7 7" />
-                                        </svg>
-                                    </a>
-
                                 </div>
 
                                 {{-- Subcategories (Level 2) --}}
