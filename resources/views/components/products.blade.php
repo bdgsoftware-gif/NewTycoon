@@ -46,12 +46,21 @@
                                 <div
                                     class="transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 space-y-3">
                                     @if ($product->in_stock)
-                                        <form action="{{ route('checkout.process', $product->id) }}" method="POST"
-                                            class="inline-block">
+                                        <form action="{{ route('checkout.buy-now', $product->id) }}" method="POST"
+                                            class="flex-1 buy-now-form">
                                             @csrf
-                                            <button type="submit" title="Click to Buy"
-                                                class="bg-white text-gray-900 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg font-quantico">
-                                                Buy Now
+                                            <input type="hidden" name="quantity" value="1"
+                                                class="buy-now-quantity-input">
+                                            <button type="submit"
+                                                class="w-full bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-quantico rounded-full">
+                                                <span class="flex items-center justify-center">
+                                                    <svg class="w-4 h-4 mr-2 hidden 2xl:block" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                                    </svg>
+                                                    Buy Now
+                                                </span>
                                             </button>
                                         </form>
                                     @else
@@ -159,8 +168,8 @@
 
                                                 <!-- Cart/Call Icon -->
                                                 @if ($product->in_stock)
-                                                    <form action="{{ route('cart.add', $product->id) }}" method="POST"
-                                                        class="add-to-cart-form inline-block">
+                                                    <form action="{{ route('cart.add', $product->id) }}"
+                                                        method="POST" class="add-to-cart-form inline-block">
                                                         @csrf
                                                         <button type="submit"
                                                             class="add-to-cart-btn p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200"

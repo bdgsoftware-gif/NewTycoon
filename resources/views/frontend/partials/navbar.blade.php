@@ -639,12 +639,15 @@
                             console.error('Server error:', data.message);
                             searchEmpty.classList.remove('hidden');
                             searchEmpty.textContent = 'Search temporarily unavailable';
+                            flash('Search is currently unavailable. Please try again later.', 'error');
                             return;
                         }
 
                         if (data.length === 0) {
                             searchEmpty.classList.remove('hidden');
                             searchEmpty.textContent = 'No results found';
+                            flash('No results found for your search. Please try different keywords.',
+                                'warning');
                             searchViewAll.classList.add('hidden');
                             return;
                         }
@@ -659,8 +662,12 @@
 
                         if (error.name === 'AbortError') {
                             searchEmpty.textContent = 'Request timed out';
+                            flash('Search request timed out. Please check your connection and try again.',
+                                'error');
                         } else {
                             searchEmpty.textContent = 'Error loading suggestions';
+                            flash('An error occurred while fetching search suggestions. Please try again later.',
+                                'error');
                         }
                     });
             }

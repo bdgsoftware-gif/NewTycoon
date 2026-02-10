@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\MediaController;
+use App\Http\Controllers\Admin\OfferController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\ContentController;
@@ -110,6 +111,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::post('/bulk/delete', [CategoryController::class, 'bulkDelete'])->name('bulk.delete');
         Route::post('/bulk/activate', [CategoryController::class, 'bulkActivate'])->name('bulk.activate');
         Route::post('/bulk/deactivate', [CategoryController::class, 'bulkDeactivate'])->name('bulk.deactivate');
+    });
+
+    Route::prefix('offer')->name('offers.')->group(function () {
+        Route::resource('/', OfferController::class);
+        Route::post('offers/{offer}/toggle-status', [OfferController::class, 'toggleStatus'])->name('toggle-status');
+        Route::post('offers/reorder', [OfferController::class, 'reorder'])->name('reorder');
     });
 
     // Orders Management

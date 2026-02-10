@@ -272,6 +272,7 @@ class CategoryController extends Controller
         return response()->json([
             'success' => true,
             'is_featured' => $category->is_featured,
+            'message' => $category->is_featured ? 'Category marked as featured.' : 'Category unmarked as featured.'
         ]);
     }
 

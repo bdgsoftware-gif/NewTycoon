@@ -64,10 +64,11 @@
                         @endif
 
                         <div class="flex items-baseline gap-3 mb-2">
-                            <span class="text-3xl font-bold text-gray-900"><span class="font-bengali">৳</span>{{ number_format($product->price, 0) }}</span>
+                            <span class="text-3xl font-bold text-gray-900"><span
+                                    class="font-bengali">৳</span>{{ number_format($product->price, 0) }}</span>
                             @if ($product->compare_price > $product->price)
-                                <span
-                                    class="text-lg text-gray-500 line-through"><span class="font-bengali">৳</span>{{ number_format($product->compare_price, 0) }}</span>
+                                <span class="text-lg text-gray-500 line-through"><span
+                                        class="font-bengali">৳</span>{{ number_format($product->compare_price, 0) }}</span>
                                 <span class="text-sm bg-red-100 text-red-700 px-2 py-1 rounded font-semibold">
                                     -{{ $product->discount_percentage }}%
                                 </span>
@@ -162,7 +163,7 @@
                                     </button>
                                 </form>
 
-                                <form action="{{ route('cart.add', $product->id) }}" method="POST">
+                                <form action="{{ route('checkout.buy-now', $product->id) }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="quantity" id="buyQty" value="1">
                                     <input type="hidden" name="buy_now" value="1">
@@ -346,10 +347,11 @@
                                     <h3 class="font-medium text-sm mb-2 line-clamp-2 group-hover:text-primary">
                                         {{ $related->name_en }}</h3>
                                     <div class="flex items-baseline gap-2">
-                                        <span class="font-bold"><span class="font-bengali">৳</span>{{ number_format($related->price, 0) }}</span>
+                                        <span class="font-bold"><span
+                                                class="font-bengali">৳</span>{{ number_format($related->price, 0) }}</span>
                                         @if ($related->compare_price > $related->price)
-                                            <span
-                                                class="text-xs text-gray-500 line-through"><span class="font-bengali">৳</span>{{ number_format($related->compare_price, 0) }}</span>
+                                            <span class="text-xs text-gray-500 line-through"><span
+                                                    class="font-bengali">৳</span>{{ number_format($related->compare_price, 0) }}</span>
                                         @endif
                                     </div>
                                 </div>

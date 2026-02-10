@@ -346,7 +346,7 @@
                             </div>
                         </div>
                         <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                            <form id="deleteForm" method="POST" class="inline">
+                            <form id="deleteForm" method="POST" class="inline" data-form>
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" data-loading data-loading-text="Deleting..."
@@ -412,30 +412,35 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (!data.success) return;
+                    if (data.success) {
+                        // Remove all possible status classes
+                        select.classList.remove(
+                            'bg-green-100', 'text-green-800', 'border-green-300',
+                            'bg-gray-100', 'text-gray-800', 'border-gray-300',
+                            'bg-red-100', 'text-red-800', 'border-red-300',
+                            'bg-yellow-100', 'text-yellow-800', 'border-yellow-300'
+                        );
 
-                    // Update select colors based on new status
-                    select.classList.remove(
-                        'bg-green-100', 'text-green-800', 'border-green-300',
-                        'bg-gray-100', 'text-gray-800', 'border-gray-300',
-                        'bg-red-100', 'text-red-800', 'border-red-300',
-                        'bg-yellow-100', 'text-yellow-800', 'border-yellow-300'
-                    );
+                        // Map status to classes
+                        const statusClasses = {
+                            'active': ['bg-green-100', 'text-green-800', 'border-green-300'],
+                            'draft': ['bg-gray-100', 'text-gray-800', 'border-gray-300'],
+                            'inactive': ['bg-red-100', 'text-red-800', 'border-red-300'],
+                            'archived': ['bg-yellow-100', 'text-yellow-800', 'border-yellow-300']
+                        };
 
-                    switch (data.status) {
-                        case 'active':
-                            select.classList.add('bg-green-100', 'text-green-800', 'border-green-300');
-                            break;
-                        case 'draft':
-                            select.classList.add('bg-gray-100', 'text-gray-800', 'border-gray-300');
-                            break;
-                        case 'inactive':
-                            select.classList.add('bg-red-100', 'text-red-800', 'border-red-300');
-                            break;
-                        case 'archived':
-                            select.classList.add('bg-yellow-100', 'text-yellow-800', 'border-yellow-300');
-                            break;
+                        if (statusClasses[data.status]) {
+                            select.classList.add(...statusClasses[data.status]);
+                        }
+
+                        flash(data.message || 'Product status updated!', 'success', 3000);
+                    } else {
+                        flash(data.message || 'Failed to update status', 'error', 5000);
                     }
+                })
+                .catch(err => {
+                    flash('System error: Could not reach the server.', 'error', 5000);
+                    console.error(err);
                 })
                 .finally(() => {
                     select.dataset.loading = '0';

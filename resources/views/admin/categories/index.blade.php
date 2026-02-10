@@ -466,16 +466,22 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (!data.success) return;
+                    if (data.success) {
+                        // Button background
+                        button.classList.toggle('bg-primary', data.is_featured);
+                        button.classList.toggle('bg-gray-300', !data.is_featured);
 
-                    // Button background
-                    button.classList.toggle('bg-primary', data.is_featured);
-                    button.classList.toggle('bg-gray-300', !data.is_featured);
+                        // Knob movement
+                        const knob = button.querySelector('span');
+                        knob.classList.toggle('translate-x-6', data.is_featured);
+                        knob.classList.toggle('translate-x-1', !data.is_featured);
 
-                    // Knob movement
-                    const knob = button.querySelector('span');
-                    knob.classList.toggle('translate-x-6', data.is_featured);
-                    knob.classList.toggle('translate-x-1', !data.is_featured);
+                        // Flash success message
+                        flash(data.message || 'Featured status updated!', 'success', 3000);
+                    } else {
+                        // Handle logic failure from server
+                        flash(data.message || 'Failed to update featured status.', 'error', 5000);
+                    }
                 })
                 .finally(() => {
                     button.dataset.loading = '0';
@@ -504,16 +510,23 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (!data.success) return;
-
-                    // Update classes based on status
-                    if (data.is_active) {
-                        select.classList.add('border-green-300', 'bg-green-50', 'text-green-700');
-                        select.classList.remove('border-red-300', 'bg-red-50', 'text-red-700');
+                    if (data.success) {
+                        if (data.is_active) {
+                            select.classList.add('border-green-300', 'bg-green-50', 'text-green-700');
+                            select.classList.remove('border-red-300', 'bg-red-50', 'text-red-700');
+                        } else {
+                            select.classList.add('border-red-300', 'bg-red-50', 'text-red-700');
+                            select.classList.remove('border-green-300', 'bg-green-50', 'text-green-700');
+                        }
+                        flash(data.message || 'Status updated successfully!', 'success', 3000);
                     } else {
-                        select.classList.add('border-red-300', 'bg-red-50', 'text-red-700');
-                        select.classList.remove('border-green-300', 'bg-green-50', 'text-green-700');
+                        flash(data.message || 'Failed to update status', 'error', 5000);
+                        return;
                     }
+                }).catch(err => {
+                    // Network/Server crash
+                    flash('A network error occurred.', 'error', 5000);
+                    console.error(err);
                 })
                 .finally(() => {
                     select.dataset.loading = '0';

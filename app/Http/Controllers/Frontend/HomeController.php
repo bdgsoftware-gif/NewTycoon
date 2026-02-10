@@ -29,16 +29,17 @@ class HomeController extends Controller
         // dd($heroSlides);
 
         // Get active categories with active parents
-        // $categories = Category::active()->root()->featured()->limit(12)->get();
-        $categories = Cache::remember('homepage.featured.categories', 3600, function () {
-            return Category::active()->root()->featured()->limit(12)->get();
-        });
+        $categories = Category::active()->root()->featured()->limit(12)->get();
+        // $categories = Cache::remember('homepage.featured.categories', 3600, function () {
+        //     return Category::active()->root()->featured()->limit(12)->get();
+        // });
 
         $products = $this->activeProductService->getHomepageActiveProducts();
         // Get active featured products
-        $featuredProducts = Cache::remember('homepage.featured.products', 3600, function () {
-            return $this->activeProductService->getActiveFeaturedProducts(8);
-        });
+        $featuredProducts = $this->activeProductService->getActiveFeaturedProducts(8);
+        // $featuredProducts = Cache::remember('homepage.featured.products', 3600, function () {
+        //     return $this->activeProductService->getActiveFeaturedProducts(8);
+        // });
 
         // $featuredProducts = FeaturedProductViewResource::collection($featuredProducts);
         // dd($featuredProducts);
@@ -46,7 +47,6 @@ class HomeController extends Controller
         // Get new Arrivals products
         $newArrivals = $this->activeProductService->getActiveNewArrivals();
         // $newArrivals = FeaturedProductViewResource::collection($newArrivals);
-
         // Get Best Sells products
         $bestsells = $this->activeProductService->getActiveBestSells();
         // $bestsells = FeaturedProductViewResource::collection($bestsells);
@@ -55,13 +55,24 @@ class HomeController extends Controller
         $recommendedProducts = $this->activeProductService->getActiveRecommendedProducts();
         // $recommendedProducts = FeaturedProductViewResource::collection($recommendedProducts);
 
-        $smartSections = $this->smartSections();
+        // $smartSections = $this->smartSections();
         $adsBanners = $this->getAdsBanners();
         $adsAnotherBanners = $this->getAnotherAdsBanners();
 
-        // Get offer data
-        $offer = Offer::active()->with('products')->first();
-        $offerProducts = $this->activeProductService->getActiveOfferProducts(8) ?? [];
+        // Get active offer with products
+        $offer = Offer::active()
+            ->with(['products' => function ($query) {
+                $query->with('category')->active()->inStock()->limit(12);
+            }])
+            ->first();
+
+        // Get offer products based on source
+        if ($offer) {
+            $offerProducts = $offer->getSourceProducts();
+        } else {
+            $offerProducts = collect();
+        }
+
         // dd($featuredProducts, $offerProducts);
         $userStories = $this->getUserStories();
 
@@ -73,7 +84,7 @@ class HomeController extends Controller
             'newArrivals',
             'bestsells',
             'recommendedProducts',
-            'smartSections',
+            // 'smartSections',
             'adsBanners',
             'userStories',
             'adsAnotherBanners',

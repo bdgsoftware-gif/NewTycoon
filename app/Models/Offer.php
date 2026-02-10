@@ -18,6 +18,7 @@ class Offer extends Model
         'slug',
         'subtitle',
         'background_type',
+        'background_svg',      // Added this
         'background_image',
         'background_video',
         'background_color',
@@ -55,15 +56,18 @@ class Offer extends Model
         'time_left',
     ];
 
-    /**
-     * Boot the model.
-     */
     protected static function booted()
     {
         parent::boot();
 
         static::creating(function ($offer) {
             if (empty($offer->slug)) {
+                $offer->slug = Str::slug($offer->title);
+            }
+        });
+
+        static::updating(function ($offer) {
+            if ($offer->isDirty('title') && empty($offer->slug)) {
                 $offer->slug = Str::slug($offer->title);
             }
         });
@@ -77,9 +81,6 @@ class Offer extends Model
         });
     }
 
-    /**
-     * Get the products for this offer.
-     */
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'offer_products')
@@ -88,9 +89,6 @@ class Offer extends Model
             ->withTimestamps();
     }
 
-    /**
-     * Get active offers.
-     */
     public function scopeActive($query)
     {
         return $query->where('status', 'active')
@@ -106,9 +104,6 @@ class Offer extends Model
             ->orderBy('created_at', 'desc');
     }
 
-    /**
-     * Check if offer is currently active.
-     */
     public function getIsActiveAttribute(): bool
     {
         return $this->status === 'active' &&
@@ -116,9 +111,6 @@ class Offer extends Model
             (!$this->end_date || $this->end_date >= now());
     }
 
-    /**
-     * Get products count.
-     */
     public function getProductsCountAttribute(): int
     {
         return Cache::remember("offer.{$this->id}.products_count", 3600, function () {
@@ -126,13 +118,18 @@ class Offer extends Model
         });
     }
 
-    /**
-     * Get background URL.
-     */
     public function getBackgroundUrlAttribute(): ?string
     {
         if ($this->background_type === 'color' && $this->background_color) {
             return null;
+        }
+
+        if ($this->background_type === 'svg' && $this->background_svg) {
+            return null; // SVG will be rendered inline
+        }
+
+        if ($this->background_type === 'video' && $this->background_video) {
+            return asset('storage/' . $this->background_video);
         }
 
         if ($this->background_image) {
@@ -142,9 +139,6 @@ class Offer extends Model
         return asset('images/offers/default-bg.jpg');
     }
 
-    /**
-     * Get main banner URL.
-     */
     public function getMainBannerUrlAttribute(): ?string
     {
         if ($this->main_banner_image) {
@@ -154,37 +148,26 @@ class Offer extends Model
         return asset('images/offers/main-banner.jpeg');
     }
 
-    /**
-     * Get time left in seconds.
-     */
     public function getTimeLeftAttribute(): ?int
     {
         if (!$this->timer_enabled || !$this->timer_end_date) {
             return null;
         }
 
-        return max(0, $this->timer_end_date->diffInSeconds(now()));
+        $diff = $this->timer_end_date->diffInSeconds(now(), false);
+        return max(0, -$diff); // Return 0 if expired
     }
 
-    /**
-     * Increment view count.
-     */
     public function incrementViewCount(): void
     {
         $this->increment('view_count');
     }
 
-    /**
-     * Increment click count.
-     */
     public function incrementClickCount(): void
     {
         $this->increment('click_count');
     }
 
-    /**
-     * Get formatted view all link.
-     */
     public function getFormattedViewAllLinkAttribute(): string
     {
         if (!$this->view_all_link) {
@@ -198,7 +181,64 @@ class Offer extends Model
         try {
             return route($this->view_all_link);
         } catch (\Exception $e) {
-            return '#';
+            return route('products.index');
         }
+    }
+
+    /**
+     * Get products based on source type
+     */
+    public function getSourceProducts()
+    {
+        switch ($this->product_source) {
+            case 'discount':
+                return $this->getDiscountProducts();
+            case 'category':
+                return $this->getCategoryProducts();
+            case 'tag':
+                return $this->getTagProducts();
+            case 'manual':
+            default:
+                return $this->products()->with('category')->take($this->product_limit)->get();
+        }
+    }
+
+    private function getDiscountProducts()
+    {
+        $minDiscount = $this->source_config['min_discount'] ?? 10;
+
+        return Product::active()
+            ->withActiveCategory()
+            ->inStock()
+            ->where('discount_percentage', '>=', $minDiscount)
+            ->orderByDesc('discount_percentage')
+            ->orderByDesc('total_sold')
+            ->with('category')
+            ->limit($this->product_limit)
+            ->get();
+    }
+
+    private function getCategoryProducts()
+    {
+        $categoryIds = $this->source_config['category_ids'] ?? [];
+
+        if (empty($categoryIds)) {
+            return collect();
+        }
+
+        return Product::active()
+            ->withActiveCategory()
+            ->inStock()
+            ->whereIn('category_id', $categoryIds)
+            ->orderByDesc('total_sold')
+            ->with('category')
+            ->limit($this->product_limit)
+            ->get();
+    }
+
+    private function getTagProducts()
+    {
+        // Implement if you have tags
+        return collect();
     }
 }

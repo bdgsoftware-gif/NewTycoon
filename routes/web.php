@@ -76,10 +76,19 @@ Route::middleware('auth')->prefix('wishlist')->name('wishlist.')->group(function
 
 // Checkout (guest + user)
 Route::prefix('checkout')->name('checkout.')->group(function () {
+    // Cart checkout
     Route::get('/', [CheckoutController::class, 'index'])->name('index');
+
+    // Buy Now checkout
+    Route::post('/buy-now/{product}', [CheckoutController::class, 'buyNow'])->name('buy-now');
+    Route::get('/buy-now', [CheckoutController::class, 'buyNowCheckout'])->name('buy-now-checkout');
+
+    // Process checkout (handles both)
     Route::post('/process', [CheckoutController::class, 'process'])->name('process');
-    Route::get('/checkout/success/{orderNumber}', [CheckoutController::class, 'success'])->name('success');
-    Route::get('/checkout/failed', [CheckoutController::class, 'failed'])->name('failed');
+
+    // Success, failed, cancel
+    Route::get('/success/{orderNumber}', [CheckoutController::class, 'success'])->name('success');
+    Route::get('/failed', [CheckoutController::class, 'failed'])->name('failed');
     Route::get('/cancel', [CheckoutController::class, 'cancel'])->name('cancel');
 });
 

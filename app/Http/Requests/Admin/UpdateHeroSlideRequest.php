@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests\Admin;
 
-use App\Models\HeroSlide;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreHeroSlideRequest extends FormRequest
+class UpdateHeroSlideRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -16,7 +15,7 @@ class StoreHeroSlideRequest extends FormRequest
     {
         $rules = [
             'type' => ['required', 'in:image,video'],
-            'background' => ['required', 'mimes:jpg,jpeg,png,webp,mp4,mov,avi', 'max:20480'],
+            'background' => ['nullable', 'mimes:jpg,jpeg,png,webp,mp4,mov,avi', 'max:20480'],
             'has_content' => ['boolean'],
             'content_position' => ['required_if:has_content,true', 'in:left,center,right'],
 
@@ -54,7 +53,6 @@ class StoreHeroSlideRequest extends FormRequest
             'type.required' => 'Slide type is required.',
             'type.in' => 'Slide type must be image or video.',
 
-            'background.required' => 'Background file is required.',
             'background.mimes' => 'Background must be an image (JPG, JPEG, PNG, WEBP) or video (MP4, MOV, AVI).',
             'background.max' => 'Background file size cannot exceed 20MB.',
 
@@ -125,12 +123,6 @@ class StoreHeroSlideRequest extends FormRequest
         } else {
             // CTA is disabled - set to null to clear existing buttons
             $this->merge(['cta_buttons' => null]);
-        }
-
-        // Set default sort_order if not provided
-        if (!$this->has('sort_order') || empty($this->sort_order)) {
-            $maxOrder = HeroSlide::max('sort_order') ?? 0;
-            $this->merge(['sort_order' => $maxOrder + 1]);
         }
     }
 }
