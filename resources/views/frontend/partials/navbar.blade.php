@@ -79,13 +79,13 @@
                         @endif
                     @endforeach
                     <!-- Single link -->
-                    <a href="/catalog"
-                        class="text-gray-700 hover:text-primary md:px-1 md:py-2 xl:px-3 rounded-md text-base md:text-sm {{ app()->isLocale('bn') ? 'font-bangla' : 'xl:text-base font-inter' }} font-semibold transition-colors duration-200">
-                        {{ __('navbar.catalog') }}
-                    </a>
                     <a href="{{ route('categories.index') }}"
                         class="text-gray-700 hover:text-primary md:px-1 md:py-2 xl:px-3 rounded-md text-base md:text-sm {{ app()->isLocale('bn') ? 'font-bangla' : 'xl:text-base font-inter' }} font-semibold transition-colors duration-200">
                         {{ __('navbar.all-categories') }}
+                    </a>
+                    <a href="/catalog"
+                        class="text-gray-700 hover:text-primary md:px-1 md:py-2 xl:px-3 rounded-md text-base md:text-sm {{ app()->isLocale('bn') ? 'font-bangla' : 'xl:text-base font-inter' }} font-semibold transition-colors duration-200">
+                        {{ __('navbar.catalog') }}
                     </a>
                 </div>
             </div>

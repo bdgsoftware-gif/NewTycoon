@@ -23,7 +23,7 @@ class FooterSeeder extends Seeder
             'brand_description_bn' =>
             'আধুনিক প্রযুক্তি ও ইলেকট্রনিক্সের জন্য আপনার বিশ্বস্ত গন্তব্য। আমরা সর্বশেষ উদ্ভাবন এবং সেরা মানের সেবা প্রদান করি।',
             'product_image' => 'images/cat/pressure-cooker.png',
-            'product_link'  => '/products/featured',
+            'product_link'  => '/products',
             'payment_methods' => [
                 'https://cdn-icons-png.flaticon.com/512/196/196578.png',
                 'https://cdn-icons-png.flaticon.com/512/196/196561.png',
