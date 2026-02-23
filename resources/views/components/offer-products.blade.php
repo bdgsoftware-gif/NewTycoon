@@ -378,7 +378,7 @@
             const offerSwiperElement = document.querySelector('.offer-products-swiper');
             if (offerSwiperElement) {
                 const productCount = {{ count($offerProducts) }};
-                console.log('Initializing Swiper with product count:', productCount);
+                // console.log('Initializing Swiper with product count:', productCount);
                 const swiperConfig = {
                     slidesPerView: 1.3,
                     spaceBetween: 16,

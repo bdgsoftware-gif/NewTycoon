@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Services\Search\ProductSearchService;
 use App\Services\Search\CategorySearchService;
-use App\Http\Resources\ProductCardViewResource;
 
 class SearchController extends Controller
 {
@@ -46,8 +45,9 @@ class SearchController extends Controller
                     $q->where('name_en', 'LIKE', "%{$query}%")
                         ->orWhere('name_bn', 'LIKE', "%{$query}%")
                         ->orWhere('sku', 'LIKE', "%{$query}%")
-                        ->orWhere('short_description_en', 'LIKE', "%{$query}%")
-                        ->orWhere('short_description_bn', 'LIKE', "%{$query}%");
+                        ->orWhere('model_number', 'LIKE', "%{$query}%");
+                    // ->orWhere('short_description_en', 'LIKE', "%{$query}%")
+                    // ->orWhere('short_description_bn', 'LIKE', "%{$query}%");
                 })
                 ->limit(8)
                 ->get(['id', 'name_en', 'name_bn', 'slug', 'price', 'featured_images', 'stock_status', 'is_new', 'discount_percentage']);
@@ -143,16 +143,20 @@ class SearchController extends Controller
             $currentCategory = Category::find($request->category);
         }
 
-        $categoryIds = $this->categoryService->resolveCategoryIds($search);
+        if ($category) {
+            $categoryIds = $this->categoryService->getCategoryChilednsIds($category);
+        } else {
+            $categoryIds = $this->categoryService->resolveCategoryIds($search);
+        }
 
         $productQuery = $this->productService->buildQuery(
             $search,
-            $category,
             $minPrice,
             $maxPrice,
             $status,
             $categoryIds
         );
+        // dd($productQuery->toSql(), $productQuery->getBindings());
         $this->applySorting($productQuery, $sort);
 
         // Track search term
@@ -166,9 +170,7 @@ class SearchController extends Controller
             );
         }
 
-        $products = ProductCardViewResource::collection(
-            $productQuery->paginate(12)->withQueryString()
-        );
+        $products = $productQuery->paginate(12)->withQueryString();
 
         $categories = $this->categoryService->getCategoriesWithProductCounts($search);
 

@@ -201,6 +201,9 @@ Route::get('/test-flash-ajax', function () {
     return response()->json(['success' => true]);
 });
 
+Route::get('/current-session', function () {
+    return session()->all();
+});
 // ==============================
 // AUTH ROUTES
 // ==============================

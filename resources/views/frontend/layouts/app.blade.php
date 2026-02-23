@@ -40,7 +40,7 @@
         @include('frontend.partials.navbar')
         <!-- Flash Messages Container -->
         <x-flash-container />
-        <main class="pt-16">
+        <main class="pt-16 lg:pt-28">
             @yield('content')
         </main>
 

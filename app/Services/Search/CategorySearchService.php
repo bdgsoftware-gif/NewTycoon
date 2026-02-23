@@ -4,7 +4,6 @@ namespace App\Services\Search;
 
 use App\Models\Category;
 use App\Models\Product;
-use Illuminate\Support\Facades\DB;
 
 class CategorySearchService
 {
@@ -57,6 +56,20 @@ class CategorySearchService
         return array_values($allCategoryIds);
     }
 
+    /**
+     * Get all child category IDs for a given category
+     */
+    public function getCategoryChilednsIds(int $categoryId): array
+    {
+        $childIds = Category::where('parent_id', $categoryId)->pluck('id')->all();
+
+        // Recursively get children's children
+        foreach ($childIds as $childId) {
+            $childIds = array_merge($childIds, $this->getCategoryChilednsIds($childId));
+        }
+        $childIds[] = $categoryId;
+        return array_values($childIds);
+    }
     /**
      * Get sidebar categories with product counts
      */

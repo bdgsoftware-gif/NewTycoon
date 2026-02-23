@@ -10,17 +10,17 @@
                         <img src="{{ asset('images/bk-logo.png') }}" alt="BK Logo" class="h-7 md:h-8 w-auto">
                     </a>
                 </div>
+
                 <div class="hidden lg:flex justify-center items-center flex-1">
                     <!-- All Categories Mega Menu (desktop) -->
-                    <div class="hidden lg:block relative group mx-2">
-                        <button
+                    <div class="relative group ml-2">
+                        <button id="all-categories-btn"
                             class="flex items-center space-x-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-base font-medium text-gray-800 border border-gray-300">
-                            <a href="{{ route('categories.index') }}">All Categories</a>
+                            <span id="selected-category-text">All Categories</span>
                             <svg class="w-4 h-4 transition-transform duration-200 group-hover:rotate-180" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 9l-7 7-7-7">
-                                </path>
+                                    d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </button>
 
@@ -33,8 +33,9 @@
                                     @foreach ($categoriesDropdown as $category)
                                         <div class="group/level1 relative">
                                             <button
-                                                class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex justify-between items-center category-level1"
-                                                data-id="{{ $category['id'] }}">
+                                                class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex justify-between items-center category-level1 category-selectable"
+                                                data-id="{{ $category['id'] }}" data-name="{{ $category['name'] }}"
+                                                data-slug="{{ $category['slug'] }}">
                                                 <span class="truncate">{{ $category['name'] }}</span>
                                                 @if ($category['has_children'])
                                                     <svg class="w-4 h-4 transition-transform duration-200 group-hover:-rotate-90"
@@ -58,19 +59,21 @@
                     </div>
 
                     <!-- Desktop Search -->
-                    <div class="hidden lg:block flex-1 max-w-xl mx-4">
+                    <div class="flex-1 max-w-xl mr-4">
                         <div class="relative" id="desktop-search-container">
-                            <form action="{{ route('search') }}" method="GET" class="relative">
+                            <form action="{{ route('search') }}" method="GET" class="relative flex">
                                 <input type="text" name="q" placeholder="Search for products..."
                                     autocomplete="off"
                                     class="w-full py-2 pl-10 pr-4 text-base bg-gray-100 border border-gray-300 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300"
                                     id="desktop-search-input">
+                                <input type="hidden" name="category" id="desktop-selected-category" value="">
                                 <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
-                                <button type="submit" class="hidden">Search</button>
+                                <button type="submit"
+                                    class="bg-accent text-base text-white px-3 py-2 border border-gray-300 hover:bg-primary/80 transition-colors">Search</button>
                             </form>
 
                             <!-- Search suggestions dropdown -->
@@ -128,7 +131,6 @@
                     </div>
                 </div>
 
-
                 <!-- Catalog link (desktop) -->
                 <a href="/catalog"
                     class="hidden lg:block text-gray-700 hover:text-primary text-base font-medium px-3 py-2 border border-transparent hover:border-gray-300">
@@ -140,7 +142,7 @@
                     <!-- Language -->
                     <div class="relative group hidden lg:block">
                         <button
-                            class="text-base font-medium text-gray-700 px-3 py-2 border border-transparent hover:border-gray-300 bg-accent/10 hover:bg-accent/20 rounded">
+                            class="text-base font-medium text-gray-700 px-3 py-2 border border-transparent hover:border-gray-300 bg-accent/10 hover:bg-accent/20">
                             {{ app()->getLocale() == 'en' ? 'English' : 'বাংলা' }}
                         </button>
                         <div
@@ -255,8 +257,7 @@
                                 <svg class="w-4 h-4 transition-transform duration-200 group-hover:rotate-180 text-gray-800 hover:text-accent"
                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                        d="M19 9l-7 7-7-7">
-                                    </path>
+                                        d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </span>
 
@@ -387,6 +388,7 @@
                 <input type="text" name="q" placeholder="Search for products..." autocomplete="off"
                     class="w-full py-3 pl-10 pr-4 text-base bg-gray-100 border border-gray-300 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all duration-300"
                     id="mobile-search-input">
+                <input type="hidden" name="category" id="mobile-selected-category" value="">
                 <svg class="absolute left-3 top-3.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -482,21 +484,24 @@
                     level3Container.classList.add('hidden');
 
                     children.forEach(child => {
-                        const btn = document.createElement('button');
-                        btn.className =
-                            'w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex justify-between items-center';
-                        btn.innerHTML = `
-                        <span class="truncate">${child.name}</span>
-                        ${child.has_children ? '<svg class="w-4 h-4 transition-transform duration-200 group-hover:-rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>' : ''}
-                    `;
-                        btn.addEventListener('mouseenter', () => {
+                        const link = document.createElement('a');
+                        link.href = child.url;
+                        link.className =
+                            'w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex justify-between items-center category-selectable';
+                        link.setAttribute('data-id', child.id);
+                        link.setAttribute('data-name', child.name);
+                        link.setAttribute('data-slug', child.slug);
+                        link.innerHTML =
+                            `<span class="truncate">${child.name}</span>
+            ${child.has_children ? '<svg class="w-4 h-4 transition-transform duration-200 group-hover:-rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>' : ''}`;
+                        link.addEventListener('mouseenter', () => {
                             if (child.children && child.children.length) {
                                 renderLevel3(child.children);
                             } else {
                                 level3Container.classList.add('hidden');
                             }
                         });
-                        level2Container.appendChild(btn);
+                        level2Container.appendChild(link);
                     });
                 }
 
@@ -508,7 +513,10 @@
                         const link = document.createElement('a');
                         link.href = grandchild.url;
                         link.className =
-                            'block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary truncate';
+                            'block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary truncate category-selectable';
+                        link.setAttribute('data-id', grandchild.id);
+                        link.setAttribute('data-name', grandchild.name);
+                        link.setAttribute('data-slug', grandchild.slug);
                         link.textContent = grandchild.name;
                         level3Container.appendChild(link);
                     });
@@ -534,6 +542,45 @@
             }
 
             document.querySelectorAll('.categories-mega-menu').forEach(initCategoriesMegaMenu);
+
+            // Category selection
+            const allCategoriesBtn = document.getElementById('all-categories-btn');
+            const selectedCategoryText = document.getElementById('selected-category-text');
+            const desktopSelectedCategory = document.getElementById('desktop-selected-category');
+            const mobileSelectedCategory = document.getElementById('mobile-selected-category');
+
+            // Handle click on any selectable category
+            document.addEventListener('click', function(e) {
+                const selectable = e.target.closest('.category-selectable');
+                if (!selectable) return;
+
+                e.preventDefault(); // Prevent navigation
+
+                const categoryId = selectable.dataset.id;
+                const categoryName = selectable.dataset.name;
+                const categorySlug = selectable.dataset.slug;
+
+                // Update button text
+                selectedCategoryText.textContent = categoryName;
+
+                // Update hidden inputs
+                if (desktopSelectedCategory) desktopSelectedCategory.value = categoryId;
+                if (mobileSelectedCategory) mobileSelectedCategory.value = categoryId;
+
+                // Close the mega menu after selection
+                const megaMenu = selectable.closest('.categories-mega-menu');
+                if (megaMenu) {
+                    megaMenu.classList.add('invisible', 'opacity-0');
+                }
+            });
+
+            // Reset selection when clicking "All Categories" button
+            allCategoriesBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                selectedCategoryText.textContent = 'All Categories';
+                if (desktopSelectedCategory) desktopSelectedCategory.value = '';
+                if (mobileSelectedCategory) mobileSelectedCategory.value = '';
+            });
 
             // Desktop search
             const desktopSearchInput = document.getElementById('desktop-search-input');

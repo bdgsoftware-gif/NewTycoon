@@ -1,7 +1,6 @@
 <!-- resources/views/components/hero-swiper.blade.php -->
 <section class="relative w-full overflow-hidden">
-    <div
-        class="swiper heroSwiper w-full aspect-[16/9] lg:aspect-[64/25] max-h-[850px] overflow-hidden bg-gray-900/50 rounded-lg">
+    <div class="swiper heroSwiper w-full aspect-[16/9] lg:aspect-[64/25] max-h-[850px] overflow-hidden bg-gray-900/50">
         <div class="swiper-wrapper">
             @foreach ($heroSlides as $slide)
                 <div class="swiper-slide relative w-full h-full">
