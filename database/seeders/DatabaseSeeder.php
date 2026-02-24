@@ -25,7 +25,8 @@ class DatabaseSeeder extends Seeder
             ReviewSeeder::class,
             FooterSeeder::class,
             OfferSeeder::class,
-            HeroSlideSeeder::class
+            HeroSlideSeeder::class,
+            SectionSeeder::class,
         ]);
     }
 }

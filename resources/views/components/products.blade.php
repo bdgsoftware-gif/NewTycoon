@@ -2,10 +2,25 @@
 <section class="py-6 md:py-12 bg-gray-50 featured-products-section">
     <div class="max-w-8xl mx-auto px-4">
         <!-- Section Title -->
-        <h2
-            class="featured-products-title text-2xl md:text-4xl lg:text-5xl font-semibold text-center text-gray-900 mb-6 md:mb-12 leading-tight font-quantico">
-            {{ __('common.featured-products') }}
-        </h2>
+        <div class="flex justify-between items-end mb-6 md:mb-10">
+            <h2
+                class="category-heading text-xl md:text-2xl lg:text-4xl font-medium text-gray-900 leading-tight capitalize font-poppins">
+                {{ __('common.featured-products') }}
+            </h2>
+
+            <a href="{{ route('categories.index') }}"
+                class="group inline-flex items-center gap-1 transform text-gray-900 text-sm 2xl:text-base font-inter font-normal tracking-wide transition-colors duration-300 hover:text-primary">
+
+                <span class="hover:underline">View All</span>
+
+                <svg class="w-4 h-4 xl:w-5 xl:h-5 transition-colors duration-300 group-hover:text-primary"
+                    fill="currentColor" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M26.68 3.867H8.175a1 1 0 0 0 0 2h16.544L4.2 26.387A1 1 0 1 0 5.613 27.8l20.52-20.52v16.545a1 1 0 0 0 2 0V5.321a1.456 1.456 0 0 0-1.453-1.454"
+                        data-name="Layer 2" />
+                </svg>
+            </a>
+        </div>
         <!-- Skeletons -->
         <div class="featured-skeletons grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6">
             @for ($i = 0; $i < 8; $i++)
@@ -34,7 +49,7 @@
 
                             @if ($product->discount_percentage > 0)
                                 <span
-                                    class="absolute top-3 right-3 bg-gradient-to-r from-red-600 to-orange-500  text-white  px-1 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-xs font-semibold font-quantico shadow-md">
+                                    class="absolute top-3 right-3 bg-gradient-to-r from-red-600 to-orange-500  text-white  px-1 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-xs font-semibold font-poppins shadow-md">
                                     -{{ $product->discount_percentage }}%
                                 </span>
                             @endif
@@ -52,7 +67,7 @@
                                             <input type="hidden" name="quantity" value="1"
                                                 class="buy-now-quantity-input">
                                             <button type="submit"
-                                                class="w-full bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-quantico rounded-full">
+                                                class="w-full bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-poppins rounded-full">
                                                 <span class="flex items-center justify-center">
                                                     <svg class="w-4 h-4 mr-2 hidden 2xl:block" fill="none"
                                                         stroke="currentColor" viewBox="0 0 24 24">
@@ -76,7 +91,7 @@
                                                         stroke-width="2"
                                                         d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                                 </svg>
-                                                <span class="font-quantico">Add to Wishlist</span>
+                                                <span class="font-poppins">Add to Wishlist</span>
                                             </button>
                                         </form>
                                     @endif
@@ -121,7 +136,7 @@
                         <a href="{{ route('product.show', $product->slug) }}" class="block mb-1"
                             title="{{ $product->name }}">
                             <h3
-                                class="text-sm font-medium text-gray-900 hover:text-primary transition-colors duration-200 line-clamp-2 mb-1 font-quantico">
+                                class="text-sm font-medium text-gray-900 hover:text-primary transition-colors duration-200 line-clamp-2 mb-1 font-poppins">
                                 {{ $product->name }}
                             </h3>
                         </a>
@@ -134,12 +149,12 @@
                             @if ($product->discount_percentage > 0)
                                 <div class="flex items-end justify-between">
                                     <div>
-                                        <span class="text-base md:text-2xl font-bold  text-gray-900 font-quantico">
+                                        <span class="text-base md:text-2xl font-bold  text-gray-900 font-poppins">
                                             <span class="font-bengali">৳</span>
                                             {{ format_currency($product->price, '') }}
                                         </span>
                                         <div class="md:mt-1">
-                                            <span class="text-sm md:text-base text-gray-500 line-through font-quantico">
+                                            <span class="text-sm md:text-base text-gray-500 line-through font-poppins">
                                                 <span class="font-bengali">৳</span>
                                                 {{ format_currency($product->compare_price, '') }}
                                             </span>
@@ -209,7 +224,7 @@
                                 </div>
                             @else
                                 <div class="flex items-start justify-between">
-                                    <span class="text-2xl font-bold text-gray-900 font-quantico">
+                                    <span class="text-2xl font-bold text-gray-900 font-poppins">
                                         <span class="font-bengali">৳</span>{{ format_currency($product->price, '') }}
                                     </span>
                                     <div>
@@ -259,28 +274,5 @@
             @endforeach
         </div>
 
-        <!-- Load More Button -->
-        @php
-            $loadMore = count($products) > 2;
-        @endphp
-        @if (isset($loadMore) && $loadMore)
-            <div class="text-center mt-12">
-                <a href="{{ route('products.index') }}" target="_self"
-                    class="group relative inline-flex items-center justify-center bg-primary text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 transform font-quantico overflow-hidden">
-
-                    <div class="relative overflow-hidden">
-                        <span
-                            class="inline-block transition-transform duration-300 transform group-hover:-translate-y-full">
-                            {{ __('common.view-more-products') }}
-                        </span>
-
-                        <span
-                            class="absolute top-full left-0 inline-block w-full transition-transform duration-300 transform group-hover:-translate-y-full">
-                            {{ __('common.view-more-products') }}
-                        </span>
-                    </div>
-                </a>
-            </div>
-        @endif
     </div>
 </section>

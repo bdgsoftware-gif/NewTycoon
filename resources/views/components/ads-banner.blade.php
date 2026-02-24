@@ -1,92 +1,51 @@
-@if ($adsBanners->count() > 0)
+{{-- resources/views/components/ads-banner.blade.php --}}
+@props(['adsBanners' => []])
+
+@php
+    $allImages = collect();
+
+    foreach ($adsBanners as $banner) {
+        $images = $banner->images ?? [];
+        foreach ($images as $imagePath) {
+            $allImages->push(
+                (object) [
+                    'image_path' => $imagePath,
+                    'link' => $banner->link ?? '#',
+                    'target' => $banner->target ?? '_self',
+                    'alt_text' => $banner->title ?? 'Advertisement Banner',
+                ],
+            );
+        }
+    }
+
+    $displayImages = $allImages->take(3);
+    $count = $displayImages->count();
+@endphp
+@php
+    echo '<pre>';
+    print_r($adsBanners->toArray());
+    echo '</pre>';
+@endphp
+@if ($count > 0)
     <section class="max-w-8xl mx-auto pt-12 ads-section">
-        <div class="relative">
+        {{-- Responsive grid layout based on image count --}}
+        <div
+            class="grid gap-4 px-4
+            @if ($count == 1) grid-cols-1
+            @elseif($count == 2) grid-cols-1 md:grid-cols-2
+            @elseif($count == 3) grid-cols-1 md:grid-cols-3 @endif">
 
-            <!-- Skeleton Overlay -->
-            <div class="ads-skeleton absolute inset-0 z-10 rounded-xl pointer-events-none p-4"></div>
+            @foreach ($displayImages as $image)
+                <a href="{{ $image->link }}" @if ($image->link !== '#') target="{{ $image->target }}" @endif
+                    class="block transition-transform duration-300 hover:scale-[1.02] hover:shadow-md">
+                    <div class="relative aspect-[16/6] overflow-hidden">
+                        {{-- Use asset() with 'storage/' prefix – adjust if your paths already include 'storage/' --}}
+                        <img src="{{ asset('storage/' . ltrim($image->image_path, '/')) }}" alt="{{ $image->alt_text }}"
+                            class="w-full h-full object-contain object-center rounded-xl" loading="lazy">
+                    </div>
+                </a>
+            @endforeach
 
-            <!-- Swiper -->
-            <div class="swiper adsSwiper relative z-20">
-                <div class="swiper-wrapper">
-
-                    @foreach ($adsBanners as $banner)
-                        <div class="swiper-slide p-4">
-                            <a href="{{ $banner->link ?? '#' }}"
-                                @if ($banner->link) target="{{ $banner->target ?? '_self' }}" @endif
-                                class="block">
-
-                                <div
-                                    class="relative aspect-[16/6] rounded-xl overflow-hidden
-                                       transform transition-all duration-300
-                                       hover:scale-[1.02] hover:shadow-md">
-
-                                    <img src="{{ asset($banner->image_path) }}"
-                                        alt="{{ $banner->alt_text ?? 'Advertisement Banner' }}"
-                                        class="w-full h-full object-contain object-center rounded-xl" loading="lazy" />
-                                </div>
-                            </a>
-                        </div>
-                    @endforeach
-
-                </div>
-            </div>
         </div>
     </section>
 @endif
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-
-            document.querySelectorAll('.ads-section').forEach(section => {
-                const swiperEl = section.querySelector('.adsSwiper');
-                const skeleton = section.querySelector('.ads-skeleton');
-
-                if (!swiperEl) return;
-
-                const swiper = new Swiper(swiperEl, {
-                    autoplay: {
-                        delay: 8000,
-                        disableOnInteraction: false,
-                    },
-                    loop: true,
-                    speed: 1000,
-                    spaceBetween: 4,
-
-                    breakpoints: {
-                        0: {
-                            slidesPerView: 1,
-                        },
-                        768: {
-                            slidesPerView: 2,
-                        }
-                    },
-
-                    on: {
-                        init(swiper) {
-                            const activeImg = swiper.slides[swiper.activeIndex]
-                                ?.querySelector('img');
-
-                            if (!activeImg) {
-                                skeleton?.remove();
-                                return;
-                            }
-
-                            if (activeImg.complete) {
-                                skeleton?.remove();
-                            } else {
-                                activeImg.addEventListener('load', () => skeleton?.remove(), {
-                                    once: true
-                                });
-                            }
-
-                            // Pause on hover
-                            swiper.el.addEventListener('mouseenter', () => swiper.autoplay.stop());
-                            swiper.el.addEventListener('mouseleave', () => swiper.autoplay.start());
-                        }
-                    }
-                });
-            });
-
-        });
-    </script>
-@endpush

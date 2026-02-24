@@ -15,7 +15,7 @@
                     <!-- All Categories Mega Menu (desktop) -->
                     <div class="relative group ml-2">
                         <button id="all-categories-btn"
-                            class="flex items-center space-x-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-base font-medium text-gray-800 border border-gray-300">
+                            class="flex items-center space-x-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-base font-medium text-gray-800 border border-gray-300 rounded-l-lg">
                             <span id="selected-category-text">All Categories</span>
                             <svg class="w-4 h-4 transition-transform duration-200 group-hover:rotate-180" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
@@ -73,7 +73,7 @@
                                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
                                 <button type="submit"
-                                    class="bg-accent text-base text-white px-3 py-2 border border-gray-300 hover:bg-primary/80 transition-colors">Search</button>
+                                    class="bg-accent text-base text-white px-3 py-2 border border-gray-300 hover:bg-primary/80 transition-colors  rounded-r-lg">Search</button>
                             </form>
 
                             <!-- Search suggestions dropdown -->
@@ -133,7 +133,7 @@
 
                 <!-- Catalog link (desktop) -->
                 <a href="/catalog"
-                    class="hidden lg:block text-gray-700 hover:text-primary text-base font-medium px-3 py-2 border border-transparent hover:border-gray-300">
+                    class="hidden lg:block text-gray-700 hover:text-primary text-base font-medium px-3 py-2 border border-transparent hover:border-gray-300 hover:rounded-lg transition duration-200 mr-2">
                     Catalog
                 </a>
 
@@ -142,7 +142,7 @@
                     <!-- Language -->
                     <div class="relative group hidden lg:block">
                         <button
-                            class="text-base font-medium text-gray-700 px-3 py-2 border border-transparent hover:border-gray-300 bg-accent/10 hover:bg-accent/20">
+                            class="text-base font-medium text-gray-700 px-3 py-2 border border-transparent hover:border-gray-300 bg-accent/10 hover:bg-accent/20 rounded-lg hover:rounded-t-lg transition duration-200">
                             {{ app()->getLocale() == 'en' ? 'English' : 'বাংলা' }}
                         </button>
                         <div
@@ -159,7 +159,7 @@
 
                     <!-- User icon + dropdown -->
                     <div class="relative group">
-                        <button class="p-2 text-gray-600 hover:text-primary hover:bg-gray-100">
+                        <button class="p-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-full">
                             <svg class="w-5 h-5" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24">
                                 <path clip-rule="evenodd" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="0.5"
@@ -169,41 +169,41 @@
                         </button>
                         <!-- User dropdown menu -->
                         <div
-                            class="absolute right-0 mt-2 w-48 bg-white shadow-md border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                            class="absolute right-0 mt-2 w-48 bg-white shadow-md border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 rounded-lg">
                             <div class="py-1">
                                 @auth
                                     @if (auth()->user()->hasAnyRole(['admin', 'moderator']))
                                         <a href="{{ route('admin.dashboard') }}"
-                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Admin
+                                            class="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100">Admin
                                             Dashboard</a>
                                     @endif
                                     <a href="{{ route('profile') }}"
-                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                                        class="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100">Profile</a>
                                     <a href="{{ route('orders.track') }}"
-                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Track Order</a>
+                                        class="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100">Track Order</a>
                                     @if (auth()->user()->hasRole('customer'))
                                         <a href="/orders"
-                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Orders</a>
+                                            class="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100">My Orders</a>
                                     @endif
                                     @if (auth()->user()->hasPermission('manage_products'))
                                         <a href="/admin/products"
-                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Products
+                                            class="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100">Products
                                             Management</a>
                                     @endif
                                     <hr class="my-1">
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
                                         <button type="submit"
-                                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</button>
+                                            class="block w-full text-left px-4 py-2 text-base text-gray-700 hover:bg-gray-100">Logout</button>
                                     </form>
                                 @else
                                     <a href="{{ route('login') }}"
-                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign In</a>
+                                        class="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100">Sign In</a>
                                     <a href="{{ route('register') }}"
-                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign Up</a>
+                                        class="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100">Sign Up</a>
                                     <hr class="my-1">
                                     <a href="{{ route('orders.track') }}"
-                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Track Order</a>
+                                        class="block px-4 py-2 text-base text-gray-700 hover:bg-gray-100">Track Order</a>
                                 @endauth
                             </div>
                         </div>
@@ -211,7 +211,7 @@
 
                     <!-- Cart icon -->
                     <a href="{{ route('cart.index') }}"
-                        class="p-2 text-gray-600 hover:text-primary hover:bg-gray-100 relative">
+                        class="p-2 text-gray-600 hover:text-primary hover:bg-gray-100 relative rounded-full">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -222,7 +222,7 @@
 
                     <!-- Mobile search icon -->
                     <button id="mobile-search-toggle"
-                        class="lg:hidden p-2 text-gray-600 hover:text-primary hover:bg-gray-100">
+                        class="lg:hidden p-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-full">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -230,7 +230,7 @@
                     </button>
 
                     <!-- Mobile menu button -->
-                    <button class="lg:hidden p-2 text-gray-600 hover:text-primary hover:bg-gray-100"
+                    <button class="lg:hidden p-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-full"
                         id="mobile-menu-button">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

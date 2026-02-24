@@ -1,3 +1,4 @@
+{{-- resources/views/frontend/home.blade.php --}}
 @extends('frontend.layouts.app')
 @section('title', 'Hi-Tech Park')
 @section('content')
@@ -6,30 +7,27 @@
     <x-products :featuredProducts="$featuredProducts" />
     @include('components.offer-products')
 
-    {{-- @include('frontend.partials.smart-section') --}}
-    {{-- @include('frontend.partials.ads-banner') --}}
-    <x-ads-banner :adsBanners="$adsBanners ?? []" />
-    <!-- New Arrivals -->
-    <x-product-slider :slidingProducts="$newArrivals ?? []" title="{{ __('home.new-arrivals') }}" sliderId="newArrival" :slidesPerView="5"
-        :autoPlay="false" :showNavigation="true" :showPagination="false" cardStyle="minimal" />
-    <!-- Recommended for you -->
-    <x-ads-banner :adsBanners="$adsAnotherBanners ?? []" />
-    <x-product-slider :slidingProducts="$recommendedProducts ?? []" title="{{ __('home.recommended') }}" sliderId="recommendedSlider" :slidesPerView="5"
-        :autoPlay="true" :showNavigation="true" :showPagination="false" cardStyle="minimal" />
-    <!-- Ad card with Products -->
-    <x-product-slider :slidingProducts="$bestsells ?? []" :adsImages="[
-        [
-            'image' => asset('images/ads/adsss.png'),
-            'link' => '/products/special-offer',
-        ],
-        [
-            'image' => asset('images/ads/addss.png'),
-            'link' => '/category/gaming',
-        ],
-    ]" title="{{ __('home.best-sellers') }}" sliderId="featured-slider"
-        :slidesPerView="3" :autoPlay="true" :showNavigation="true" :showPagination="false" cardStyle="modern" />
-    <!--  -->
+    @foreach ($sections as $section)
+        @if ($section->type === 'product_slider')
+            <x-product-slider :slidingProducts="$section->products" :banners="$section->banners" title="{{ $section->title }}"
+                sliderId="section-{{ $section->id }}" :slidesPerView="$section->settings['slidesPerView'] ?? 5" :autoPlay="$section->settings['autoPlay'] ?? true" :showNavigation="$section->settings['showNavigation'] ?? true"
+                :showPagination="$section->settings['showPagination'] ?? false" cardStyle="minimal" />
+        @elseif($section->type === 'banner')
+            @php
+                $bannerItems = $section->banners->map(function ($banner) {
+                    return (object) [
+                        'image_path' => $banner->images[0] ?? '',
+                        'link' => $banner->link,
+                        'target' => '_self',
+                    ];
+                });
+            @endphp
+            <x-ads-banner :adsBanners="$bannerItems" />
+        @endif
+    @endforeach
 
-    <!-- User Video Stories Section -->
-    {{-- @include('frontend.partials.user-stories') --}}
+    {{-- The old static banners and product sliders below are removed --}}
+    {{-- <x-ads-banner ... />  (removed) --}}
+    {{-- <x-product-slider ... /> (removed) --}}
+    {{-- ... etc --}}
 @endsection

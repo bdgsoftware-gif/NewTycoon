@@ -23,11 +23,11 @@
 
     <!-- Stock Badge -->
     @if (!$product['in_stock'])
-        <div class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 z-20 font-quantico">
+        <div class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 z-20 font-poppins">
             OUT OF STOCK
         </div>
     @elseif($product['is_new'])
-        <div class="absolute top-2 right-2 bg-accent text-white text-xs font-bold px-2 py-1 z-20 font-quantico">
+        <div class="absolute top-2 right-2 bg-accent text-white text-xs font-bold px-2 py-1 z-20 font-poppins">
             NEW
         </div>
     @endif
@@ -43,7 +43,7 @@
                         @csrf
                         <input type="hidden" name="quantity" value="1" class="buy-now-quantity-input">
                         <button type="submit"
-                            class="w-full bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-quantico">
+                            class="w-full bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-poppins">
                             <span class="flex items-center justify-center">
                                 <svg class="w-4 h-4 mr-2 hidden 2xl:block" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
@@ -79,7 +79,7 @@
             <div class="bg-gradient-to-t from-black/90 via-black/70 to-transparent pt-6 pb-4 px-4">
                 <div class="flex space-x-2">
                     <a href="{{ route('contact') }}"
-                        class="flex-1 bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-quantico">
+                        class="flex-1 bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-poppins">
                         <span class="flex items-center justify-center">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -96,14 +96,14 @@
     <!-- Product Info -->
     <div class="p-4 border-t border-gray-100 flex-grow flex flex-col">
         <a href="{{ $product['url'] }}"
-            class="font-medium font-quantico text-gray-900 text-sm mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-200 flex-grow">
+            class="font-medium font-poppins text-gray-900 text-sm mb-3 line-clamp-2 group-hover:text-primary transition-colors duration-200 flex-grow">
             {{ $product['name'] }}
         </a>
 
         <!-- Price + Wishlist -->
         <div class="mt-auto">
             <div class="flex items-center justify-between">
-                <span class="text-lg font-bold font-quantico text-gray-900">
+                <span class="text-lg font-bold font-poppins text-gray-900">
                     <span class="font-bengali">৳</span>{{ number_format($product['discounted_price'], 0) }}
                 </span>
 

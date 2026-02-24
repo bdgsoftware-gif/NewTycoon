@@ -1,7 +1,7 @@
 <div class="w-full py-6 md:py-12 max-w-8xl mx-auto px-4 category-section">
     <div class="flex justify-between items-end mb-6 md:mb-10">
         <h2
-            class="category-heading text-xl md:text-2xl lg:text-4xl font-bold text-gray-900 leading-tight capitalize font-quantico">
+            class="category-heading text-xl md:text-2xl lg:text-4xl font-medium text-gray-900 leading-tight capitalize font-poppins">
             {!! __('home.home-categories-header', ['break' => '<br>']) !!}
         </h2>
 

@@ -8,11 +8,8 @@ use Illuminate\View\Component;
 
 class ProductSlider extends Component
 {
-    /**
-     * Create a new component instance.
-     */
     public $slidingProducts;
-    public $adsImages;
+    public $banners;          // renamed from adsImages
     public $title;
     public $sliderId;
     public $autoPlay;
@@ -24,7 +21,7 @@ class ProductSlider extends Component
 
     public function __construct(
         $slidingProducts = [],
-        $adsImages = [],
+        $banners = [],        // now accepts 'banners' attribute
         $title = 'Recommended for you',
         $sliderId = 'productSlider',
         $autoPlay = true,
@@ -35,7 +32,7 @@ class ProductSlider extends Component
         $cardStyle = 'modern'
     ) {
         $this->slidingProducts = $slidingProducts ?: [];
-        $this->adsImages = $adsImages ?: [];
+        $this->banners = $banners ?: [];
         $this->title = $title;
         $this->sliderId = $sliderId;
         $this->autoPlay = filter_var($autoPlay, FILTER_VALIDATE_BOOLEAN);
@@ -46,9 +43,6 @@ class ProductSlider extends Component
         $this->cardStyle = $cardStyle;
     }
 
-    /**
-     * Get the view / contents that represent the component.
-     */
     public function render(): View|Closure|string
     {
         return view('components.product-slider');

@@ -7,7 +7,7 @@
     <div class="max-w-8xl mx-auto px-4 py-8">
         <!-- Page Header -->
         <div class="mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2 font-quantico">All Products</h1>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2 font-poppins">All Products</h1>
             <p class="text-gray-600 font-inter">Browse our complete collection of premium products</p>
         </div>
 
@@ -18,7 +18,7 @@
                     class="bg-white rounded-xl p-6 mb-6 border border-gray-200 lg:sticky lg:top-6 max-h-[calc(100vh-2rem)] overflow-y-auto no-scrollbar">
                     <!-- Search Filter -->
                     <div class="mb-6">
-                        <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Search</h3>
+                        <h3 class="font-semibold text-gray-900 mb-3 font-poppins">Search</h3>
                         <form method="GET" action="{{ route('products.index') }}" id="searchForm">
                             <div class="relative">
                                 <input type="text" name="search" value="{{ request('search') }}"
@@ -55,7 +55,7 @@
                     <!-- Category Filter -->
                     @if ($categories->count() > 0)
                         <div class="mb-6">
-                            <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Categories</h3>
+                            <h3 class="font-semibold text-gray-900 mb-3 font-poppins">Categories</h3>
                             <div class="space-y-2 max-h-96 overflow-y-auto no-scrollbar border-b border-gray-200 shadow-sm"
                                 role="navigation" aria-label="Category filters">
                                 <!-- FIXED: Simplified 'All Categories' link -->
@@ -78,7 +78,7 @@
 
                     <!-- Price Range Filter -->
                     <div class="mb-6">
-                        <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Price Range</h3>
+                        <h3 class="font-semibold text-gray-900 mb-3 font-poppins">Price Range</h3>
                         <div class="space-y-4">
                             <div class="flex items-center justify-between">
                                 <span class="text-sm font-medium text-gray-700 font-inter"><span
@@ -117,7 +117,7 @@
 
                     <!-- Status Filter -->
                     <div class="mb-6">
-                        <h3 class="font-semibold text-gray-900 mb-3 font-quantico">Status</h3>
+                        <h3 class="font-semibold text-gray-900 mb-3 font-poppins">Status</h3>
                         <div class="grid grid-cols-2 gap-2">
                             <!-- FIXED: Removed 'status' param instead of setting to 'all' -->
                             <a href="{{ route('products.index', request()->except('status')) }}"
@@ -239,13 +239,13 @@
                                         <div class="absolute top-3 left-3 flex flex-col space-y-1 z-10">
                                             @if ($isNew)
                                                 <span
-                                                    class="bg-gradient-to-r from-primary to-primary-dark text-white text-xs font-bold px-3 py-1.5 font-quantico rounded">
+                                                    class="bg-gradient-to-r from-primary to-primary-dark text-white text-xs font-bold px-3 py-1.5 font-poppins rounded">
                                                     NEW
                                                 </span>
                                             @endif
                                             @if (!$inStock)
                                                 <span
-                                                    class="bg-gray-700/90 text-white text-xs font-bold px-3 py-1.5 font-quantico rounded">
+                                                    class="bg-gray-700/90 text-white text-xs font-bold px-3 py-1.5 font-poppins rounded">
                                                     SOLD OUT
                                                 </span>
                                             @endif
@@ -255,7 +255,7 @@
                                         @if ($discountPercentage > 0)
                                             <div class="absolute top-3 right-3 z-10">
                                                 <span
-                                                    class="bg-gradient-to-r from-accent to-orange-500 text-white text-xs font-bold px-3 py-1.5 font-quantico rounded">
+                                                    class="bg-gradient-to-r from-accent to-orange-500 text-white text-xs font-bold px-3 py-1.5 font-poppins rounded">
                                                     -{{ $discountPercentage }}% OFF
                                                 </span>
                                             </div>
@@ -267,14 +267,14 @@
                                 <div class="p-4 border-t border-gray-100 flex-grow flex flex-col">
 
                                     <a href="{{ route('product.show', $productSlug) }}" title="{{ $productName }}"
-                                        class="font-medium font-quantico text-gray-900 text-sm mb-2 line-clamp-2 group-hover:text-primary transition-colors duration-200">
+                                        class="font-medium font-poppins text-gray-900 text-sm mb-2 line-clamp-2 group-hover:text-primary transition-colors duration-200">
                                         {{ $productName }}
                                     </a>
                                     <!-- Price + Wishlist -->
                                     <div class="mt-auto">
                                         <div class="flex items-center justify-between">
                                             <!-- FIXED: No decimal for BDT -->
-                                            <span class="text-lg font-bold font-quantico text-gray-900">
+                                            <span class="text-lg font-bold font-poppins text-gray-900">
                                                 <span class="font-bengali">৳</span>{{ number_format($finalPrice, 0) }}
                                             </span>
 
@@ -335,7 +335,7 @@
                                             class="bg-gradient-to-t from-black/90 via-black/70 to-transparent pt-6 pb-4 px-4">
                                             <div class="flex space-x-2">
                                                 <a href="{{ route('checkout.process', $productId) }}"
-                                                    class="flex-1 bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-quantico rounded-lg">
+                                                    class="flex-1 bg-white hover:bg-gray-100 text-gray-900 text-center font-semibold py-2.5 px-4 transition-colors duration-200 text-sm shadow-lg font-poppins rounded-lg">
                                                     <span class="flex items-center justify-center">
                                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
                                                             viewBox="0 0 24 24">
@@ -387,10 +387,10 @@
                                     d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-700 mb-2 font-quantico">No products found</h3>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2 font-poppins">No products found</h3>
                         <p class="text-gray-500 mb-6 font-inter">Try adjusting your filters or search terms</p>
                         <a href="{{ route('products.index') }}"
-                            class="inline-block px-6 py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition-colors duration-200 font-quantico">
+                            class="inline-block px-6 py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition-colors duration-200 font-poppins">
                             Clear Filters
                         </a>
                     </div>

@@ -7,7 +7,7 @@
         <div class="max-w-6xl mx-auto px-4">
             {{-- Header --}}
             <div class="mb-8">
-                <h1 class="text-3xl font-quantico font-bold text-gray-900 mb-2">Checkout</h1>
+                <h1 class="text-3xl font-poppins font-bold text-gray-900 mb-2">Checkout</h1>
                 <p class="text-gray-600">Complete your order</p>
             </div>
 
