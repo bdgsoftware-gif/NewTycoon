@@ -18,5 +18,6 @@ class BrandSeeder extends Seeder
             'slug' => 'tycoon',
             'is_active' => true,
         ]);
+        
     }
 }

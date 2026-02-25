@@ -8,94 +8,130 @@ use App\Models\AdBanner;
 
 class SectionSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-        // 1. Create/Update Banners
-        $promoBanner = AdBanner::updateOrCreate(
-            ['title' => 'Main Promo Banner'],
+
+        /*
+        |--------------------------------------------------------------------------
+        | 1. CREATE BANNERS
+        |--------------------------------------------------------------------------
+        */
+
+        $mainPromo = AdBanner::updateOrCreate(
+            ['title' => 'Homepage Main Promo'],
             [
-                'images' => ['ads-banner/banner1.jpg'],
+                'images' => [
+                    'ads-banner/banner1.jpg'
+                ],
                 'link' => '/offers',
-                'is_active' => true
+                'order' => 1,
+                'is_active' => true,
             ]
         );
 
-        $saleBanner = AdBanner::updateOrCreate(
-            ['title' => 'Secondary Summer Sale'],
+        $dualPromo = AdBanner::updateOrCreate(
+            ['title' => 'Homepage Dual Promo'],
             [
-                'images' => ['ads-banner/banner2.jpg', 'ads-banner/banner3.jpg'],
+                'images' => [
+                    'ads-banner/banner2.jpg',
+                    'ads-banner/banner3.jpg',
+                ],
                 'link' => '/summer-sale',
-                'is_active' => true
+                'order' => 2,
+                'is_active' => true,
+            ]
+        );
+
+        $triplePromo = AdBanner::updateOrCreate(
+            ['title' => 'Homepage Triple Promo'],
+            [
+                'images' => [
+                    'ads-banner/banner4.jpg',
+                    'ads-banner/banner5.jpg',
+                    'ads-banner/banner6.jpg',
+                ],
+                'link' => '/mega-deal',
+                'order' => 3,
+                'is_active' => true,
             ]
         );
 
 
-        // 2. Create the 3 Product Slider Sections
-        $productTypes = [
+        /*
+        |--------------------------------------------------------------------------
+        | 2. PRODUCT SLIDER SECTIONS
+        |--------------------------------------------------------------------------
+        */
+
+        $productSections = [
+
             [
                 'name' => 'Homepage New Arrivals',
-                'title' => 'New Arrivals',
-                'type' => 'new_arrivals',
-                'order' => 1
+                'title_en' => 'New Arrivals',
+                'title_bn' => 'নতুন আসা পণ্য',
+                'product_type' => 'new_arrivals',
+                'order' => 1,
+                'banner' => $mainPromo
             ],
+
             [
                 'name' => 'Homepage Best Sells',
-                'title' => 'Best Selling Products',
-                'type' => 'best_sells',
-                'order' => 2
+                'title_en' => 'Best Selling Products',
+                'title_bn' => 'সবচেয়ে বেশী বিক্রি পণ্য',
+                'product_type' => 'best_sells',
+                'order' => 2,
+                'banner' => $dualPromo
             ],
+
             [
                 'name' => 'Homepage Recommended',
-                'title' => 'Recommended For You',
-                'type' => 'recommended',
-                'order' => 3
+                'title_en' => 'Recommended For You',
+                'title_bn' => 'আপনার জন্য প্রস্তাবিত',
+                'product_type' => 'recommended',
+                'order' => 3,
+                'banner' => $triplePromo
             ],
         ];
 
-        foreach ($productTypes as $item) {
-            $section = Section::create([
-                'name'     => $item['name'],
-                'title'    => $item['title'],
-                'type'     => 'product_slider',
-                'order'    => $item['order'],
-                'settings' => [
-                    'product_type'   => $item['type'],
-                    'slidesPerView'  => 5,
-                    'autoPlay'       => false,
-                    'showNavigation' => true,
-                ],
-            ]);
+        foreach ($productSections as $item) {
 
-            // Optional: Attach a banner to the 'New Arrivals' slider specifically
-            if ($item['type'] === 'new_arrivals') {
-                $section->banners()->attach($promoBanner->id, [
-                    'order'    => 0,
-                    'position' => 2, // appears after 2nd product
-                ]);
-            } else if ($item['type'] === 'best_sells') {
-                $section->banners()->attach($saleBanner->id, [
-                    'order'    => 0,
-                    'position' => 3, // appears after 3rd product
-                ]);
-            } else if ($item['type'] === 'recommended') {
-                $section->banners()->attach($saleBanner->id, [
-                    'order'    => 0,
-                    'position' => 1, // appears after 1st product
-                ]);
-            }
+            Section::updateOrCreate(
+                ['name' => $item['name']],
+                [
+                    'title_en' => $item['title_en'],
+                    'title_bn' => $item['title_bn'],
+                    'type' => 'product_slider',
+                    'order' => $item['order'],
+                    'ad_banner_id' => $item['banner']->id,
+
+                    'settings' => [
+                        'product_type'   => $item['product_type'],
+                        'slidesPerView'  => 5,
+                        'autoPlay'       => true,
+                        'showNavigation' => true,
+                        'showPagination' => false,
+                    ],
+                ]
+            );
         }
 
-        // 3. Create a Pure Banner Section (Standalone)
-        $midBannerSection = Section::create([
-            'name'  => 'Homepage Mid Banner',
-            'type'  => 'banner',
-            'order' => 4,
-        ]);
 
-        // Attach both banners to this section
-        $midBannerSection->banners()->attach([
-            $promoBanner->id => ['order' => 1],
-            $saleBanner->id  => ['order' => 2],
-        ]);
+        /*
+        |--------------------------------------------------------------------------
+        | 3. PURE BANNER SECTION
+        |--------------------------------------------------------------------------
+        */
+
+        Section::updateOrCreate(
+            ['name' => 'Homepage Mid Banner'],
+            [
+                'title_en' => 'Mid-Page Promotion',
+                'title_bn' => 'মধ্য পৃষ্ঠার প্রচারণা',
+                'type' => 'banner',
+                'order' => 4,
+                'ad_banner_id' => $dualPromo->id,
+                'is_active' => true,
+            ]
+        );
     }
 }

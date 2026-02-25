@@ -70,8 +70,7 @@ class HomeController extends Controller
             $offerProducts = collect();
         }
 
-        $sections = Section::with(['banners'])->where('is_active', true)->orderBy('order')->get();
-
+        $sections = Section::with('banner')->where('is_active', true)->orderBy('order')->get();
         $sections->transform(function ($section) {
             if ($section->type === 'product_slider') {
 
@@ -87,7 +86,7 @@ class HomeController extends Controller
 
             return $section;
         });
-        // dd($sections->toArray());
+        
         return view('frontend.home', compact(
             'heroSlides',
             'categories',

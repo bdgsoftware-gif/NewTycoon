@@ -8,7 +8,7 @@
                 {{ __('common.featured-products') }}
             </h2>
 
-            <a href="{{ route('categories.index') }}"
+            <a href="{{ route('products.featured') }}"
                 class="group inline-flex items-center gap-1 transform text-gray-900 text-sm 2xl:text-base font-inter font-normal tracking-wide transition-colors duration-300 hover:text-primary">
 
                 <span class="hover:underline">View All</span>

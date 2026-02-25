@@ -35,11 +35,6 @@ class OfferController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'subtitle' => 'nullable|string|max:500',
-            'background_type' => 'required|in:svg,image,video,color',
-            'background_svg' => 'nullable|string',
-            'background_image' => 'nullable|image|max:5120',
-            'background_video' => 'nullable|mimes:mp4,webm|max:20480',
-            'background_color' => 'nullable|string|max:20',
             'main_banner_image' => 'nullable|image|max:5120',
             'timer_enabled' => 'boolean',
             'timer_end_date' => 'nullable|date|after:now',
@@ -56,20 +51,9 @@ class OfferController extends Controller
             'products.*' => 'exists:products,id',
         ]);
 
-        // Handle file uploads
-        if ($request->hasFile('background_image')) {
-            $validated['background_image'] = $request->file('background_image')
-                ->store('offers/backgrounds', 'public');
-        }
-
-        if ($request->hasFile('background_video')) {
-            $validated['background_video'] = $request->file('background_video')
-                ->store('offers/videos', 'public');
-        }
-
         if ($request->hasFile('main_banner_image')) {
             $validated['main_banner_image'] = $request->file('main_banner_image')
-                ->store('offers/banners', 'public');
+                ->store('offers', 'public');
         }
 
         // Set defaults
@@ -104,11 +88,6 @@ class OfferController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'subtitle' => 'nullable|string|max:500',
-            'background_type' => 'required|in:svg,image,video,color',
-            'background_svg' => 'nullable|string',
-            'background_image' => 'nullable|image|max:5120',
-            'background_video' => 'nullable|mimes:mp4,webm|max:20480',
-            'background_color' => 'nullable|string|max:20',
             'main_banner_image' => 'nullable|image|max:5120',
             'timer_enabled' => 'boolean',
             'timer_end_date' => 'nullable|date',
@@ -124,23 +103,6 @@ class OfferController extends Controller
             'products' => 'nullable|array',
             'products.*' => 'exists:products,id',
         ]);
-
-        // Handle file uploads
-        if ($request->hasFile('background_image')) {
-            if ($offer->background_image) {
-                Storage::disk('public')->delete($offer->background_image);
-            }
-            $validated['background_image'] = $request->file('background_image')
-                ->store('offers/backgrounds', 'public');
-        }
-
-        if ($request->hasFile('background_video')) {
-            if ($offer->background_video) {
-                Storage::disk('public')->delete($offer->background_video);
-            }
-            $validated['background_video'] = $request->file('background_video')
-                ->store('offers/videos', 'public');
-        }
 
         if ($request->hasFile('main_banner_image')) {
             if ($offer->main_banner_image) {
@@ -175,13 +137,6 @@ class OfferController extends Controller
 
     public function destroy(Offer $offer)
     {
-        // Delete images
-        if ($offer->background_image) {
-            Storage::disk('public')->delete($offer->background_image);
-        }
-        if ($offer->background_video) {
-            Storage::disk('public')->delete($offer->background_video);
-        }
         if ($offer->main_banner_image) {
             Storage::disk('public')->delete($offer->main_banner_image);
         }

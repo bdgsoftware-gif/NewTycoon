@@ -17,11 +17,6 @@ class Offer extends Model
         'title',
         'slug',
         'subtitle',
-        'background_type',
-        'background_svg',      // Added this
-        'background_image',
-        'background_video',
-        'background_color',
         'main_banner_image',
         'timer_enabled',
         'timer_end_date',
@@ -51,7 +46,6 @@ class Offer extends Model
     protected $appends = [
         'is_active',
         'products_count',
-        'background_url',
         'main_banner_url',
         'time_left',
     ];
@@ -116,27 +110,6 @@ class Offer extends Model
         return Cache::remember("offer.{$this->id}.products_count", 3600, function () {
             return $this->products()->count();
         });
-    }
-
-    public function getBackgroundUrlAttribute(): ?string
-    {
-        if ($this->background_type === 'color' && $this->background_color) {
-            return null;
-        }
-
-        if ($this->background_type === 'svg' && $this->background_svg) {
-            return null; // SVG will be rendered inline
-        }
-
-        if ($this->background_type === 'video' && $this->background_video) {
-            return asset('storage/' . $this->background_video);
-        }
-
-        if ($this->background_image) {
-            return asset('storage/' . $this->background_image);
-        }
-
-        return asset('images/offers/default-bg.jpg');
     }
 
     public function getMainBannerUrlAttribute(): ?string

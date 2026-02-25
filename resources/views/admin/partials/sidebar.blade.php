@@ -9,8 +9,8 @@
                 this.activeGroup = 'products';
             @elseif(request()->routeIs('admin.categories.*'))
                 this.activeGroup = 'categories';
-            {{-- @elseif(request()->routeIs('admin.categories.*') || request()->routeIs('admin.hero-slides.*'))
-                this.activeGroup = 'content'; --}}
+            @elseif(request()->routeIs('admin.content.*') || request()->routeIs('admin.hero-slides.*'))
+                this.activeGroup = 'content';
             @elseif(request()->routeIs('admin.orders.*'))
                 this.activeGroup = 'orders';
             @elseif(request()->routeIs('admin.offers.*'))
@@ -210,6 +210,28 @@
                                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                         Hero Slides
+                    </a>
+
+                    <!-- Ad Banners -->
+                    <a href="{{ route('admin.content.ad-banners.index') }}"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.content.ad-banners.*') ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:text-white hover:bg-gray-700/30' }}">
+                        <svg class="mr-3 h-4 w-4 {{ request()->routeIs('admin.content.ad-banners.*') ? 'text-primary' : 'text-gray-500 group-hover:text-primary' }}"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Ad Banners
+                    </a>
+
+                    <!-- Sections -->
+                    <a href="{{ route('admin.content.sections.index') }}"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.content.sections.*') ? 'bg-primary/10 text-primary' : 'text-gray-400 hover:text-white hover:bg-gray-700/30' }}">
+                        <svg class="mr-3 h-4 w-4 {{ request()->routeIs('admin.content.sections.*') ? 'text-primary' : 'text-gray-500 group-hover:text-primary' }}"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        Sections
                     </a>
 
                     <!-- Add more content management links here as needed -->

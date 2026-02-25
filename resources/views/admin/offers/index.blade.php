@@ -344,11 +344,11 @@
                         const offers = [];
                         document.querySelectorAll('#sortable-offers tr[data-id]').forEach((row,
                             index) => {
-                                offers.push({
-                                    id: row.dataset.id,
-                                    order: index + 1
-                                });
+                            offers.push({
+                                id: row.dataset.id,
+                                order: index + 1
                             });
+                        });
 
                         fetch('{{ route('admin.offers.reorder') }}', {
                             method: 'POST',

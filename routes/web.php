@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Frontend\CartController;
+use App\Http\Controllers\Frontend\CatalogController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\OrderController;
 use App\Http\Controllers\Frontend\ReviewController;
@@ -39,8 +40,16 @@ Route::get('/language/{locale}', function ($locale) {
 
 
 // Products
-Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-Route::get('/products/category/{category:slug}', [ProductController::class, 'category'])->name('products.category');
+Route::prefix('products')->name('products.')->controller(ProductController::class)->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/category/{category:slug}', 'category')->name('category');
+    Route::get('/featured-products', 'featured')->name('featured');
+    Route::get('/new-arrivals', 'newArrivals')->name('new-arrivals');
+    Route::get('/best-selling', 'bestSelling')->name('best-selling');
+    Route::get('/recommended', 'recommended')->name('recommended');
+    Route::get('/offers', 'offers')->name('offers');
+});
+
 Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
 
 // Categories
@@ -129,6 +138,8 @@ Route::view('/technology-and-innovation', 'frontend.pages.technology')->name('te
 Route::view('/certifications', 'frontend.pages.certifications')->name('certifications');
 Route::view('/partners', 'frontend.pages.partners')->name('partners');
 Route::view('/sustainability', 'frontend.pages.sustainability')->name('sustainability');
+Route::get('/catalogs', [CatalogController::class, 'index'])->name('catalogs');
+Route::view('/careers', 'frontend.pages.careers')->name('careers');
 
 // =========================
 // Support & Service

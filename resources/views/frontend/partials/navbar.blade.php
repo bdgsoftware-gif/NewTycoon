@@ -132,7 +132,7 @@
                 </div>
 
                 <!-- Catalog link (desktop) -->
-                <a href="/catalog"
+                <a href="{{ route('catalogs') }}"
                     class="hidden lg:block text-gray-700 hover:text-primary text-base font-medium px-3 py-2 border border-transparent hover:border-gray-300 hover:rounded-lg transition duration-200 mr-2">
                     Catalog
                 </a>
@@ -365,7 +365,8 @@
                 @endif
             @endforeach
             <!-- Catalog link for mobile -->
-            <a href="/catalog" class="text-gray-700 hover:text-primary block px-3 py-2 text-base font-semibold">
+            <a href="{{ route('catalogs') }}"
+                class="text-gray-700 hover:text-primary block px-3 py-2 text-base font-semibold">
                 Catalog
             </a>
         </div>

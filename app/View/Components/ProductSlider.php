@@ -5,11 +5,12 @@ namespace App\View\Components;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
+use Illuminate\Support\Collection;
 
 class ProductSlider extends Component
 {
     public $slidingProducts;
-    public $banners;          // renamed from adsImages
+    public $banner;          // renamed from adsImages
     public $title;
     public $sliderId;
     public $autoPlay;
@@ -21,7 +22,7 @@ class ProductSlider extends Component
 
     public function __construct(
         $slidingProducts = [],
-        $banners = [],        // now accepts 'banners' attribute
+        $banner,     
         $title = 'Recommended for you',
         $sliderId = 'productSlider',
         $autoPlay = true,
@@ -32,7 +33,7 @@ class ProductSlider extends Component
         $cardStyle = 'modern'
     ) {
         $this->slidingProducts = $slidingProducts ?: [];
-        $this->banners = $banners ?: [];
+        $this->banner = $banner;
         $this->title = $title;
         $this->sliderId = $sliderId;
         $this->autoPlay = filter_var($autoPlay, FILTER_VALIDATE_BOOLEAN);

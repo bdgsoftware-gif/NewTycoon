@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             OfferSeeder::class,
             HeroSlideSeeder::class,
             SectionSeeder::class,
+            CatalogSeeder::class,
         ]);
     }
 }

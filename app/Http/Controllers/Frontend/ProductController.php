@@ -20,22 +20,156 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $perPage = $request->get('per_page', 20);
-        $search = $request->get('search');
-        $category = $request->get('category');
-        $minPrice = $request->get('min_price');
-        $maxPrice = $request->get('max_price');
-        $sort = $request->get('sort', 'latest');
-        $status = $request->get('status');
+        $query = Product::query()->with(['category:id,name_en,name_bn,slug,parent_id']);
 
-        // Base query with active category check
+        $products = $this->getFilteredProductsQuery($request, $query)->paginate($request->get('per_page', 20));
+
+        $categories = $this->getCategoryFilterData();
+        $priceRange = $this->getGlobalPriceRange();
+
+        return view('frontend.products.index', array_merge(
+            compact('products', 'categories', 'priceRange'),
+            $this->getFilterParameters($request)
+        ));
+    }
+
+    /**
+     * Display featured products
+     */
+    public function featured(Request $request)
+    {
         $query = Product::query()
             ->with(['category:id,name_en,name_bn,slug,parent_id'])
-            ->active()
-            ->latest()
-            ->withActiveCategory();
+            ->featured();  // scope from Product model
 
-        if ($search) {
+        $products = $this->getFilteredProductsQuery($request, $query)->paginate($request->get('per_page', 20));
+
+        $categories = $this->getCategoryFilterData();
+        $priceRange = $this->getGlobalPriceRange();
+
+        return view('frontend.products.index', array_merge(
+            compact('products', 'categories', 'priceRange'),
+            $this->getFilterParameters($request),
+            [
+                'title'       => 'Featured Products',
+                'description' => 'Explore our hand-picked featured products'
+            ]
+        ));
+    }
+
+    /**
+     * Display new arrivals
+     */
+    public function newArrivals(Request $request)
+    {
+        $query = Product::query()
+            ->with(['category:id,name_en,name_bn,slug,parent_id'])
+            ->new();  // scope from Product model
+
+        $products = $this->getFilteredProductsQuery($request, $query)->paginate($request->get('per_page', 20));
+
+        $categories = $this->getCategoryFilterData();
+        $priceRange = $this->getGlobalPriceRange();
+
+        return view('frontend.products.index', array_merge(
+            compact('products', 'categories', 'priceRange'),
+            $this->getFilterParameters($request),
+            [
+                'title'       => 'New Arrivals',
+                'description' => 'Discover our latest products'
+            ]
+        ));
+    }
+
+    /**
+     * Display best selling products
+     */
+    public function bestSelling(Request $request)
+    {
+        $query = Product::query()
+            ->with(['category:id,name_en,name_bn,slug,parent_id'])
+            ->where(function ($q) {
+                $q->where('is_bestsells', true)
+                    ->orWhere('average_rating', '>=', 4.2)
+                    ->orWhere('total_sold', '>', 50);
+            })
+            ->orderByDesc('average_rating')
+            ->orderByDesc('total_sold');
+
+        $products = $this->getFilteredProductsQuery($request, $query, $skipSorting = true)
+            ->paginate($request->get('per_page', 20));
+
+        $categories = $this->getCategoryFilterData();
+        $priceRange = $this->getGlobalPriceRange();
+
+        return view('frontend.products.index', array_merge(
+            compact('products', 'categories', 'priceRange'),
+            $this->getFilterParameters($request),
+            [
+                'title'       => 'Best Selling',
+                'description' => 'Our most popular products'
+            ]
+        ));
+    }
+
+    /**
+     * Display recommended products
+     */
+    public function recommended(Request $request)
+    {
+        $query = Product::query()
+            ->with(['category:id,name_en,name_bn,slug,parent_id'])
+            ->inStock()
+            ->orderByDesc('total_sold')
+            ->orderByDesc('average_rating');
+
+        $products = $this->getFilteredProductsQuery($request, $query, $skipSorting = true)
+            ->paginate($request->get('per_page', 20));
+
+        $categories = $this->getCategoryFilterData();
+        $priceRange = $this->getGlobalPriceRange();
+
+        return view('frontend.products.index', array_merge(
+            compact('products', 'categories', 'priceRange'),
+            $this->getFilterParameters($request),
+            [
+                'title'       => 'Recommended for You',
+                'description' => 'Products we think you will love'
+            ]
+        ));
+    }
+
+    public function offers(Request $request)
+    {
+        $query = Product::query()
+            ->with(['category:id,name_en,name_bn,slug,parent_id'])
+            ->featured(); 
+
+        $products = $this->getFilteredProductsQuery($request, $query)->paginate($request->get('per_page', 20));
+
+        $categories = $this->getCategoryFilterData();
+        $priceRange = $this->getGlobalPriceRange();
+
+        return view('frontend.products.index', array_merge(
+            compact('products', 'categories', 'priceRange'),
+            $this->getFilterParameters($request),
+            [
+                'title'       => 'Offer Products',
+                'description' => 'Check out our special offer products'
+            ]
+        ));
+    }
+
+    /**
+     * Apply all filters (search, category, price, status, sort) to a query.
+     */
+    protected function getFilteredProductsQuery(Request $request, $baseQuery = null, $skipSorting = false)
+    {
+        $query = $baseQuery ?: Product::query();
+        $query->active()->withActiveCategory();
+
+        // Search
+        if ($search = $request->get('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('name_en', 'like', "%{$search}%")
                     ->orWhere('name_bn', 'like', "%{$search}%")
@@ -46,29 +180,26 @@ class ProductController extends Controller
             });
         }
 
-        // Apply category filter
-        if ($category) {
-            // Get category and all its descendant IDs
+        // Category filter
+        if ($category = $request->get('category')) {
             $categoryModel = Category::where('id', $category)
                 ->orWhere('slug', $category)
                 ->first();
-
             if ($categoryModel) {
-                $categoryIds = $categoryModel->getAllCategoryIds();
-                $query->whereIn('category_id', $categoryIds);
+                $query->whereIn('category_id', $categoryModel->getAllCategoryIds());
             }
         }
 
-        // Apply price range filter
-        if ($minPrice !== null && $minPrice !== '') {
-            $query->where('price', '>=', $minPrice);
+        // Price range
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', $request->min_price);
         }
-        if ($maxPrice !== null && $maxPrice !== '') {
-            $query->where('price', '<=', $maxPrice);
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', $request->max_price);
         }
 
-        // Apply status filter
-        if ($status) {
+        // Status filter (overrides the base scope if needed)
+        if ($status = $request->get('status')) {
             switch ($status) {
                 case 'in_stock':
                     $query->inStock();
@@ -91,12 +222,20 @@ class ProductController extends Controller
             }
         }
 
-        $this->applySorting($query, $sort);
+        // Sorting (skip if the base query already has custom ordering)
+        if (!$skipSorting) {
+            $this->applySorting($query, $request->get('sort', 'latest'));
+        }
 
-        // Paginate results
-        $products = $query->paginate($perPage)->withQueryString();
+        return $query;
+    }
 
-        $categories = Category::active()
+    /**
+     * Get categories with product counts for filter sidebar.
+     */
+    protected function getCategoryFilterData()
+    {
+        return Category::active()
             ->leaf()
             ->select('id', 'name_en', 'name_bn', 'slug', 'parent_id', 'depth')
             ->with('parent:id,name_en,name_bn')
@@ -106,29 +245,71 @@ class ProductController extends Controller
             ->having('products_count', '>', 0)
             ->orderBy('name_en')
             ->get();
+    }
 
-        // Get price range for filter
-        $activePrices = Product::active()
+    /**
+     * Get global min/max price from all active products.
+     */
+    protected function getGlobalPriceRange()
+    {
+        $prices = Product::active()
             ->withActiveCategory()
             ->selectRaw('MIN(price) as min_price, MAX(price) as max_price')
             ->first();
 
-        $priceRange = [
-            'min' => (int) ($activePrices->min_price ?? 0),
-            'max' => (int) ($activePrices->max_price ?? 100000),
+        return [
+            'min' => (int) ($prices->min_price ?? 0),
+            'max' => (int) ($prices->max_price ?? 100000),
         ];
+    }
 
-        return view('frontend.products.index', compact(
-            'products',
-            'categories',
-            'priceRange',
-            'search',
-            'category',
-            'minPrice',
-            'maxPrice',
-            'sort',
-            'status'
-        ));
+    /**
+     * Extract filter parameters from request for view.
+     */
+    protected function getFilterParameters(Request $request)
+    {
+        return [
+            'search'    => $request->get('search'),
+            'category'  => $request->get('category'),
+            'minPrice'  => $request->get('min_price'),
+            'maxPrice'  => $request->get('max_price'),
+            'sort'      => $request->get('sort', 'latest'),
+            'status'    => $request->get('status'),
+        ];
+    }
+
+    /**
+     * Apply sorting to query (mirrors index method).
+     */
+    protected function applySorting($query, string $sort): void
+    {
+        switch ($sort) {
+            case 'price_low':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_high':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'name_asc':
+                $query->orderBy('name_en', 'asc');
+                break;
+            case 'name_desc':
+                $query->orderBy('name_en', 'desc');
+                break;
+            case 'popular':
+                $query->orderBy('total_sold', 'desc')
+                    ->orderBy('average_rating', 'desc');
+                break;
+            case 'rating':
+                $query->orderBy('average_rating', 'desc')
+                    ->orderBy('rating_count', 'desc');
+                break;
+            case 'newest':
+            case 'latest':
+            default:
+                $query->latest('created_at');
+                break;
+        }
     }
 
     /**
@@ -309,42 +490,5 @@ class ProductController extends Controller
             ->get();
 
         return view('frontend.products.category', compact('category', 'products', 'subCategories'));
-    }
-
-    /**
-     * Apply sorting to query
-     * FIXED: Use actual database columns
-     */
-    protected function applySorting($query, string $sort): void
-    {
-        switch ($sort) {
-            case 'price_low':
-                $query->orderBy('price', 'asc');
-                break;
-            case 'price_high':
-                $query->orderBy('price', 'desc');
-                break;
-            case 'name_asc':
-                $query->orderBy('name_en', 'asc');  // FIXED: Use column name
-                break;
-            case 'name_desc':
-                $query->orderBy('name_en', 'desc');  // FIXED: Use column name
-                break;
-            case 'popular':
-                $query->orderBy('total_sold', 'desc')
-                    ->orderBy('average_rating', 'desc');
-                break;
-            case 'rating':
-                $query->orderBy('average_rating', 'desc')
-                    ->orderBy('rating_count', 'desc');
-                break;
-            case 'newest':
-                $query->latest('created_at');
-                break;
-            case 'latest':
-            default:
-                $query->latest('created_at');
-                break;
-        }
     }
 }

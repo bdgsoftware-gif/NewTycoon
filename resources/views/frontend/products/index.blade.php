@@ -1,14 +1,15 @@
 @extends('frontend.layouts.app')
 
-@section('title', 'All Products')
-@section('description', 'Browse our collection of products')
+@section('title', $title ?? 'All Products')
+@section('description', $description ?? 'Browse our collection of products')
 
 @section('content')
     <div class="max-w-8xl mx-auto px-4 py-8">
         <!-- Page Header -->
         <div class="mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2 font-poppins">All Products</h1>
-            <p class="text-gray-600 font-inter">Browse our complete collection of premium products</p>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2 font-poppins">{{ $title ?? 'All Products' }}</h1>
+            <p class="text-gray-600 font-inter"> {{ $description ?? 'Browse our complete collection of premium products' }}
+            </p>
         </div>
 
         <div class="flex flex-col lg:flex-row gap-8">

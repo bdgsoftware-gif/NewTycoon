@@ -7,8 +7,8 @@
             <div class="mb-8">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-900">Create New Offer</h1>
-                        <p class="mt-2 text-sm text-gray-600">Add a new promotional offer</p>
+                        <h1 class="text-3xl font-bold text-gray-900">Edit Offer</h1>
+                        <p class="mt-2 text-sm text-gray-600">Update offer details and settings</p>
                     </div>
                     <div class="flex items-center space-x-3">
                         <a href="{{ route('admin.offers.index') }}"
@@ -17,14 +17,16 @@
                         </a>
                         <button type="submit" form="offerForm"
                             class="px-6 py-2.5 bg-gradient-to-r from-primary to-primary/80 text-white text-sm font-medium rounded-xl hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all">
-                            Create Offer
+                            Update Offer
                         </button>
                     </div>
                 </div>
             </div>
 
-            <form id="offerForm" action="{{ route('admin.offers.store') }}" method="POST" enctype="multipart/form-data">
+            <form id="offerForm" action="{{ route('admin.offers.update', $offer) }}" method="POST"
+                enctype="multipart/form-data">
                 @csrf
+                @method('PUT')
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <!-- Left Column - Main Content -->
@@ -42,7 +44,8 @@
                                     <label for="title" class="block text-sm font-medium text-gray-700 mb-1">
                                         Title <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="text" id="title" name="title" required value="{{ old('title') }}"
+                                    <input type="text" id="title" name="title" required
+                                        value="{{ old('title', $offer->title) }}"
                                         class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors @error('title') border-red-300 @enderror"
                                         placeholder="e.g., Summer Sale 2024">
                                     @error('title')
@@ -57,7 +60,7 @@
                                     </label>
                                     <textarea id="subtitle" name="subtitle" rows="2"
                                         class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors @error('subtitle') border-red-300 @enderror"
-                                        placeholder="Brief description of the offer">{{ old('subtitle') }}</textarea>
+                                        placeholder="Brief description of the offer">{{ old('subtitle', $offer->subtitle) }}</textarea>
                                     @error('subtitle')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
@@ -74,8 +77,15 @@
                                                 accept="image/*"
                                                 class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20">
                                         </div>
+                                        @if ($offer->main_banner_image)
+                                            <div class="w-20 h-20 rounded-lg overflow-hidden border border-gray-200">
+                                                <img src="{{ $offer->main_banner_url }}" alt="Banner"
+                                                    class="w-full h-full object-cover">
+                                            </div>
+                                        @endif
                                     </div>
-                                    <p class="mt-1 text-xs text-gray-500">Product showcase image, Max 5MB.</p>
+                                    <p class="mt-1 text-xs text-gray-500">Product showcase image, Max 5MB. Leave empty to
+                                        keep current.</p>
                                 </div>
                             </div>
                         </div>
@@ -96,10 +106,10 @@
                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                                         @foreach (['manual' => 'Manual Selection', 'discount' => 'Auto - By Discount', 'category' => 'Auto - By Category'] as $value => $label)
                                             <label
-                                                class="relative flex flex-col items-center justify-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:border-primary hover:bg-primary/5 sourceOption {{ old('product_source', 'manual') === $value ? 'border-primary bg-primary/10' : 'border-gray-200' }}">
+                                                class="relative flex flex-col items-center justify-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:border-primary hover:bg-primary/5 sourceOption {{ old('product_source', $offer->product_source) === $value ? 'border-primary bg-primary/10' : 'border-gray-200' }}">
                                                 <input type="radio" name="product_source" value="{{ $value }}"
                                                     class="sr-only"
-                                                    {{ old('product_source', 'manual') === $value ? 'checked' : '' }}>
+                                                    {{ old('product_source', $offer->product_source) === $value ? 'checked' : '' }}>
                                                 @if ($value === 'manual')
                                                     <svg class="w-8 h-8 text-gray-700 mb-2" fill="none"
                                                         stroke="currentColor" viewBox="0 0 24 24">
@@ -132,7 +142,7 @@
                                 <div id="sourceFields">
                                     <!-- Manual Products -->
                                     <div id="manual-products"
-                                        class="{{ old('product_source', 'manual') === 'manual' ? '' : 'hidden' }}">
+                                        class="{{ old('product_source', $offer->product_source) === 'manual' ? '' : 'hidden' }}">
                                         <label class="block text-sm font-medium text-gray-700 mb-1">
                                             Select Products
                                         </label>
@@ -141,7 +151,7 @@
                                             size="6">
                                             @foreach ($products as $product)
                                                 <option value="{{ $product->id }}"
-                                                    {{ in_array($product->id, old('products', [])) ? 'selected' : '' }}>
+                                                    {{ in_array($product->id, old('products', $selectedProducts ?? [])) ? 'selected' : '' }}>
                                                     {{ $product->name }} - ৳{{ number_format($product->price, 2) }}
                                                 </option>
                                             @endforeach
@@ -151,18 +161,19 @@
 
                                     <!-- Discount Config -->
                                     <div id="discount-config"
-                                        class="{{ old('product_source') === 'discount' ? '' : 'hidden' }}">
+                                        class="{{ old('product_source', $offer->product_source) === 'discount' ? '' : 'hidden' }}">
                                         <label for="min_discount" class="block text-sm font-medium text-gray-700 mb-1">
                                             Minimum Discount Percentage
                                         </label>
                                         <div class="flex items-center space-x-3">
                                             <input type="range" id="min_discount" name="source_config[min_discount]"
                                                 min="1" max="100"
-                                                value="{{ old('source_config.min_discount', 10) }}"
+                                                value="{{ old('source_config.min_discount', $offer->source_config['min_discount'] ?? 10) }}"
                                                 class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                                             <div class="w-20">
                                                 <input type="number" id="min_discount_input" min="1"
-                                                    max="100" value="{{ old('source_config.min_discount', 10) }}"
+                                                    max="100"
+                                                    value="{{ old('source_config.min_discount', $offer->source_config['min_discount'] ?? 10) }}"
                                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg text-center">
                                             </div>
                                             <span class="text-gray-500">%</span>
@@ -173,7 +184,7 @@
 
                                     <!-- Category Config -->
                                     <div id="category-config"
-                                        class="{{ old('product_source') === 'category' ? '' : 'hidden' }}">
+                                        class="{{ old('product_source', $offer->product_source) === 'category' ? '' : 'hidden' }}">
                                         <label class="block text-sm font-medium text-gray-700 mb-1">
                                             Select Categories
                                         </label>
@@ -182,12 +193,12 @@
                                             size="5">
                                             @foreach ($categories as $category)
                                                 <option value="{{ $category->id }}"
-                                                    {{ in_array($category->id, old('source_config.category_ids', [])) ? 'selected' : '' }}>
+                                                    {{ in_array($category->id, old('source_config.category_ids', $offer->source_config['category_ids'] ?? [])) ? 'selected' : '' }}>
                                                     {{ $category->name }}
                                                 </option>
                                                 @foreach ($category->children as $child)
                                                     <option value="{{ $child->id }}"
-                                                        {{ in_array($child->id, old('source_config.category_ids', [])) ? 'selected' : '' }}>
+                                                        {{ in_array($child->id, old('source_config.category_ids', $offer->source_config['category_ids'] ?? [])) ? 'selected' : '' }}>
                                                         &nbsp;&nbsp;→ {{ $child->name }}
                                                     </option>
                                                 @endforeach
@@ -204,7 +215,7 @@
                                         Product Limit <span class="text-red-500">*</span>
                                     </label>
                                     <input type="number" id="product_limit" name="product_limit" min="1"
-                                        max="100" required value="{{ old('product_limit', 12) }}"
+                                        max="100" required value="{{ old('product_limit', $offer->product_limit) }}"
                                         class="w-32 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors">
                                     <p class="mt-1 text-xs text-gray-500">Maximum number of products to display (1-100)</p>
                                 </div>
@@ -231,7 +242,7 @@
                                         class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors">
                                         @foreach (['draft' => 'Draft', 'active' => 'Active', 'inactive' => 'Inactive', 'scheduled' => 'Scheduled'] as $value => $label)
                                             <option value="{{ $value }}"
-                                                {{ old('status', 'draft') === $value ? 'selected' : '' }}>
+                                                {{ old('status', $offer->status) === $value ? 'selected' : '' }}>
                                                 {{ $label }}
                                             </option>
                                         @endforeach
@@ -242,19 +253,20 @@
                                 <div class="space-y-4">
                                     <div class="flex items-center">
                                         <input type="checkbox" id="timer_enabled" name="timer_enabled" value="1"
-                                            {{ old('timer_enabled') ? 'checked' : '' }}
+                                            {{ old('timer_enabled', $offer->timer_enabled) ? 'checked' : '' }}
                                             class="h-4 w-4 text-primary rounded border-gray-300 focus:ring-primary/20">
                                         <label for="timer_enabled" class="ml-2 text-sm font-medium text-gray-700">
                                             Enable Countdown Timer
                                         </label>
                                     </div>
 
-                                    <div id="timerFields" class="{{ old('timer_enabled') ? '' : 'hidden' }}">
+                                    <div id="timerFields"
+                                        class="{{ old('timer_enabled', $offer->timer_enabled) ? '' : 'hidden' }}">
                                         <label for="timer_end_date" class="block text-sm font-medium text-gray-700 mb-1">
                                             Timer End Date
                                         </label>
                                         <input type="datetime-local" id="timer_end_date" name="timer_end_date"
-                                            value="{{ old('timer_end_date') }}"
+                                            value="{{ old('timer_end_date', $offer->timer_end_date ? $offer->timer_end_date->format('Y-m-d\TH:i') : '') }}"
                                             class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors">
                                     </div>
                                 </div>
@@ -268,7 +280,7 @@
                                             Start Date
                                         </label>
                                         <input type="datetime-local" id="start_date" name="start_date"
-                                            value="{{ old('start_date') }}"
+                                            value="{{ old('start_date', $offer->start_date ? $offer->start_date->format('Y-m-d\TH:i') : '') }}"
                                             class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors">
                                     </div>
 
@@ -277,7 +289,7 @@
                                             End Date
                                         </label>
                                         <input type="datetime-local" id="end_date" name="end_date"
-                                            value="{{ old('end_date') }}"
+                                            value="{{ old('end_date', $offer->end_date ? $offer->end_date->format('Y-m-d\TH:i') : '') }}"
                                             class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors">
                                     </div>
                                 </div>
@@ -287,7 +299,8 @@
                                     <label for="order" class="block text-sm font-medium text-gray-700 mb-1">
                                         Display Order
                                     </label>
-                                    <input type="number" id="order" name="order" value="{{ old('order', 0) }}"
+                                    <input type="number" id="order" name="order"
+                                        value="{{ old('order', $offer->order) }}"
                                         class="w-32 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors">
                                     <p class="mt-1 text-xs text-gray-500">Lower numbers appear first</p>
                                 </div>
@@ -298,7 +311,7 @@
                                         View All Link
                                     </label>
                                     <input type="text" id="view_all_link" name="view_all_link"
-                                        value="{{ old('view_all_link', 'products.index') }}"
+                                        value="{{ old('view_all_link', $offer->view_all_link) }}"
                                         class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                                         placeholder="products.index or /shop">
                                 </div>
@@ -309,7 +322,7 @@
                                         View All Text
                                     </label>
                                     <input type="text" id="view_all_text" name="view_all_text"
-                                        value="{{ old('view_all_text', 'View All') }}"
+                                        value="{{ old('view_all_text', $offer->view_all_text ?? 'View All') }}"
                                         class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                                         placeholder="Button text for view all link">
                                 </div>
@@ -327,7 +340,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                                         </svg>
-                                        Create Offer
+                                        Update Offer
                                     </button>
 
                                     <a href="{{ route('admin.offers.index') }}"
@@ -342,6 +355,39 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Preview Card -->
+                        @if (isset($offer))
+                            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                                <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+                                    <h2 class="text-lg font-semibold text-gray-900">Quick Stats</h2>
+                                </div>
+                                <div class="p-6">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="bg-gray-50 rounded-xl p-4 text-center">
+                                            <div class="text-2xl font-bold text-gray-900">
+                                                {{ number_format($offer->view_count) }}</div>
+                                            <div class="text-sm text-gray-600 mt-1">Views</div>
+                                        </div>
+                                        <div class="bg-gray-50 rounded-xl p-4 text-center">
+                                            <div class="text-2xl font-bold text-gray-900">
+                                                {{ number_format($offer->click_count) }}</div>
+                                            <div class="text-sm text-gray-600 mt-1">Clicks</div>
+                                        </div>
+                                        <div class="bg-gray-50 rounded-xl p-4 text-center">
+                                            <div class="text-2xl font-bold text-gray-900">{{ $offer->products_count }}
+                                            </div>
+                                            <div class="text-sm text-gray-600 mt-1">Products</div>
+                                        </div>
+                                        <div class="bg-gray-50 rounded-xl p-4 text-center">
+                                            <div class="text-lg font-bold text-gray-900">
+                                                {{ ucfirst($offer->product_source) }}</div>
+                                            <div class="text-sm text-gray-600 mt-1">Source</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </form>

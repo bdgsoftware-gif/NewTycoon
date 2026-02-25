@@ -2,21 +2,18 @@
 @php
     $totalProducts = count($slidingProducts);
     $totalSlides = $totalProducts;
-
-    $bannerModels = $banners;
-    @dump($bannerModels)
 @endphp
 
-{{-- Top banner slider (if any banners exist) --}}
-{{-- @if ($bannerModels->isNotEmpty())
-    <x-ads-banner :adsBanners="$bannerModels" />
-@endif --}}
+@if ($banner)
+    <x-ads-banner :banner="$banner" />
+@endif
 
 <section class="max-w-8xl mx-auto py-12 px-4" data-slider-section="{{ $sliderId }}">
     <!-- Section Header -->
     <div class="flex items-center justify-between mb-8">
         <div>
-            <h2 class="text-2xl md:text-3xl font-bold text-gray-900 font-poppins">{{ $title }}</h2>
+            <h2 class="text-xl md:text-2xl lg:text-4xl font-medium text-gray-900 leading-tight font-poppins">
+                {{ $title }}</h2>
         </div>
         @if ($showNavigation && $totalSlides >= $slidesPerView)
             <div class="flex items-center space-x-2 hidden md:flex">

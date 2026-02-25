@@ -13,11 +13,6 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug')->unique();
             $table->text('subtitle')->nullable();
-            $table->enum('background_type', ['svg', 'image', 'video', 'color'])->default('svg');
-            $table->longText('background_svg')->nullable();
-            $table->string('background_image')->nullable();
-            $table->string('background_video')->nullable();
-            $table->string('background_color')->nullable();
             $table->string('main_banner_image')->nullable();
             $table->boolean('timer_enabled')->default(true);
             $table->datetime('timer_end_date')->nullable();

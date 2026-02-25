@@ -9,20 +9,13 @@
 
     @foreach ($sections as $section)
         @if ($section->type === 'product_slider')
-            <x-product-slider :slidingProducts="$section->products" :banners="$section->banners" title="{{ $section->title }}"
+            <x-product-slider :slidingProducts="$section->products" :banner="$section->banner" title="{{ $section->title }}"
                 sliderId="section-{{ $section->id }}" :slidesPerView="$section->settings['slidesPerView'] ?? 5" :autoPlay="$section->settings['autoPlay'] ?? true" :showNavigation="$section->settings['showNavigation'] ?? true"
                 :showPagination="$section->settings['showPagination'] ?? false" cardStyle="minimal" />
         @elseif($section->type === 'banner')
-            @php
-                $bannerItems = $section->banners->map(function ($banner) {
-                    return (object) [
-                        'image_path' => $banner->images[0] ?? '',
-                        'link' => $banner->link,
-                        'target' => '_self',
-                    ];
-                });
-            @endphp
-            <x-ads-banner :adsBanners="$bannerItems" />
+            @if ($section->banner)
+                <x-ads-banner :banner="$section->banner" />
+            @endif
         @endif
     @endforeach
 
