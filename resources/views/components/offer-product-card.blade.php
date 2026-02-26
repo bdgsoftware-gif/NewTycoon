@@ -28,7 +28,7 @@
         </div>
     @elseif($product['is_new'])
         <div class="absolute top-2 right-2 bg-accent text-white text-xs font-bold px-2 py-1 z-20 font-poppins">
-            NEW
+            {{ __('products.new') }}
         </div>
     @endif
 

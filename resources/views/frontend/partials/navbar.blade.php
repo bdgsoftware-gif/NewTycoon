@@ -16,7 +16,7 @@
                     <div class="relative group ml-2">
                         <button id="all-categories-btn"
                             class="flex items-center space-x-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-base font-medium text-gray-800 border border-gray-300 rounded-l-lg">
-                            <span id="selected-category-text">All Categories</span>
+                            <span id="selected-category-text">{{ __('home.all-categories') }}</span>
                             <svg class="w-4 h-4 transition-transform duration-200 group-hover:rotate-180" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -73,7 +73,7 @@
                                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
                                 <button type="submit"
-                                    class="bg-accent text-base text-white px-3 py-2 border border-gray-300 hover:bg-primary/80 transition-colors  rounded-r-lg">Search</button>
+                                    class="bg-accent text-base text-white px-3 py-2 border border-gray-300 hover:bg-primary/80 transition-colors  rounded-r-lg">{{ __('home.search') }}</button>
                             </form>
 
                             <!-- Search suggestions dropdown -->
@@ -82,7 +82,8 @@
                                 <div class="p-2">
                                     <!-- Popular searches (shown when input empty) -->
                                     <div id="desktop-popular-searches" class="px-3 py-2">
-                                        <p class="text-xs font-medium text-gray-500 mb-2">Popular Searches</p>
+                                        <p class="text-xs font-medium text-gray-500 mb-2">
+                                            {{ __('home.popular-searches') }}</p>
                                         <div id="desktop-popular-loading" class="hidden flex items-center space-x-2">
                                             <div class="animate-spin h-4 w-4 border-b-2 border-primary"></div>
                                             <span class="text-sm text-gray-600">Loading popular searches...</span>
@@ -134,27 +135,17 @@
                 <!-- Catalog link (desktop) -->
                 <a href="{{ route('catalogs') }}"
                     class="hidden lg:block text-gray-700 hover:text-primary text-base font-medium px-3 py-2 border border-transparent hover:border-gray-300 hover:rounded-lg transition duration-200 mr-2">
-                    Catalog
+                    {{ __('home.catalogs') }}
                 </a>
 
                 <!-- Right icons (language, user, cart, mobile menu) -->
                 <div class="flex items-center space-x-1">
                     <!-- Language -->
-                    <div class="relative group hidden lg:block">
-                        <button
-                            class="text-base font-medium text-gray-700 px-3 py-2 border border-transparent hover:border-gray-300 bg-accent/10 hover:bg-accent/20 rounded-lg hover:rounded-t-lg transition duration-200">
-                            {{ app()->getLocale() == 'en' ? 'English' : 'বাংলা' }}
-                        </button>
-                        <div
-                            class="w-full absolute right-0 mt-0 text-center bg-white border border-gray-200 shadow-md hidden group-hover:block z-50">
-                            @if (app()->getLocale() == 'en')
-                                <a href="{{ url('language/bn') }}"
-                                    class="block py-2 text-sm hover:bg-gray-100">বাংলা</a>
-                            @else
-                                <a href="{{ url('language/en') }}"
-                                    class="block py-2 text-sm hover:bg-gray-100">English</a>
-                            @endif
-                        </div>
+                    <div class="hidden lg:block">
+                        <a href="{{ url('language/' . (app()->getLocale() == 'en' ? 'bn' : 'en')) }}"
+                            class="text-base font-medium text-gray-700 px-3 py-2 border border-transparent hover:border-gray-300 bg-accent/10 hover:bg-accent/20 rounded-lg transition duration-200 inline-block">
+                            {{ app()->getLocale() == 'en' ? 'বাংলা' : 'English' }}
+                        </a>
                     </div>
 
                     <!-- User icon + dropdown -->
@@ -367,7 +358,7 @@
             <!-- Catalog link for mobile -->
             <a href="{{ route('catalogs') }}"
                 class="text-gray-700 hover:text-primary block px-3 py-2 text-base font-semibold">
-                Catalog
+                {{ __('home.catalogs') }}
             </a>
         </div>
     </div>

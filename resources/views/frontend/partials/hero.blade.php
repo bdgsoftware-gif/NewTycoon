@@ -82,17 +82,17 @@
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <div class="text-white font-semibold text-sm md:text-base min-w-[70px] text-center">
+                    <div class="text-black font-semibold text-sm md:text-base min-w-[70px] text-center">
                         <span class="swiper-current-slide">1</span> / <span
                             class="swiper-total-slides">{{ count($heroSlides) }}</span>
                     </div>
 
                     <button
-                        class="swiper-autoplay-toggle w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-300">
-                        <svg class="w-4 h-4 text-white swiper-play-icon" fill="currentColor" viewBox="0 0 24 24">
+                        class="swiper-autoplay-toggle w-8 h-8 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 transition-colors duration-300">
+                        <svg class="w-4 h-4 text-black swiper-play-icon" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M6 4l12 8-12 8z" />
                         </svg>
-                        <svg class="w-4 h-4 text-white swiper-pause-icon hidden" fill="currentColor"
+                        <svg class="w-4 h-4 text-black swiper-pause-icon hidden" fill="currentColor"
                             viewBox="0 0 24 24">
                             <path d="M6 4h4v16H6zm8 0h4v16h-4z" />
                         </svg>

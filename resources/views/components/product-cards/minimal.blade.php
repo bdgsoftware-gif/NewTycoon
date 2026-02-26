@@ -50,7 +50,7 @@
         </div>
     @elseif($isNew)
         <div class="absolute top-2 right-2 bg-accent text-white text-xs font-bold px-2 py-1 z-20 font-poppins">
-            NEW
+            {{ __('products.new') }}
         </div>
     @endif
 
@@ -130,7 +130,7 @@
         <div class="mt-auto">
             <div class="flex items-center justify-between">
                 <span class="text-lg font-bold font-poppins text-gray-900">
-                    <span class="font-bengali">৳</span>{{ number_format($finalPrice, 0) }}
+                    <span class="font-bengali">৳</span>{{ format_currency($finalPrice, '') }}
                 </span>
 
                 <!-- Quick Actions -->
@@ -175,10 +175,10 @@
             @if ($discountPercentage > 0)
                 <div class="flex items-center space-x-2 mt-2 font-inter">
                     <span class="text-xs bg-accent/10 text-accent font-semibold px-2 py-1">
-                        Save {{ $discountPercentage }}%
+                        Save {{ format_number($discountPercentage) }}%
                     </span>
                     <span class="text-xs text-gray-500 line-through">
-                        <span class="font-bengali">৳</span>{{ number_format($originalPrice, 2) }}
+                        <span class="font-bengali">৳</span>{{ format_currency($originalPrice, '') }}
                     </span>
                 </div>
             @endif

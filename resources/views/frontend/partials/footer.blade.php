@@ -12,7 +12,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-16">
             <!-- Brand Section - Centered -->
             <div class="lg:col-span-4 flex justify-center lg:justify-start" data-aos="fade-up">
-                <div class="p-8 max-w-sm w-full">
+                <div class="p-2 max-w-sm w-full">
                     <!-- Logo -->
                     <div class="text-center lg:text-left">
                         <a href="{{ url('/') }}" aria-label="Home" class="inline-block"
@@ -23,9 +23,44 @@
                     </div>
 
                     <!-- Description -->
-                    {{-- <p class="mt-6 text-gray-300 leading-relaxed text-sm text-center lg:text-left">
+                    <p class="mt-6 text-gray-300 leading-relaxed text-sm text-justify lg:text-justify">
                         {{ $footerData['brand']['description'] }}
-                    </p> --}}
+                    </p>
+                    <p class="mt-2 text-gray-400 text-sm text-center lg:text-left">
+                        {{ $footerData['brand']['address'] }}
+                    </p>
+                    <!-- Hotline & Emails -->
+                    <div class="mt-4 space-y-2 text-sm text-gray-300 text-center lg:text-left">
+
+                        <!-- Hotline -->
+                        <div class="flex items-center justify-center lg:justify-start gap-2">
+                            <i class="fas fa-phone-alt text-primary text-xs"></i>
+                            <a href="tel:{{ $footerData['contact_info']['hotline_1'] ?? '+8801xxxxxxxxx' }}"
+                                class="hover:text-white transition">
+                                {{ $footerData['contact_info']['hotline_1'] ?? '+8801xxxxxxxxx' }}
+                            </a>
+                            <span class="text-gray-500">|</span>
+                            <a href="tel:{{ $footerData['contact_info']['hotline_2'] ?? '+8801xxxxxxxx' }}"
+                                class="hover:text-white transition">
+                                {{ $footerData['contact_info']['hotline_2'] ?? '+8801xxxxxxxxx' }}
+                            </a>
+                        </div>
+
+                        <!-- Emails -->
+                        <div class="flex items-center justify-center lg:justify-start gap-2">
+                            <i class="fas fa-envelope text-primary text-xs"></i>
+                            <a href="mailto:{{ $footerData['contact_info']['email_1'] ?? 'xxx@example.com' }}"
+                                class="hover:text-white transition">
+                                {{ $footerData['contact_info']['email_1'] ?? 'xxx@example.com' }}
+                            </a>
+                            <span class="text-gray-500">|</span>
+                            <a href="mailto:{{ $footerData['contact_info']['email_2'] ?? 'xxx@example.com' }}"
+                                class="hover:text-white transition">
+                                {{ $footerData['contact_info']['email_2'] ?? 'xxx@example.com' }}
+                            </a>
+                        </div>
+
+                    </div>
 
                     <!-- Social Media -->
                     <div class="flex justify-center lg:justify-start gap-3 mt-6">
@@ -108,4 +143,3 @@
         </div>
     </div>
 </footer>
-

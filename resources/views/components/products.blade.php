@@ -43,17 +43,67 @@
                             @if ($product->is_new)
                                 <span
                                     class="absolute top-3 left-3 bg-gradient-to-r from-primary to-primary-dark text-white text-[10px] md:text-xs font-bold  px-1 py-0.5 md:px-3 md:py-1 rounded-full font-inter">
-                                    New
+                                    {{ __('products.new') }}
                                 </span>
                             @endif
 
                             @if ($product->discount_percentage > 0)
-                                <span
-                                    class="absolute top-3 right-3 bg-gradient-to-r from-red-600 to-orange-500  text-white  px-1 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-xs font-semibold font-poppins shadow-md">
-                                    -{{ $product->discount_percentage }}%
-                                </span>
-                            @endif
+                                <div class="absolute top-2 right-2 w-16 md:w-20 drop-shadow-lg">
 
+                                    <svg viewBox="0 0 600 200" class="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
+
+                                        <defs>
+                                            <linearGradient id="gradRed" x1="0%" y1="0%" x2="0%"
+                                                y2="100%">
+                                                <stop offset="0%" stop-color="#ff3a3a" />
+                                                <stop offset="100%" stop-color="#ff1f1f" />
+                                            </linearGradient>
+
+                                            <linearGradient id="gradWhite" x1="0%" y1="0%" x2="0%"
+                                                y2="100%">
+                                                <stop offset="0%" stop-color="#dedbd2" />
+                                                <stop offset="100%" stop-color="#cfcac1" />
+                                            </linearGradient>
+
+                                            <mask id="ticketMask">
+                                                <rect width="600" height="200" rx="20" fill="#fff" />
+                                                <!-- Side ticket holes -->
+                                                <circle cy="40" r="18" />
+                                                <circle cy="80" r="18" />
+                                                <circle cy="120" r="18" />
+                                                <circle cy="160" r="18" />
+                                                <circle cx="600" cy="40" r="18" />
+                                                <circle cx="600" cy="80" r="18" />
+                                                <circle cx="600" cy="120" r="18" />
+                                                <circle cx="600" cy="160" r="18" />
+                                            </mask>
+                                        </defs>
+
+                                        <!-- Background halves -->
+                                        <path fill="url(#gradRed)" mask="url(#ticketMask)" d="M0 0h300v200H0z" />
+                                        <path fill="url(#gradWhite)" mask="url(#ticketMask)" d="M300 0h300v200H300z" />
+
+                                        <!-- Discount Number -->
+                                        <text x="40" y="145" font-size="130" font-weight="bold" fill="#fff"
+                                            font-family="Arial, sans-serif">
+                                            {{ format_number($product->discount_percentage) }}
+                                        </text>
+
+                                        <!-- Percent -->
+                                        <text x="190" y="115" font-size="85" font-weight="bold" fill="#fff"
+                                            font-family="Arial, sans-serif">
+                                            %
+                                        </text>
+
+                                        <!-- OFF -->
+                                        <text x="320" y="145" font-size="130" font-weight="bold" fill="#333"
+                                            letter-spacing="3" font-family="Arial, sans-serif">
+                                            {{ __('products.off') }}
+                                        </text>
+
+                                    </svg>
+                                </div>
+                            @endif
 
                             <!-- Hover Overlay with Actions -->
                             <div
@@ -74,7 +124,7 @@
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                                                     </svg>
-                                                    Buy Now
+                                                    {{ __('products.buy-now') }}
                                                 </span>
                                             </button>
                                         </form>
@@ -85,8 +135,8 @@
                                             <button type="submit"
                                                 class="wishlist-btn bg-white text-gray-900 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center space-x-2"
                                                 title="Add to Wishlist">
-                                                <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
+                                                <svg class="w-5 h-5 text-red-500" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         stroke-width="2"
                                                         d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -116,8 +166,8 @@
                                             <button type="submit" title="Add to Cart"
                                                 class="add-to-cart-btn bg-white p-3 rounded-full hover:bg-gray-100 transition-all duration-300 transform hover:scale-110 {{ !$product->in_stock ? 'opacity-50 cursor-not-allowed' : '' }}"
                                                 {{ !$product->in_stock ? 'disabled' : '' }}>
-                                                <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
+                                                <svg class="w-5 h-5 text-gray-700" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         stroke-width="2"
                                                         d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -165,8 +215,8 @@
                                         <div class="flex items-center justify-between pt-1">
                                             <div class="flex items-center md:space-x-1">
                                                 <!-- Wishlist Icon -->
-                                                <form action="{{ route('wishlist.add', $product->id) }}" method="POST"
-                                                    class="add-to-wishlist-form inline-block">
+                                                <form action="{{ route('wishlist.add', $product->id) }}"
+                                                    method="POST" class="add-to-wishlist-form inline-block">
                                                     @csrf
                                                     <button type="submit"
                                                         class="wishlist-btn p-1.5 rounded-full hover:bg-gray-100 transition-colors duration-200"

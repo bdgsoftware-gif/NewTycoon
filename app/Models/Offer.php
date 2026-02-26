@@ -14,9 +14,13 @@ class Offer extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'title',
+        'title_en',
+        'title_bn',
+        'short_des_en',
+        'short_des_bn',
         'slug',
-        'subtitle',
+        'subtitle_en',
+        'subtitle_bn',
         'main_banner_image',
         'timer_enabled',
         'timer_end_date',
@@ -56,13 +60,13 @@ class Offer extends Model
 
         static::creating(function ($offer) {
             if (empty($offer->slug)) {
-                $offer->slug = Str::slug($offer->title);
+                $offer->slug = Str::slug($offer->title_en);
             }
         });
 
         static::updating(function ($offer) {
-            if ($offer->isDirty('title') && empty($offer->slug)) {
-                $offer->slug = Str::slug($offer->title);
+            if ($offer->isDirty('title_en') && empty($offer->slug)) {
+                $offer->slug = Str::slug($offer->title_en);
             }
         });
 
@@ -213,5 +217,20 @@ class Offer extends Model
     {
         // Implement if you have tags
         return collect();
+    }
+
+    public function getTitleAttribute()
+    {
+        return app()->getLocale() === 'bn' ? ($this->title_bn ?? $this->title_en) : $this->title_en;
+    }
+
+    public function getSubtitleAttribute()
+    {
+        return app()->getLocale() === 'bn' ? ($this->subtitle_bn ?? $this->subtitle_en) : $this->subtitle_en;
+    }
+
+    public function getShortDescriptionAttribute()
+    {
+        return app()->getLocale() === 'bn' ? ($this->short_des_bn ?? $this->short_des_en) : $this->short_des_en;
     }
 }

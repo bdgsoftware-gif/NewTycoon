@@ -139,9 +139,10 @@ Route::view('/certifications', 'frontend.pages.certifications')->name('certifica
 Route::view('/partners', 'frontend.pages.partners')->name('partners');
 Route::view('/sustainability', 'frontend.pages.sustainability')->name('sustainability');
 Route::get('/catalogs', [CatalogController::class, 'index'])->name('catalogs');
+Route::get('/catalog/view/{catalog}', [CatalogController::class, 'view'])->name('catalog.view');
 Route::view('/careers', 'frontend.pages.careers')->name('careers');
 
-// =========================
+// =========================    
 // Support & Service
 // =========================
 Route::view('/contact', 'frontend.pages.contact')->name('contact');

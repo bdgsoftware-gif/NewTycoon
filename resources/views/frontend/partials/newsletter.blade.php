@@ -1,5 +1,5 @@
 <!-- Newsletter Section - Enhanced Design -->
-<div class="max-w-8xl mx-auto mt-10 relative overflow-hidden bg-gradient-to-br from-primary/90 to-accent/90 rounded-3xl p-8 md:p-12 mb-12 shadow-2xl border border-white/10"
+<div class="max-w-8xl mx-auto mt-10 relative overflow-hidden bg-gradient-to-br from-[#9f1d1f] via-[#7a2f1a] to-[#5a2c16] placeholder:rounded-3xl p-8 md:p-12 mb-12 shadow-2xl border border-white/10"
     data-aos="fade-up">
     <!-- Decorative blurred orbs (pure Tailwind) -->
     <div class="absolute -top-24 -right-24 w-64 h-64 bg-primary/20 rounded-full blur-3xl"></div>

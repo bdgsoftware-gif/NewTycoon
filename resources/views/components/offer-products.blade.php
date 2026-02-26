@@ -50,7 +50,7 @@
             {{-- Header --}}
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-xl md:text-2xl lg:text-4xl font-medium text-gray-900 leading-tight font-poppins">
-                    {{ $offer->products_section_title ?? __('home.special-offer-products') }}
+                    {{ $offer->short_description }}
                 </h3>
 
 
@@ -99,7 +99,7 @@
                                 @elseif($product->is_new)
                                     <div
                                         class="absolute top-2 right-2 bg-accent text-white text-xs font-bold px-2 py-1 z-20 font-poppins">
-                                        NEW
+                                        {{ __('products.new') }}
                                     </div>
                                 @endif
 
@@ -123,7 +123,7 @@
                                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                                     stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                                                             </svg>
-                                                            Buy Now
+                                                            {{ __('products.buy-now') }}
                                                         </span>
                                                     </button>
                                                 </form>

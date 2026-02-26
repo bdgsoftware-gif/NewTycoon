@@ -12,9 +12,13 @@ class OfferSeeder extends Seeder
     public function run(): void
     {
         $offer = Offer::create([
-            'title' => 'Winter Dhamaka Offer 2025',
+            'title_en' => 'Winter Dhamaka Offer 2025',
+            'title_bn' => 'বিশ্ব শীতকালের ডামাকা অফার ২০২৫',
             'slug' => Str::slug('Winter Dhamaka Offer 2025'),
-            'subtitle' => 'Enjoy the coolest discounts of the season with up to 70% off!',
+            'subtitle_en' => 'Enjoy the coolest discounts of the season with up to 70% off!',
+            'subtitle_bn' => 'মৌসুমের সবচেয়ে শীতল ডিসকাউন্টগুলি আপনি পাবেন 70% পর্যন্ত!',
+            'short_des_en' => 'Limited time offer for winter season.',
+            'short_des_bn' => 'শীতকালের জন্য সীমিত সময়ের অফার।',
             'timer_enabled' => true,
             'timer_end_date' => now()->addDays(7),
             'view_all_link' => 'products',

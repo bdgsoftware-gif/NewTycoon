@@ -1,50 +1,39 @@
 @extends('frontend.layouts.app')
 
 @section('title', 'Catalogs')
-@section('description', 'Explore our extensive catalogs featuring a wide range of products. From the latest trends to
-    timeless classics, our catalogs are designed to inspire and help you find exactly what you need. Browse through our
+@section('description', 'Explore our extensive catalogs featuring a wide range of products. Browse through our
     collections and discover the perfect items for your lifestyle.')
 
 @section('content')
-
-    <div class="bg-gray-50 min-h-screen">
+    <div class="bg-gray-50 min-h-screen max-w-8xl mx-auto">
 
         {{-- Hero Section --}}
-        <div class="bg-white border-b">
-            <div class="max-w-7xl mx-auto px-4 py-16 text-center">
-                <h1 class="text-4xl font-bold text-gray-800 mb-4">
-                    Our Catalogs
-                </h1>
-                <p class="text-gray-600 max-w-2xl mx-auto">
-                    Discover detailed company brochures and business profiles. Click any catalog to open and explore the
-                    full PDF in a new tab.
-                </p>
-
-                {{-- Search --}}
-                <div class="mt-8 max-w-xl mx-auto">
-                    <input type="text" id="catalogSearch" placeholder="Search catalogs..."
-                        class="w-full px-5 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none">
-                </div>
-            </div>
+        <div class="bg-white border-b border-primary px-4 py-12 text-left">
+            <h1 class="text-4xl font-bold text-primary mb-4">
+                Our Catalogs
+            </h1>
+            <p class="text-gray-600 max-w-2xl text-left">
+                Discover detailed company brochures and business profiles. Click any catalog to open and explore the full
+                PDF in a new tab.
+            </p>
         </div>
 
-
         {{-- Catalog Grid --}}
-        <div class="max-w-7xl mx-auto px-4 py-12">
-
+        <div class="bg-white px-4 py-12">
             @if ($catalogs->count() > 0)
-
                 <div id="catalogGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
 
                     @foreach ($catalogs as $catalog)
-                        <div class="catalog-card bg-white rounded-xl shadow-sm hover:shadow-lg transition duration-300 overflow-hidden group cursor-pointer"
-                            data-title="{{ strtolower($catalog->title) }}"
-                            onclick="window.open('{{ asset('storage/' . $catalog->pdf_file) }}', '_blank')">
+                        <a href="{{ route('catalog.view', $catalog->id) }}" target="_blank" rel="noopener noreferrer"
+                            class="catalog-card bg-white shadow-sm hover:shadow-lg transition duration-300 overflow-hidden group block"
+                            data-title="{{ strtolower($catalog->title) }}">
+
                             {{-- Thumbnail --}}
                             <div class="relative h-56 overflow-hidden bg-gray-100">
                                 @if ($catalog->thumbnail)
                                     <img src="{{ asset('storage/' . $catalog->thumbnail) }}" alt="{{ $catalog->title }}"
-                                        class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                                        class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                                        loading="lazy">
                                 @else
                                     <div class="flex items-center justify-center h-full text-gray-400 text-sm">
                                         No Preview Available
@@ -56,7 +45,7 @@
                                     class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition duration-300 flex items-center justify-center">
                                     <span
                                         class="opacity-0 group-hover:opacity-100 text-white text-sm font-medium border px-4 py-2 rounded-lg transition duration-300">
-                                        View PDF
+                                        Open Catalog
                                     </span>
                                 </div>
                             </div>
@@ -73,7 +62,7 @@
                                     </p>
                                 @endif
                             </div>
-                        </div>
+                        </a>
                     @endforeach
 
                 </div>
@@ -92,25 +81,7 @@
                         Please check back later.
                     </p>
                 </div>
-
             @endif
-
         </div>
-
     </div>
-
-
-    {{-- Search Script --}}
-    <script>
-        document.getElementById('catalogSearch').addEventListener('keyup', function() {
-            let value = this.value.toLowerCase();
-            let cards = document.querySelectorAll('.catalog-card');
-
-            cards.forEach(card => {
-                let title = card.getAttribute('data-title');
-                card.style.display = title.includes(value) ? 'block' : 'none';
-            });
-        });
-    </script>
-
 @endsection
