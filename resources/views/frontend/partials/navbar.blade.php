@@ -293,7 +293,7 @@
                         </div>
                     @else
                         <a href="{{ $item['url'] }}"
-                            class="text-gray-700 hover:text-primary text-sm font-medium py-2 inline-block border-b-2 border-transparent hover:border-primary">
+                            class="text-gray-800 hover:text-primary text-base font-semibold py-2 inline-block border-b-2 border-transparent hover:border-primary">
                             {{ $item['name'] }}
                         </a>
                     @endif

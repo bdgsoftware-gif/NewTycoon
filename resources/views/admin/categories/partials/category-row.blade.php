@@ -81,7 +81,7 @@
     {{-- Featured Toggle --}}
     <td class="px-4 py-3">
         <div class="flex justify-center">
-            @if ($level === 1)
+            @if ($level === 1 || $level === 2)
                 {{-- Featured Toggle --}}
                 <button onclick="toggleFeatured(this, {{ $category->id }})"
                     class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer

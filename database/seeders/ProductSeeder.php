@@ -16,63 +16,41 @@ class ProductSeeder extends Seeder
      */
     private $products = [
         // RICE COOKERS & MULTI COOKERS
-        '2.8L Rice Cooker' => [
+        'Rice Cooker' => [
             ['name' => 'Tycoon Rice Cooker 2.8L Red 1000W', 'model' => 'TRM-2401R', 'price' => 4190, 'colors' => ['Red']],
             ['name' => 'Tycoon Rice Cooker 2.8L Yellow 1000W', 'model' => 'TRM-2401Y', 'price' => 4190, 'colors' => ['Yellow']],
             ['name' => 'Tycoon Rice Cooker 2.8L White 1000W', 'model' => 'TRM-2401W', 'price' => 4190, 'colors' => ['White']],
             ['name' => 'Tycoon Rice Cooker 2.8L Orange 1000W', 'model' => 'TRM-24010', 'price' => 4190, 'colors' => ['Orange']],
             ['name' => 'Tycoon Rice Cooker 2.8L Maroon 1000W', 'model' => 'TRM-2502M', 'price' => 4190, 'colors' => ['Maroon'], 'is_new' => true],
             ['name' => 'Tycoon Rice Cooker 2.8L Maroon SS Pots 1000W', 'model' => 'TRM-2502M-SS', 'price' => 4690, 'colors' => ['Maroon'], 'is_new' => true],
-        ],
-        '3.2L Rice Cooker' => [
             ['name' => 'Tycoon Rice Cooker 3.2L Red 1200W', 'model' => 'TRM-3501R', 'price' => 5290, 'colors' => ['Red'], 'is_new' => true],
-        ],
-        '3.5L Rice Cooker' => [
             ['name' => 'Tycoon Rice Cooker 3.5L Red 1200W', 'model' => 'TRM-3.5R', 'price' => 5590, 'colors' => ['Red'], 'is_new' => true],
-        ],
-        'Multi Cooker' => [
             ['name' => 'Tycoon Multi Cooker 5.5L Maroon 1500W', 'model' => 'TCN-EMC-01', 'price' => 7990, 'colors' => ['Maroon'], 'is_new' => true],
             ['name' => 'Tycoon Multi Cooker 5.5L Maroon SS Pots 1500W', 'model' => 'TCN-EMC-01SS', 'price' => 7990, 'colors' => ['Maroon'], 'is_new' => true],
         ],
 
         // PRESSURE COOKERS
-        'Aluminum Pressure Cooker' => [
+        'Pressure Cooker' => [
             ['name' => 'Tycoon Pressure Cooker 5.5L Queen White', 'model' => 'TCN-PC-5.5L', 'price' => 2400, 'colors' => ['White']],
-        ],
-        'SS Pressure Cooker' => [
             ['name' => 'Tycoon SS TRI PLY Pressure Cooker 6.5L', 'model' => 'TCN-PCSS-6E', 'price' => 4490, 'colors' => ['Silver'], 'is_new' => true],
         ],
 
         // MIXER GRINDERS
-        '750W Mixer Grinder' => [
+        'Mixer Grinder' => [
             ['name' => 'Tycoon Mixer Grinder 750W', 'model' => 'TMG-2401M', 'price' => 6990],
             ['name' => 'Tycoon Mixer Grinder 750W Jumbo Edition', 'model' => 'TMG-2501J', 'price' => 7150, 'is_new' => true],
-        ],
-        '1000W Mixer Grinder' => [
             ['name' => 'Tycoon Mixer Grinder 1000W', 'model' => 'TMG-1000W', 'price' => 7500],
-        ],
-        '1500W Mixer Grinder' => [
             ['name' => 'Tycoon Mixer Grinder 1500W Ninja Edition', 'model' => 'TMG-2601N', 'price' => 7990, 'is_new' => true],
             ['name' => 'Tycoon Mixer Grinder 1500W Samurai Edition', 'model' => 'TMG-26015', 'price' => 8990, 'is_new' => true],
         ],
 
         // COOKWARE
-        'Non-Stick Cookware Set' => [
+        'Cookware' => [
             ['name' => 'Tycoon 7 Pieces Non-Stick Cookware Set Gravity Gray', 'model' => 'TCN-NSC-2401GG', 'price' => 4800, 'colors' => ['Gray']],
-        ],
-        'SS Fry Pan' => [
             ['name' => 'Tycoon SS Honey Comb Fry Pan with Glass Lid 28cm', 'model' => 'TCN-SSFP-01', 'price' => 3990, 'is_new' => true],
-        ],
-        'SS Wok Pan' => [
             ['name' => 'Tycoon SS Honey Comb Wok Pan with Glass Lid 28cm', 'model' => 'TCN-SSWP-01', 'price' => 4490, 'is_new' => true],
-        ],
-        'SS Soup Bowl' => [
             ['name' => 'Tycoon SS Soup Bowl with SS Lid Set 3 Pcs', 'model' => 'TCN-SSSB-01', 'price' => 4990, 'is_new' => true],
-        ],
-        'SS Haman Dista' => [
             ['name' => 'Tycoon SS Haman Dista with Silicon Lid', 'model' => 'TCN-HM01', 'price' => 2490, 'is_new' => true],
-        ],
-        'Kitchen Rack' => [
             ['name' => 'Tycoon SS Kitchen Rack with Glass & Spoon Holders', 'model' => 'TCN-SSKR-01', 'price' => 6990, 'is_new' => true],
         ],
 
